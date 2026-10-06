@@ -113,6 +113,19 @@ export default function SOSShelterSelectScreen() {
   const [rankedShelters, setRankedShelters] = useState<RankedShelter[]>([]);
   const [selectedShelterId, setSelectedShelterId] = useState<string>('');
   const [dispatchedSuccess, setDispatchedSuccess] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyCode = async () => {
+    if (sosData?.compactCode) {
+      try {
+        await navigator.clipboard.writeText(sosData.compactCode);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (e) {
+        console.warn('Clipboard write failed', e);
+      }
+    }
+  };
 
   useEffect(() => {
     const userCoords: GeoCoordinates = sosData?.coordinates || { lat: 28.6139, lng: 77.2090 };
@@ -202,8 +215,12 @@ export default function SOSShelterSelectScreen() {
 
     setDispatchedSuccess(true);
 
-    // Open device SMS client
-    window.location.href = smsUrl;
+    // Try opening device SMS client (on smartphone)
+    try {
+      window.location.href = smsUrl;
+    } catch (e) {
+      console.warn('SMS protocol not handled on this system', e);
+    }
   };
 
   const selectedShelter = rankedShelters.find((s) => s.shelterId === selectedShelterId);
@@ -237,13 +254,30 @@ export default function SOSShelterSelectScreen() {
           padding: '10px 14px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '4px',
+          gap: '6px',
           fontFamily: 'monospace',
           fontSize: '0.8rem',
         }}>
-          <span style={{ fontSize: '0.72rem', color: 'var(--color-outline)', fontWeight: 700 }}>
-            ENCODED SMS PAYLOAD:
-          </span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.72rem', color: 'var(--color-outline)', fontWeight: 700 }}>
+              ENCODED SMS PAYLOAD:
+            </span>
+            <button
+              onClick={handleCopyCode}
+              style={{
+                background: copied ? 'var(--color-tertiary-container)' : 'var(--color-surface-container-highest)',
+                color: copied ? 'var(--color-on-tertiary-container)' : 'var(--color-primary)',
+                border: '1px solid var(--color-outline-variant)',
+                borderRadius: '6px',
+                padding: '3px 8px',
+                fontSize: '0.75rem',
+                cursor: 'pointer',
+                fontWeight: 600,
+              }}
+            >
+              {copied ? '✓ Copied' : '📋 Copy Code'}
+            </button>
+          </div>
           <span style={{ color: 'var(--color-primary)', fontWeight: 700, wordBreak: 'break-all' }}>
             {sosData.compactCode}
           </span>
@@ -259,11 +293,15 @@ export default function SOSShelterSelectScreen() {
           padding: '14px',
           fontSize: '0.9rem',
           lineHeight: 1.4,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '6px',
         }}>
-          <strong>✓ SOS Dispatched to Device SMS!</strong>
-          <p style={{ margin: '4px 0 0', fontSize: '0.82rem' }}>
-            If your messaging app did not open automatically, send the code above to{' '}
-            <strong>{selectedShelter?.registeredMobile}</strong>.
+          <strong>✓ SOS Dispatched & Saved!</strong>
+          <p style={{ margin: 0, fontSize: '0.82rem' }}>
+            • <strong>Mobile Phones:</strong> Opens your SMS app directly with the pre-filled code.<br />
+            • <strong>Desktop / Offline:</strong> Request is recorded in IndexedDB storage and queued to sync to Firebase Firestore once live credentials are connected.<br />
+            • <strong>Shelter Target:</strong> {selectedShelter?.shelterName} ({selectedShelter?.registeredMobile})
           </p>
         </div>
       )}
