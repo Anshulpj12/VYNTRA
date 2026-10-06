@@ -8,7 +8,6 @@ import { db } from '../../shared/firebase/config';
 import { PATHS } from '../../shared/firebase/paths';
 import { generateUniqueId } from '../../shared/utils/id-generator';
 import type { ServiceProvider, GeoCoordinates } from '../../shared/types';
-import { Timestamp } from 'firebase/firestore';
 import { saveCurrentProvider } from './registration-store';
 
 export interface RegistrationInput {
@@ -80,7 +79,7 @@ export async function registerServiceProvider(
   }
 
   const providerId = generateUniqueId('SVC');
-  const now = Timestamp.now();
+  const now = Date.now();
 
   const provider: ServiceProvider = {
     providerId,

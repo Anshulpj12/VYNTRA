@@ -14,7 +14,6 @@ import {
   acceptOrderFirst,
 } from '../orders/order-service';
 import type { ServiceProvider, Order } from '../../shared/types';
-import { Timestamp } from 'firebase/firestore';
 
 export interface DashboardMetrics {
   pendingCount: number;
@@ -32,7 +31,7 @@ export const DEFAULT_PROVIDER: ServiceProvider = {
   state: 'Madhya Pradesh',
   district: 'Jabalpur',
   coordinates: { lat: 23.1685, lng: 79.9338 },
-  registeredAt: Timestamp.now(),
+  registeredAt: Date.now(),
   isActive: true,
 };
 

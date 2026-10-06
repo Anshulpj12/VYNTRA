@@ -37,7 +37,7 @@ const SEED_INCOMING_ORDERS: Order[] = [
     targetMode: 'five-nearest',
     targetProviderIds: [],
     status: 'pending',
-    createdAt: { toMillis: () => Date.now() - 1000 * 60 * 12 } as unknown as import('firebase/firestore').Timestamp,
+    createdAt: Date.now() - 1000 * 60 * 12,
   },
   {
     orderId: 'VYNTRA-ORD-ASHA0002',
@@ -52,7 +52,7 @@ const SEED_INCOMING_ORDERS: Order[] = [
     targetMode: 'five-nearest',
     targetProviderIds: [],
     status: 'pending',
-    createdAt: { toMillis: () => Date.now() - 1000 * 60 * 25 } as unknown as import('firebase/firestore').Timestamp,
+    createdAt: Date.now() - 1000 * 60 * 25,
   },
 ];
 

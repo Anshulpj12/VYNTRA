@@ -9,7 +9,6 @@ import { db } from '../../shared/firebase/config';
 import { PATHS } from '../../shared/firebase/paths';
 import { generateUniqueId } from '../../shared/utils/id-generator';
 import type { Order, OrderItem, GeoCoordinates } from '../../shared/types';
-import { Timestamp } from 'firebase/firestore';
 
 const LOCAL_ORDERS_KEY = 'vyntra_orders_cache';
 
@@ -53,7 +52,7 @@ export function saveLocalOrders(orders: Order[]): void {
  */
 export async function createOrder(input: CreateOrderInput): Promise<Order> {
   const orderId = generateUniqueId('ORD');
-  const now = Timestamp.now();
+  const now = Date.now();
 
   const newOrder: Order = {
     orderId,
@@ -121,7 +120,7 @@ export async function getIncomingPendingOrders(providerId: string): Promise<Orde
 
   if (navigator.onLine) {
     try {
-      const q = query(collection(db, PATHS.orders), orderBy('createdAt', 'desc'));
+      const q = query(collection(db, PATHS.orders()), orderBy('createdAt', 'desc'));
       const snapshot = await getDocs(q);
       const onlineOrders: Order[] = [];
       snapshot.forEach((d) => {
@@ -157,7 +156,7 @@ export async function getActiveOrdersForProvider(providerId: string): Promise<Or
 
   if (navigator.onLine) {
     try {
-      const q = query(collection(db, PATHS.orders), orderBy('createdAt', 'desc'));
+      const q = query(collection(db, PATHS.orders()), orderBy('createdAt', 'desc'));
       const snapshot = await getDocs(q);
       snapshot.forEach((d) => {
         const order = d.data() as Order;
@@ -182,7 +181,7 @@ export async function acceptOrderFirst(
   providerId: string
 ): Promise<{ success: boolean; message: string; order?: Order }> {
   // Check online first if possible to prevent race condition
-  let currentOrder = await getOrderById(orderId);
+  const currentOrder = await getOrderById(orderId);
   if (!currentOrder) {
     return { success: false, message: 'Order not found.' };
   }
@@ -194,8 +193,8 @@ export async function acceptOrderFirst(
     };
   }
 
-  const now = Timestamp.now();
-  currentOrder = {
+  const now = Date.now();
+  const acceptedOrder: Order = {
     ...currentOrder,
     status: 'accepted',
     acceptedByProviderId: providerId,
@@ -204,7 +203,7 @@ export async function acceptOrderFirst(
 
   // Update local cache
   const cached = getLocalCachedOrders().map((o) =>
-    o.orderId === orderId ? currentOrder! : o
+    o.orderId === orderId ? acceptedOrder : o
   );
   saveLocalOrders(cached);
 
@@ -222,5 +221,5 @@ export async function acceptOrderFirst(
     }
   }
 
-  return { success: true, message: 'Order accepted successfully!', order: currentOrder };
+  return { success: true, message: 'Order accepted successfully!', order: acceptedOrder };
 }

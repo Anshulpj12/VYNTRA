@@ -32,12 +32,12 @@ export function predictItemDepletion(
   if (usageLogs.length > 0) {
     // Sort logs chronologically
     const sortedLogs = [...usageLogs].sort(
-      (a, b) => a.usedAt.toMillis() - b.usedAt.toMillis()
+      (a, b) => a.usedAt - b.usedAt
     );
 
-    const firstTime = sortedLogs[0].usedAt.toMillis();
+    const firstTime = sortedLogs[0].usedAt;
     const lastTime = Math.max(
-      sortedLogs[sortedLogs.length - 1].usedAt.toMillis(),
+      sortedLogs[sortedLogs.length - 1].usedAt,
       Date.now()
     );
 

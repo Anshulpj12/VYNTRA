@@ -25,7 +25,7 @@ const SEED_SERVICE_PROVIDERS: ServiceProvider[] = [
     state: 'Madhya Pradesh',
     district: 'Jabalpur',
     coordinates: { lat: 23.1685, lng: 79.9338 },
-    registeredAt: { toMillis: () => Date.now() } as unknown as import('firebase/firestore').Timestamp,
+    registeredAt: Date.now(),
     isActive: true,
   },
   {
@@ -36,7 +36,7 @@ const SEED_SERVICE_PROVIDERS: ServiceProvider[] = [
     state: 'Madhya Pradesh',
     district: 'Bhopal',
     coordinates: { lat: 23.2599, lng: 77.4126 },
-    registeredAt: { toMillis: () => Date.now() } as unknown as import('firebase/firestore').Timestamp,
+    registeredAt: Date.now(),
     isActive: true,
   },
   {
@@ -47,7 +47,7 @@ const SEED_SERVICE_PROVIDERS: ServiceProvider[] = [
     state: 'Madhya Pradesh',
     district: 'Indore',
     coordinates: { lat: 22.7196, lng: 75.8577 },
-    registeredAt: { toMillis: () => Date.now() } as unknown as import('firebase/firestore').Timestamp,
+    registeredAt: Date.now(),
     isActive: true,
   },
   {
@@ -58,7 +58,7 @@ const SEED_SERVICE_PROVIDERS: ServiceProvider[] = [
     state: 'Rajasthan',
     district: 'Jaipur',
     coordinates: { lat: 26.9124, lng: 75.7873 },
-    registeredAt: { toMillis: () => Date.now() } as unknown as import('firebase/firestore').Timestamp,
+    registeredAt: Date.now(),
     isActive: true,
   },
   {
@@ -69,7 +69,7 @@ const SEED_SERVICE_PROVIDERS: ServiceProvider[] = [
     state: 'Delhi',
     district: 'Central Delhi',
     coordinates: { lat: 28.6139, lng: 77.2090 },
-    registeredAt: { toMillis: () => Date.now() } as unknown as import('firebase/firestore').Timestamp,
+    registeredAt: Date.now(),
     isActive: true,
   },
 ];
@@ -90,7 +90,7 @@ export async function getAllActiveProviders(): Promise<ServiceProvider[]> {
   if (navigator.onLine) {
     try {
       const q = query(
-        collection(db, PATHS.serviceProviders),
+        collection(db, PATHS.serviceProviders()),
         where('isActive', '==', true)
       );
       const snapshot = await getDocs(q);

@@ -10,7 +10,6 @@ import { db } from '../../shared/firebase/config';
 import { PATHS } from '../../shared/firebase/paths';
 import { getOrderById, getLocalCachedOrders, saveLocalOrders } from '../orders/order-service';
 import type { Order, InventoryItem, ShelterMetadata } from '../../shared/types';
-import { Timestamp } from 'firebase/firestore';
 
 const CHECKLIST_STORAGE_PREFIX = 'vyntra_dispatch_checklist_';
 
@@ -84,7 +83,7 @@ export async function authorizeDispatch(
     };
   }
 
-  const now = Timestamp.now();
+  const now = Date.now();
   const updatedOrder: Order = {
     ...order,
     status: 'dispatched',
@@ -125,7 +124,7 @@ export async function confirmDeliveryAndAutoUpdateInventory(
     return { success: false, updatedItemsCount: 0, error: 'Order not found.' };
   }
 
-  const now = Timestamp.now();
+  const now = Date.now();
   const shelterId = order.requestingShelterId;
 
   // 1. Mark order as confirmed
@@ -181,10 +180,23 @@ export async function confirmDeliveryAndAutoUpdateInventory(
           // Create new item document
           const safeId = `inv-${orderItem.itemName.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
           const itemDocRef = doc(db, PATHS.shelterInventoryItem(shelterId, safeId));
+          const lower = orderItem.itemName.toLowerCase();
+          const category: InventoryItem['category'] =
+            lower.includes('pad') || lower.includes('hygiene') || lower.includes('sanitary')
+              ? 'hygiene'
+              : lower.includes('medical') || lower.includes('trauma') || lower.includes('aid') || lower.includes('stretcher') || lower.includes('wheelchair')
+              ? 'medical'
+              : lower.includes('blanket') || lower.includes('bed')
+              ? 'bedding'
+              : lower.includes('food') || lower.includes('water')
+              ? 'provisions'
+              : 'emergency';
+
           const newItem: InventoryItem = {
             itemId: safeId,
             shelterId,
             itemName: orderItem.itemName,
+            category,
             currentQuantity: orderItem.requestedQuantity,
             requiredMinimum: Math.max(10, Math.round(orderItem.requestedQuantity * 0.3)),
             lastUpdatedAt: now,
