@@ -37,7 +37,7 @@ const INITIAL_DEMO_SHELTERS: ShelterMetadata[] = [
       { itemName: 'Sanitary Pads', currentQuantity: 300, requiredMinimum: 100 },
       { itemName: 'Emergency First Aid Kit', currentQuantity: 25, requiredMinimum: 10 },
     ],
-    lastUpdatedAt: Timestamp.now(),
+    lastUpdatedAt: Date.now(),
   },
   {
     shelterId: 'VYNTRA-SHL-02',
@@ -58,7 +58,7 @@ const INITIAL_DEMO_SHELTERS: ShelterMetadata[] = [
     inventorySummary: [
       { itemName: 'Baby Formula', currentQuantity: 50, requiredMinimum: 20 },
     ],
-    lastUpdatedAt: Timestamp.now(),
+    lastUpdatedAt: Date.now(),
   },
   {
     shelterId: 'VYNTRA-SHL-03',
@@ -79,7 +79,7 @@ const INITIAL_DEMO_SHELTERS: ShelterMetadata[] = [
     inventorySummary: [
       { itemName: 'Medical Cots', currentQuantity: 40, requiredMinimum: 15 },
     ],
-    lastUpdatedAt: Timestamp.now(),
+    lastUpdatedAt: Date.now(),
   },
 ];
 

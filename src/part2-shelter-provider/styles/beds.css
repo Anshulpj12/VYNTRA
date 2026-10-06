@@ -1,0 +1,259 @@
+/**
+ * VYNTRA Part 2 — Bed Management Styles
+ */
+
+.beds {
+  animation: slideUp var(--vyntra-transition) ease;
+}
+
+/* ─── Stats ─── */
+.beds__stats {
+  margin-bottom: var(--vyntra-space-xl);
+}
+
+.beds__stat-card {
+  padding: var(--vyntra-space-lg);
+}
+
+.beds__stat-label {
+  color: var(--vyntra-on-surface-muted);
+  margin-bottom: var(--vyntra-space-sm);
+}
+
+.beds__stat-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--vyntra-space-sm);
+  flex-wrap: wrap;
+}
+
+/* ─── Admission Form ─── */
+.beds__admission-form {
+  padding: var(--vyntra-space-xl);
+  margin-bottom: var(--vyntra-space-xl);
+  border: 2px solid var(--vyntra-primary);
+  border-radius: var(--vyntra-radius-lg);
+  animation: slideUp var(--vyntra-transition) ease;
+}
+
+.beds__admission-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--vyntra-space-xl);
+  gap: var(--vyntra-space-md);
+}
+
+.beds__id-toggle {
+  display: flex;
+  gap: 0;
+  margin-bottom: var(--vyntra-space-lg);
+  background: var(--vyntra-surface-container);
+  border-radius: var(--vyntra-radius);
+  padding: 3px;
+  width: fit-content;
+}
+
+.beds__id-toggle-btn {
+  padding: var(--vyntra-space-sm) var(--vyntra-space-lg);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--vyntra-font-body);
+  font-size: var(--vyntra-body-sm-size);
+  font-weight: 600;
+  border-radius: var(--vyntra-radius-sm);
+  color: var(--vyntra-on-surface-muted);
+  transition: all var(--vyntra-transition);
+  min-height: 40px;
+}
+
+.beds__id-toggle-btn--active {
+  background: var(--vyntra-surface);
+  color: var(--vyntra-on-surface);
+  box-shadow: var(--vyntra-shadow-sm);
+}
+
+.beds__generated-id {
+  display: flex;
+  align-items: center;
+  gap: var(--vyntra-space-sm);
+  height: var(--vyntra-input-height);
+  padding: 0 var(--vyntra-space-md);
+  background: var(--vyntra-surface-container);
+  border-radius: var(--vyntra-radius);
+  border: 1.5px solid var(--vyntra-border);
+}
+
+/* ─── Stay Duration ─── */
+.beds__stay-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--vyntra-gutter);
+  margin-top: var(--vyntra-space-md);
+}
+
+.beds__stay-counter {
+  display: flex;
+  align-items: center;
+  gap: var(--vyntra-space-sm);
+}
+
+.beds__stay-input {
+  width: 80px;
+  text-align: center;
+  font-family: var(--vyntra-font-headline);
+  font-size: 24px;
+  font-weight: 700;
+  border: 2px solid var(--vyntra-border-strong);
+  border-radius: var(--vyntra-radius);
+  padding: var(--vyntra-space-sm);
+  background: var(--vyntra-surface);
+  color: var(--vyntra-on-surface);
+  height: var(--vyntra-input-height);
+  outline: none;
+}
+
+.beds__stay-input:focus {
+  border-color: var(--vyntra-primary);
+  box-shadow: var(--vyntra-focus-ring);
+}
+
+/* ─── Deduction Notice ─── */
+.beds__deduction-notice {
+  display: flex;
+  align-items: center;
+  gap: var(--vyntra-space-sm);
+  background: var(--vyntra-secondary-light);
+  border: 1.5px solid var(--vyntra-secondary);
+  border-radius: var(--vyntra-radius);
+  padding: var(--vyntra-space-md);
+  font-size: var(--vyntra-body-sm-size);
+  color: var(--vyntra-triage-p3-text);
+  margin-top: var(--vyntra-space-md);
+}
+
+/* ─── Occupancy Roster ─── */
+.beds__roster {
+  background: var(--vyntra-surface);
+  border: 1.5px solid var(--vyntra-border);
+  border-radius: var(--vyntra-radius-lg);
+  padding: var(--vyntra-space-xl);
+}
+
+.beds__roster-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--vyntra-space-lg);
+  gap: var(--vyntra-space-md);
+  flex-wrap: wrap;
+}
+
+.beds__roster-count {
+  display: flex;
+  align-items: center;
+  gap: var(--vyntra-space-sm);
+}
+
+.beds__roster-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.beds__roster-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 2fr 0.8fr;
+  gap: var(--vyntra-space-md);
+  align-items: center;
+  padding: var(--vyntra-space-md) 0;
+  border-bottom: 1px solid var(--vyntra-border);
+}
+
+.beds__roster-row--header {
+  font-size: var(--vyntra-label-md-size);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--vyntra-label-md-spacing);
+  color: var(--vyntra-on-surface-muted);
+  padding-bottom: var(--vyntra-space-md);
+  border-bottom: 2px solid var(--vyntra-border);
+}
+
+.beds__roster-person {
+  display: flex;
+  align-items: center;
+  gap: var(--vyntra-space-sm);
+}
+
+.beds__roster-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--vyntra-primary-light);
+  color: var(--vyntra-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.beds__roster-id {
+  margin-top: 4px;
+}
+
+.beds__roster-bed {
+  font-family: var(--vyntra-font-headline);
+  font-size: var(--vyntra-body-md-size);
+}
+
+.beds__roster-date {
+  font-size: var(--vyntra-body-sm-size);
+  color: var(--vyntra-on-surface-muted);
+}
+
+.beds__roster-stay {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.beds__stay-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--vyntra-body-sm-size);
+}
+
+.beds__stay-badge {
+  font-weight: 700;
+}
+
+.beds__roster-actions {
+  display: flex;
+  gap: var(--vyntra-space-xs);
+}
+
+/* ─── Mobile ─── */
+@media (max-width: 1024px) {
+  .beds__roster-row {
+    grid-template-columns: 1fr;
+    gap: var(--vyntra-space-sm);
+    padding: var(--vyntra-space-md);
+    background: var(--vyntra-surface-container);
+    border-radius: var(--vyntra-radius);
+    margin-bottom: var(--vyntra-space-sm);
+    border-bottom: none;
+  }
+
+  .beds__roster-row--header {
+    display: none;
+  }
+
+  .beds__stay-row {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,232 @@
+/**
+ * VYNTRA Part 2 — Inventory Styles
+ */
+
+.inventory {
+  animation: slideUp var(--vyntra-transition) ease;
+}
+
+.inventory__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--vyntra-space-xl);
+  gap: var(--vyntra-space-md);
+  flex-wrap: wrap;
+}
+
+.inventory__header-actions {
+  display: flex;
+  gap: var(--vyntra-space-sm);
+}
+
+/* ─── Low Stock Alert ─── */
+.inventory__alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--vyntra-space-md);
+  background: var(--vyntra-primary-light);
+  border: 2px solid var(--vyntra-primary);
+  border-radius: var(--vyntra-radius-lg);
+  padding: var(--vyntra-space-lg);
+  margin-bottom: var(--vyntra-space-xl);
+  animation: slideUp var(--vyntra-transition) ease;
+}
+
+.inventory__alert-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.inventory__alert-content strong {
+  color: var(--vyntra-triage-p1-text);
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: var(--vyntra-badge-spacing);
+  font-size: var(--vyntra-body-sm-size);
+  margin-bottom: 4px;
+}
+
+.inventory__alert-content p {
+  font-size: var(--vyntra-body-md-size);
+  color: var(--vyntra-on-surface);
+  margin: 0;
+}
+
+/* ─── Filters ─── */
+.inventory__filters {
+  display: flex;
+  gap: var(--vyntra-space-xs);
+  margin-bottom: var(--vyntra-space-lg);
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+/* ─── Add Form ─── */
+.inventory__add-form {
+  margin-bottom: var(--vyntra-space-lg);
+  border: 2px solid var(--vyntra-tertiary);
+  animation: slideUp var(--vyntra-transition) ease;
+}
+
+/* ─── Inventory Table ─── */
+.inventory__table {
+  background: var(--vyntra-surface);
+  border: 1.5px solid var(--vyntra-border);
+  border-radius: var(--vyntra-radius-lg);
+  overflow: hidden;
+}
+
+.inventory__table-header {
+  display: grid;
+  grid-template-columns: 2.5fr 1fr 1fr 1.2fr 1.5fr;
+  gap: var(--vyntra-space-md);
+  padding: var(--vyntra-space-md) var(--vyntra-space-lg);
+  font-size: var(--vyntra-label-md-size);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--vyntra-label-md-spacing);
+  color: var(--vyntra-on-surface-muted);
+  border-bottom: 2px solid var(--vyntra-border);
+  background: var(--vyntra-surface-container);
+}
+
+.inventory__table-row {
+  display: grid;
+  grid-template-columns: 2.5fr 1fr 1fr 1.2fr 1.5fr;
+  gap: var(--vyntra-space-md);
+  padding: var(--vyntra-space-lg);
+  align-items: center;
+  border-bottom: 1px solid var(--vyntra-border);
+  transition: background var(--vyntra-transition);
+}
+
+.inventory__table-row:hover {
+  background: var(--vyntra-surface-container);
+}
+
+.inventory__table-row:last-child {
+  border-bottom: none;
+}
+
+.inventory__item-info {
+  display: flex;
+  align-items: center;
+  gap: var(--vyntra-space-md);
+}
+
+.inventory__item-icon {
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--vyntra-surface-container);
+  border-radius: var(--vyntra-radius);
+  flex-shrink: 0;
+}
+
+.inventory__item-qty {
+  font-family: var(--vyntra-font-headline);
+  font-weight: 700;
+}
+
+.inventory__item-min {
+  font-size: var(--vyntra-body-md-size);
+  color: var(--vyntra-on-surface-muted);
+}
+
+/* ─── Stock Health Badges ─── */
+.inventory__health-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: var(--vyntra-radius-full);
+  font-size: var(--vyntra-label-md-size);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.inventory__stock--critical {
+  background: var(--vyntra-primary-light);
+  color: var(--vyntra-triage-p1-text);
+  border: 1.5px solid var(--vyntra-primary);
+}
+
+.inventory__stock--low {
+  background: var(--vyntra-warning-light);
+  color: var(--vyntra-on-warning);
+  border: 1.5px solid var(--vyntra-warning);
+}
+
+.inventory__stock--safe {
+  background: var(--vyntra-tertiary-light);
+  color: #166534;
+  border: 1.5px solid var(--vyntra-tertiary);
+}
+
+.inventory__stock--stable {
+  background: var(--vyntra-tertiary-light);
+  color: #166534;
+  border: 1.5px solid var(--vyntra-tertiary);
+}
+
+/* ─── Quick Adjust ─── */
+.inventory__item-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.inventory__quick-adjust {
+  display: flex;
+  gap: 4px;
+}
+
+.inventory__adjust-btn {
+  width: 40px;
+  height: 36px;
+  border: 1.5px solid var(--vyntra-border-strong);
+  border-radius: var(--vyntra-radius-sm);
+  background: var(--vyntra-surface);
+  cursor: pointer;
+  font-family: var(--vyntra-font-body);
+  font-size: var(--vyntra-body-sm-size);
+  font-weight: 700;
+  transition: all var(--vyntra-transition);
+  color: var(--vyntra-on-surface);
+}
+
+.inventory__adjust-btn:hover {
+  background: var(--vyntra-surface-container);
+  border-color: var(--vyntra-primary);
+}
+
+/* ─── Usage Form ─── */
+.inventory__usage-form {
+  grid-column: 1 / -1;
+  background: var(--vyntra-secondary-light);
+  border: 1.5px solid var(--vyntra-secondary);
+  border-radius: var(--vyntra-radius);
+  padding: var(--vyntra-space-lg);
+  margin-top: var(--vyntra-space-sm);
+  animation: slideUp var(--vyntra-transition) ease;
+}
+
+/* ─── Mobile ─── */
+@media (max-width: 1024px) {
+  .inventory__table-header {
+    display: none;
+  }
+
+  .inventory__table-row {
+    grid-template-columns: 1fr;
+    gap: var(--vyntra-space-sm);
+    padding: var(--vyntra-space-md);
+  }
+
+  .inventory__quick-adjust {
+    flex-wrap: wrap;
+  }
+}

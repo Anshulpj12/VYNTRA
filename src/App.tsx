@@ -1,3 +1,4 @@
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './part1-user-system/auth/AuthContext';
 import LoginScreen from './part1-user-system/auth/LoginScreen';
@@ -11,6 +12,7 @@ import DistrictChatScreen from './part1-user-system/world-chat/DistrictChatScree
 import SOSConditionsScreen from './part1-user-system/sos/SOSConditionsScreen';
 import SOSShelterSelectScreen from './part1-user-system/sos/SOSShelterSelectScreen';
 import ConnectivityBadge from './part1-user-system/components/ConnectivityBadge';
+import ShelterApp from './part2-shelter-provider/ShelterApp';
 
 import ServiceProviderRegistrationScreen from './part3-service-provider/registration/ServiceProviderRegistrationScreen';
 import ServiceDashboardScreen from './part3-service-provider/dashboard/ServiceDashboardScreen';
@@ -40,7 +42,7 @@ function AppRoutes() {
         <Route path="/auth/login" element={<LoginScreen />} />
         <Route path="/auth/role-select" element={<ProtectedRoute><RoleSelectScreen /></ProtectedRoute>} />
 
-        {/* User Routes */}
+        {/* User Routes (Part 1) */}
         <Route path="/user/home" element={<ProtectedRoute><HomeScreen /></ProtectedRoute>} />
         <Route path="/user/profile/create" element={<ProtectedRoute><ProfileCreateScreen /></ProtectedRoute>} />
         <Route path="/user/profile" element={<ProtectedRoute><ProfileViewScreen /></ProtectedRoute>} />
@@ -56,8 +58,8 @@ function AppRoutes() {
         <Route path="/sos/conditions" element={<ProtectedRoute><SOSConditionsScreen /></ProtectedRoute>} />
         <Route path="/sos/shelters" element={<ProtectedRoute><SOSShelterSelectScreen /></ProtectedRoute>} />
 
-        {/* Part 2 Placeholder */}
-        <Route path="/shelter/*" element={<div className="placeholder-screen"><h2>Shelter Provider Module</h2><p>Part 2 — Coming Soon</p></div>} />
+        {/* Part 2: Shelter Provider Module */}
+        <Route path="/shelter/*" element={<ShelterApp />} />
 
         {/* Part 3: Service Provider, Orders & Dispatch */}
         <Route path="/service/register" element={<ProtectedRoute><ServiceProviderRegistrationScreen /></ProtectedRoute>} />

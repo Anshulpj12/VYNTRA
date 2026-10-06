@@ -1,11 +1,15 @@
 /* ============================================================
    VYNTRA — Design System Tokens
-   Based on Stitch "Sanctuary Haven" reference design
+   Shared design tokens for Part 1 (User), Part 2 (Shelter), Part 3 (Service)
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
+  /* ══════════════════════════════════════════════════════════
+     PART 1 & CORE TOKENS (--color-*, --space-*, --radius-*)
+     ══════════════════════════════════════════════════════════ */
+
   /* ── Primary: Safety & Action (warm rose-coral) ── */
   --color-primary: #ad2644;
   --color-primary-hover: #8f0a30;
@@ -134,4 +138,172 @@
   --transition-fast: 150ms ease;
   --transition-normal: 250ms ease;
   --transition-slow: 400ms ease;
+
+  /* ══════════════════════════════════════════════════════════
+     PART 2 NAMESPACED TOKENS (--vyntra-*)
+     ══════════════════════════════════════════════════════════ */
+
+  --vyntra-primary: #D94862;
+  --vyntra-primary-hover: #C2304C;
+  --vyntra-primary-active: #961B32;
+  --vyntra-primary-light: #FDE8EB;
+  --vyntra-primary-surface: #FFF5F6;
+  --vyntra-on-primary: #FFFFFF;
+
+  --vyntra-secondary: #7E57C2;
+  --vyntra-secondary-hover: #6A3FB0;
+  --vyntra-secondary-light: #EDE7F6;
+  --vyntra-secondary-surface: #F8F5FF;
+  --vyntra-on-secondary: #FFFFFF;
+
+  --vyntra-tertiary: #10B981;
+  --vyntra-tertiary-hover: #059669;
+  --vyntra-tertiary-light: #E8F5E9;
+  --vyntra-tertiary-surface: #F0FDF4;
+  --vyntra-on-tertiary: #FFFFFF;
+
+  --vyntra-warning: #F59E0B;
+  --vyntra-warning-hover: #D97706;
+  --vyntra-warning-light: #FFF8E1;
+  --vyntra-warning-surface: #FFFDF5;
+  --vyntra-on-warning: #78350F;
+
+  --vyntra-error: #BA1A1A;
+  --vyntra-error-light: #FFDAD6;
+  --vyntra-error-surface: #FFF5F4;
+  --vyntra-on-error: #FFFFFF;
+
+  --vyntra-background: #FAF8F7;
+  --vyntra-surface: #FFFFFF;
+  --vyntra-surface-dim: #F3EFEF;
+  --vyntra-surface-container: #F1F5F9;
+  --vyntra-surface-elevated: #FFFFFF;
+  --vyntra-on-background: #1E232A;
+  --vyntra-on-surface: #0F172A;
+  --vyntra-on-surface-muted: #475569;
+  --vyntra-on-surface-subtle: #94A3B8;
+
+  --vyntra-border: #E2E8F0;
+  --vyntra-border-warm: #E6DFDD;
+  --vyntra-border-strong: #CBD5E1;
+  --vyntra-border-focus: var(--vyntra-primary);
+
+  --vyntra-slate-dark: #0F172A;
+  --vyntra-slate-mid: #1E293B;
+  --vyntra-slate-muted: #334155;
+  --vyntra-on-slate: #F8FAFC;
+
+  --vyntra-triage-p1-bg: #FDE8EB;
+  --vyntra-triage-p1-border: #D94862;
+  --vyntra-triage-p1-text: #961B32;
+  --vyntra-triage-p2-bg: #FFF3E0;
+  --vyntra-triage-p2-border: #F57C00;
+  --vyntra-triage-p2-text: #B24500;
+  --vyntra-triage-p3-bg: #EDE7F6;
+  --vyntra-triage-p3-border: #7E57C2;
+  --vyntra-triage-p3-text: #4A148C;
+
+  --vyntra-sync-online-bg: #E8F5E9;
+  --vyntra-sync-online-border: #A5D6A7;
+  --vyntra-sync-online-text: #1B5E20;
+  --vyntra-sync-offline-bg: #EDE7F6;
+  --vyntra-sync-offline-border: #D1C4E9;
+  --vyntra-sync-offline-text: #4A148C;
+  --vyntra-sync-pending-bg: #FFF8E1;
+  --vyntra-sync-pending-border: #FFE082;
+  --vyntra-sync-pending-text: #E65100;
+
+  --vyntra-font-headline: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --vyntra-font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --vyntra-display-lg-size: 40px;
+  --vyntra-display-lg-weight: 800;
+  --vyntra-display-lg-line: 48px;
+  --vyntra-display-lg-spacing: -0.02em;
+
+  --vyntra-headline-lg-size: 32px;
+  --vyntra-headline-lg-weight: 700;
+  --vyntra-headline-lg-line: 40px;
+  --vyntra-headline-md-size: 22px;
+  --vyntra-headline-md-weight: 600;
+  --vyntra-headline-md-line: 28px;
+  --vyntra-headline-sm-size: 18px;
+  --vyntra-headline-sm-weight: 600;
+  --vyntra-headline-sm-line: 24px;
+
+  --vyntra-body-lg-size: 18px;
+  --vyntra-body-lg-weight: 400;
+  --vyntra-body-lg-line: 28px;
+  --vyntra-body-md-size: 16px;
+  --vyntra-body-md-weight: 400;
+  --vyntra-body-md-line: 24px;
+  --vyntra-body-sm-size: 14px;
+  --vyntra-body-sm-weight: 400;
+  --vyntra-body-sm-line: 20px;
+
+  --vyntra-label-lg-size: 15px;
+  --vyntra-label-lg-weight: 600;
+  --vyntra-label-lg-line: 20px;
+  --vyntra-label-md-size: 13px;
+  --vyntra-label-md-weight: 600;
+  --vyntra-label-md-line: 18px;
+  --vyntra-label-md-spacing: 0.02em;
+
+  --vyntra-counter-size: 36px;
+  --vyntra-counter-weight: 800;
+  --vyntra-counter-line: 40px;
+
+  --vyntra-badge-size: 12px;
+  --vyntra-badge-weight: 800;
+  --vyntra-badge-line: 16px;
+  --vyntra-badge-spacing: 0.05em;
+
+  --vyntra-space-xs: 0.25rem;
+  --vyntra-space-sm: 0.5rem;
+  --vyntra-space-md: 1rem;
+  --vyntra-space-lg: 1.5rem;
+  --vyntra-space-xl: 2rem;
+  --vyntra-space-2xl: 2.5rem;
+  --vyntra-space-3xl: 3rem;
+  --vyntra-gutter: 1.5rem;
+  --vyntra-margin: 2rem;
+
+  --vyntra-radius-sm: 0.25rem;
+  --vyntra-radius: 0.5rem;
+  --vyntra-radius-md: 0.75rem;
+  --vyntra-radius-lg: 1rem;
+  --vyntra-radius-xl: 1.5rem;
+  --vyntra-radius-full: 9999px;
+
+  --vyntra-shadow-sm: 0px 2px 4px rgba(15, 23, 42, 0.04);
+  --vyntra-shadow-md: 0px 4px 12px -2px rgba(15, 23, 42, 0.08), 0px 2px 6px -1px rgba(15, 23, 42, 0.04);
+  --vyntra-shadow-lg: 0px 8px 24px rgba(15, 23, 42, 0.08);
+  --vyntra-shadow-xl: 0px 12px 32px -4px rgba(15, 23, 42, 0.16);
+
+  --vyntra-transition-fast: 150ms ease;
+  --vyntra-transition: 200ms ease;
+  --vyntra-transition-slow: 300ms ease-out;
+
+  --vyntra-touch-min: 48px;
+  --vyntra-button-min-height: 52px;
+  --vyntra-button-emergency-height: 56px;
+  --vyntra-sos-height: 64px;
+  --vyntra-input-height: 52px;
+  --vyntra-focus-ring: 0 0 0 3px rgba(217, 72, 98, 0.25);
+
+  --vyntra-sidebar-width: 260px;
+  --vyntra-header-height: 64px;
+  --vyntra-max-width: 1280px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --vyntra-display-lg-size: 30px;
+    --vyntra-display-lg-line: 38px;
+    --vyntra-headline-lg-size: 26px;
+    --vyntra-headline-lg-line: 34px;
+    --vyntra-gutter: 1rem;
+    --vyntra-margin: 1rem;
+    --vyntra-sidebar-width: 0px;
+  }
 }

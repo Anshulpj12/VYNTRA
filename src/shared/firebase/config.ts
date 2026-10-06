@@ -1,8 +1,7 @@
 /**
  * VYNTRA — Firebase Configuration & Initialization
  * 
- * IMPORTANT: Replace the firebaseConfig values with your actual Firebase project credentials.
- * These are placeholder values.
+ * Configured with live project credentials and offline fallback detection.
  */
 
 import { initializeApp, getApps, getApp } from 'firebase/app';
@@ -25,6 +24,15 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();
+
+/**
+ * Checks whether Firebase credentials are configured with real values
+ */
+export function isFirebaseConfigured(): boolean {
+  return typeof firebaseConfig.apiKey === 'string' &&
+    !firebaseConfig.apiKey.includes('YOUR_API_KEY') &&
+    firebaseConfig.apiKey.length > 0;
+}
 
 // Safe Analytics initialization for browser environments
 let analytics: Analytics | null = null;

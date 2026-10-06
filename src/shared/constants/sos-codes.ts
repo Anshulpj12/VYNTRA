@@ -1,9 +1,13 @@
 /**
  * VYNTRA — SOS Condition Codes
- * Used by Part 1 (encoding) and Part 3 (decoding).
- * Format: VYNTRA|<lat>,<lng>|<codes-joined-by-dashes>|<userId>|<unix-timestamp>
+ * 
+ * Shared condition codes used identically by Part 1 (encoding)
+ * and Part 3 (decoding). Do NOT modify without coordination.
+ * 
+ * @module shared/constants/sos-codes
  */
 
+/** SOS condition code mapping */
 export const SOS_CONDITIONS: Record<string, string> = {
   PG: 'Pregnancy',
   MN: 'Menstruation',
@@ -17,7 +21,13 @@ export const SOS_CONDITIONS: Record<string, string> = {
   EA: 'Elderly Assistance',
 };
 
-export const SOS_CONDITION_CODES = Object.keys(SOS_CONDITIONS);
+export const SOS_CONDITION_CODES = SOS_CONDITIONS;
+
+/** Type for valid condition code keys */
+export type SOSConditionCode = keyof typeof SOS_CONDITIONS;
+
+/** All valid condition codes as an array */
+export const ALL_CONDITION_CODES: string[] = Object.keys(SOS_CONDITIONS);
 
 /** Encode an SOS request into a compact string */
 export function encodeSOS(

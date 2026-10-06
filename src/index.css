@@ -3,7 +3,7 @@
    Design System: Serene Sanctuary (Stitch MCP Reference)
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -26,20 +26,16 @@ html, body {
 }
 
 body {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  margin: 0;
+  padding: 0;
   min-height: 100vh;
 }
 
 #root {
   width: 100%;
-  max-width: 440px;
   min-height: 100vh;
-  margin: 0 auto;
-  background-color: #fbf9f6;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
-  position: relative;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
 }

@@ -1,0 +1,156 @@
+/**
+ * VYNTRA Part 2 — Facilities Styles
+ */
+
+.facilities {
+  animation: slideUp var(--vyntra-transition) ease;
+}
+
+.facilities__header {
+  margin-bottom: var(--vyntra-space-xl);
+}
+
+/* ─── Summary ─── */
+.facilities__summary {
+  margin-bottom: var(--vyntra-space-xl);
+}
+
+.facilities__summary-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  padding: var(--vyntra-space-lg);
+}
+
+.facilities__summary-icon {
+  font-size: 32px;
+  margin-bottom: var(--vyntra-space-xs);
+}
+
+.facilities__summary-label {
+  color: var(--vyntra-on-surface-muted);
+}
+
+/* ─── Filters ─── */
+.facilities__filters {
+  display: flex;
+  gap: var(--vyntra-space-xs);
+  margin-bottom: var(--vyntra-space-lg);
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.facilities__filter-btn {
+  padding: var(--vyntra-space-sm) var(--vyntra-space-md);
+  border: 1.5px solid var(--vyntra-border);
+  border-radius: var(--vyntra-radius-full);
+  background: var(--vyntra-surface);
+  cursor: pointer;
+  font-family: var(--vyntra-font-body);
+  font-size: var(--vyntra-body-sm-size);
+  font-weight: 600;
+  color: var(--vyntra-on-surface-muted);
+  transition: all var(--vyntra-transition);
+  white-space: nowrap;
+  min-height: 40px;
+}
+
+.facilities__filter-btn:hover {
+  border-color: var(--vyntra-primary);
+  color: var(--vyntra-primary);
+}
+
+.facilities__filter-btn--active {
+  background: var(--vyntra-primary-light);
+  border-color: var(--vyntra-primary);
+  color: var(--vyntra-primary);
+}
+
+/* ─── Add Form ─── */
+.facilities__add-form {
+  margin-bottom: var(--vyntra-space-lg);
+  border: 2px solid var(--vyntra-tertiary);
+  animation: slideUp var(--vyntra-transition) ease;
+}
+
+/* ─── Facility Cards Grid ─── */
+.facilities__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--vyntra-gutter);
+}
+
+.facilities__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vyntra-space-sm);
+}
+
+.facilities__card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--vyntra-space-md);
+}
+
+.facilities__card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--vyntra-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.facilities__card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.facilities__card-desc {
+  font-size: var(--vyntra-body-sm-size);
+  margin: var(--vyntra-space-xs) 0;
+}
+
+.facilities__card-stats {
+  display: flex;
+  align-items: center;
+  gap: var(--vyntra-space-md);
+  margin-top: var(--vyntra-space-sm);
+}
+
+.facilities__card-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.facilities__card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--vyntra-space-sm);
+  padding-top: var(--vyntra-space-sm);
+  border-top: 1px solid var(--vyntra-border);
+}
+
+.facilities__edit-form {
+  margin-top: var(--vyntra-space-sm);
+  padding-top: var(--vyntra-space-sm);
+  border-top: 1px solid var(--vyntra-border);
+}
+
+@media (max-width: 768px) {
+  .facilities__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .facilities__filters {
+    -webkit-overflow-scrolling: touch;
+  }
+}

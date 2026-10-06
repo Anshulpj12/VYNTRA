@@ -1,7 +1,10 @@
 /**
  * VYNTRA — Rate Limiter
- * Throttles repeated identical requests by combination key.
- * Uses a sliding window approach.
+ * 
+ * Combination-based rate limiting for queries and requests.
+ * Prevents repeated identical requests from overwhelming the client or backend.
+ * 
+ * @module shared/utils/rate-limiter
  */
 
 interface RateLimitEntry {
@@ -17,7 +20,8 @@ const DEFAULT_MAX_REQUESTS = 5;
 
 /**
  * Checks if a request with the given combination key is allowed.
- * @param combinationKey A unique string representing the search combination (e.g., "RJ-JAIPUR-450")
+ * 
+ * @param combinationKey A unique string representing the search combination
  * @param maxRequests Maximum requests allowed within the window (default: 5)
  * @param windowMs Time window in milliseconds (default: 60000ms / 1 minute)
  * @returns true if the request is allowed, false if rate-limited
@@ -52,9 +56,26 @@ export function isRequestAllowed(
 }
 
 /**
+ * Checks whether a request with the given combination key is rate-limited.
+ * Inverse of isRequestAllowed.
+ * 
+ * @returns true if rate-limited (blocked), false if allowed
+ */
+export function isRateLimited(
+  combinationKey: string,
+  maxRequests: number = DEFAULT_MAX_REQUESTS,
+  windowMs: number = DEFAULT_WINDOW_MS
+): boolean {
+  return !isRequestAllowed(combinationKey, maxRequests, windowMs);
+}
+
+/**
  * Returns the remaining cooldown time in seconds before a rate-limited key can retry.
  */
-export function getCooldownSeconds(combinationKey: string, windowMs: number = DEFAULT_WINDOW_MS): number {
+export function getCooldownSeconds(
+  combinationKey: string,
+  windowMs: number = DEFAULT_WINDOW_MS
+): number {
   const entry = store.get(combinationKey);
   if (!entry) return 0;
 
@@ -68,4 +89,16 @@ export function getCooldownSeconds(combinationKey: string, windowMs: number = DE
  */
 export function clearRateLimit(combinationKey: string): void {
   store.delete(combinationKey);
+}
+
+/**
+ * Resets the rate limit for a specific combination key (alias for clearRateLimit).
+ */
+export const resetRateLimit = clearRateLimit;
+
+/**
+ * Clears all rate limit entries.
+ */
+export function clearAllRateLimits(): void {
+  store.clear();
 }

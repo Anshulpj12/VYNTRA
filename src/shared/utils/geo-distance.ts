@@ -1,10 +1,16 @@
 /**
- * VYNTRA — Haversine Geo-Distance Calculator
- * Calculates the distance in kilometers between two geographic coordinates.
+ * VYNTRA — Geo-Distance Calculator
+ * 
+ * Haversine formula implementation for calculating distances
+ * between two geographical coordinate points.
+ * Supports both coordinate object pairs and raw lat/lng arguments.
+ * 
+ * @module shared/utils/geo-distance
  */
 
-import type { GeoCoordinates } from '../types';
+import type { Coordinates, GeoCoordinates } from '../types';
 
+/** Earth's mean radius in kilometers */
 const EARTH_RADIUS_KM = 6371;
 
 function toRadians(degrees: number): number {
@@ -12,20 +18,42 @@ function toRadians(degrees: number): number {
 }
 
 /**
- * Calculates distance between two coordinates using the Haversine formula.
- * @returns Distance in kilometers
+ * Calculates distance using coordinate objects or raw lat/lng.
  */
-export function calculateDistance(from: GeoCoordinates, to: GeoCoordinates): number {
-  const dLat = toRadians(to.lat - from.lat);
-  const dLng = toRadians(to.lng - from.lng);
+export function calculateDistance(from: Coordinates, to: Coordinates): number;
+export function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number;
+export function calculateDistance(
+  a: Coordinates | number,
+  b: Coordinates | number,
+  c?: number,
+  d?: number
+): number {
+  let lat1: number, lng1: number, lat2: number, lng2: number;
 
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRadians(from.lat)) * Math.cos(toRadians(to.lat)) *
-    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  if (typeof a === 'object' && typeof b === 'object') {
+    lat1 = a.lat;
+    lng1 = a.lng;
+    lat2 = b.lat;
+    lng2 = b.lng;
+  } else {
+    lat1 = a as number;
+    lng1 = b as number;
+    lat2 = c as number;
+    lng2 = d as number;
+  }
 
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return EARTH_RADIUS_KM * c;
+  const dLat = toRadians(lat2 - lat1);
+  const dLng = toRadians(lng2 - lng1);
+
+  const sinHalfLat = Math.sin(dLat / 2);
+  const sinHalfLng = Math.sin(dLng / 2);
+
+  const val =
+    sinHalfLat * sinHalfLat +
+    Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * sinHalfLng * sinHalfLng;
+
+  const angle = 2 * Math.atan2(Math.sqrt(val), Math.sqrt(1 - val));
+  return EARTH_RADIUS_KM * angle;
 }
 
 /**
@@ -41,4 +69,17 @@ export function sortByDistance<T extends { coordinates: GeoCoordinates }>(
       distanceKm: calculateDistance(from, item.coordinates),
     }))
     .sort((a, b) => a.distanceKm - b.distanceKm);
+}
+
+/**
+ * Formats a distance value into a human-readable string.
+ * 
+ * @param distanceKm - Distance in kilometers
+ * @returns Formatted string (e.g., "1.2 km" or "850 m")
+ */
+export function formatDistance(distanceKm: number): string {
+  if (distanceKm < 1) {
+    return `${Math.round(distanceKm * 1000)} m`;
+  }
+  return `${distanceKm.toFixed(1)} km`;
 }
