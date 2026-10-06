@@ -1,0 +1,277 @@
+/**
+ * VYNTRA — Shared TypeScript Interfaces
+ * 
+ * These interfaces define the data contracts used across all three parts
+ * of the platform. Do NOT duplicate or modify these within any part's folder.
+ * 
+ * @module shared/types
+ */
+
+/* ─────────────────────────── User Types ─────────────────────────── */
+
+/** Core user identity created during authentication */
+export interface VyntraUser {
+  /** Unique application ID in VYNTRA-USR-XXXXXXXX format */
+  appId: string;
+  /** Firebase Auth UID from Google login */
+  googleUid: string;
+  /** User's selected role */
+  role: 'user' | 'shelter-provider' | 'service-provider';
+  /** Account creation timestamp */
+  createdAt: number;
+  /** Last login timestamp */
+  lastLoginAt: number;
+}
+
+/** Coordinate pair for geographical positioning */
+export interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
+/** Pregnancy status for female users */
+export interface PregnancyStatus {
+  isPregnant: boolean;
+  estimatedMonth?: number;
+}
+
+/** Complete user profile metadata */
+export interface UserProfile {
+  appId: string;
+  name: string;
+  gender: 'male' | 'female' | 'other' | 'prefer-not-to-say';
+  age: number;
+  state: string;
+  district: string;
+  homeAddress: string;
+  homeCoordinates: Coordinates;
+  emergencyContact: string;
+  pregnancyStatus?: PregnancyStatus;
+  disabilities?: string[];
+  medicalConditions?: string;
+  currentlyMenstruating?: boolean;
+  specialRequirements?: string;
+  profileCompleteness: number;
+  lastModifiedAt: number;
+  pendingSync: boolean;
+}
+
+/* ────────────────────────── Cycle Types ──────────────────────────── */
+
+/** Timestamp event with auto/manual time */
+export interface CycleEvent {
+  autoDateTime: number;
+  editedDateTime?: number;
+}
+
+/** Personal note attached to a cycle */
+export interface CycleNote {
+  noteId: string;
+  content: string;
+  createdAt: number;
+  updatedAt?: number;
+}
+
+/** Single menstrual cycle record */
+export interface CycleRecord {
+  cycleId: string;
+  userId: string;
+  startEvent: CycleEvent;
+  endEvent?: CycleEvent;
+  durationDays?: number;
+  notes: CycleNote[];
+  isActive: boolean;
+}
+
+/* ─────────────────────────── Chat Types ──────────────────────────── */
+
+/** Single World Chat message */
+export interface ChatMessage {
+  messageId: string;
+  userId: string;
+  districtCode: string;
+  category: string;
+  content: string;
+  timestamp: number;
+}
+
+/** 6-hour period record */
+export interface SixHourRecord {
+  recordId: string;
+  districtCode: string;
+  stateCode: string;
+  periodStart: number;
+  periodEnd: number;
+  status: 'active' | 'completed';
+  messages: ChatMessage[];
+  messageCount: number;
+}
+
+/* ────────────────────────── Shelter Types ─────────────────────────── */
+
+/** Registered shelter provider */
+export interface ShelterProvider {
+  /** Unique shelter ID in VYNTRA-SHL-XXXXXXXX format */
+  shelterId: string;
+  /** Firebase Auth UID of the provider */
+  providerGoogleUid: string;
+  shelterName: string;
+  location: string;
+  state: string;
+  district: string;
+  coordinates: Coordinates;
+  registeredMobile: string;
+  totalBedCapacity: number;
+  occupiedBeds: number;
+  availableBeds: number;
+  isActive: boolean;
+  registeredAt: number;
+  lastUpdatedAt: number;
+}
+
+/** Occupant summary within metadata */
+export interface OccupantSummary {
+  personId: string;
+  expectedStayDays: number;
+  admittedAt: number;
+}
+
+/** Facility summary within metadata */
+export interface FacilitySummary {
+  facilityId: string;
+  facilityName: string;
+  type: 'women-specific' | 'sanitation' | 'medical' | 'general';
+  totalCapacity: number;
+  currentAvailable: number;
+}
+
+/** Inventory item summary within metadata */
+export interface InventoryItemSummary {
+  itemName: string;
+  currentQuantity: number;
+  requiredMinimum: number;
+}
+
+/** Consolidated current state of a shelter */
+export interface ShelterMetadata {
+  shelterId: string;
+  shelterName: string;
+  coordinates: Coordinates;
+  registeredMobile: string;
+  state: string;
+  district: string;
+  city: string;
+  totalBedCapacity: number;
+  occupiedBeds: number;
+  availableBeds: number;
+  currentOccupants: OccupantSummary[];
+  facilities: FacilitySummary[];
+  inventorySummary: InventoryItemSummary[];
+  /** Readiness score from 0-100, calculated by Part 3 */
+  shelterScore: number;
+  lastUpdatedAt: number;
+}
+
+/** Person staying at a shelter */
+export interface Occupant {
+  /** Either existing app ID or shelter-generated VYNTRA-PRS-XXXXXXXX */
+  personId: string;
+  isExistingAppUser: boolean;
+  existingAppId?: string;
+  shelterAssignedId?: string;
+  name: string;
+  admittedAt: number;
+  expectedStayDays: number;
+  assignedBedNumber?: number;
+  status: 'active' | 'discharged';
+  dischargedAt?: number;
+}
+
+/** Facility record at a shelter */
+export interface Facility {
+  facilityId: string;
+  shelterId: string;
+  facilityName: string;
+  type: 'women-specific' | 'sanitation' | 'medical' | 'general';
+  totalCapacity: number;
+  currentAvailable: number;
+  description: string;
+  lastUpdatedAt: number;
+}
+
+/** Inventory item at a shelter */
+export interface InventoryItem {
+  itemId: string;
+  shelterId: string;
+  itemName: string;
+  category: 'hygiene' | 'medical' | 'provisions' | 'bedding' | 'emergency' | 'general';
+  currentQuantity: number;
+  requiredMinimum: number;
+  lastUpdatedAt: number;
+  /** Average daily consumption, calculated by Part 3 */
+  usageRate?: number;
+}
+
+/** Single usage record for an inventory item */
+export interface UsageLogEntry {
+  logId: string;
+  itemId: string;
+  shelterId: string;
+  quantityUsed: number;
+  associatedPersonId?: string;
+  usedAt: number;
+  notes?: string;
+}
+
+/* ──────────────────── Service Provider Types ──────────────────────── */
+
+/** Registered service provider */
+export interface ServiceProvider {
+  providerId: string;
+  providerGoogleUid: string;
+  providerName: string;
+  location: string;
+  state: string;
+  district: string;
+  coordinates: Coordinates;
+  registeredAt: number;
+  isActive: boolean;
+}
+
+/** Resource order from shelter to service providers */
+export interface Order {
+  orderId: string;
+  requestingShelterId: string;
+  requestingShelterName: string;
+  shelterCoordinates: Coordinates;
+  items: Array<{
+    itemName: string;
+    requestedQuantity: number;
+  }>;
+  targetMode: 'single' | 'five-nearest';
+  targetProviderIds: string[];
+  acceptedByProviderId?: string;
+  status: 'pending' | 'accepted' | 'preparing' | 'dispatched' | 'delivered' | 'confirmed';
+  createdAt: number;
+  acceptedAt?: number;
+  dispatchedAt?: number;
+  confirmedAt?: number;
+}
+
+/** SOS request generated by a user */
+export interface SOSRequest {
+  userId: string;
+  coordinates: Coordinates;
+  coordinateSource: 'gps' | 'profile';
+  selectedConditions: string[];
+  compactCode: string;
+  selectedShelterId: string;
+  shelterMobileNumber: string;
+  createdAt: number;
+  sentViaSMS: boolean;
+}
+
+/* ─────────────────── Connectivity / PWA Types ────────────────────── */
+
+/** PWA connectivity status */
+export type ConnectivityStatus = 'online-synced' | 'offline-saved' | 'sync-pending';
