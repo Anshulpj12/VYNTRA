@@ -1,0 +1,137 @@
+/* ============================================================
+   VYNTRA — Design System Tokens
+   Based on Stitch "Sanctuary Haven" reference design
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ── Primary: Safety & Action (warm rose-coral) ── */
+  --color-primary: #ad2644;
+  --color-primary-hover: #8f0a30;
+  --color-primary-container: #ce405b;
+  --color-primary-surface: #ffdadc;
+  --color-primary-surface-dim: #ffb2b9;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #fffbff;
+
+  /* ── Secondary: Care & Community (plum-lavender) ── */
+  --color-secondary: #6f48b2;
+  --color-secondary-hover: #572e99;
+  --color-secondary-container: #b78efe;
+  --color-secondary-surface: #ebdcff;
+  --color-secondary-surface-dim: #d4bbff;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #491d8a;
+
+  /* ── Tertiary: Safe Haven (botanical green) ── */
+  --color-tertiary: #186a22;
+  --color-tertiary-hover: #005312;
+  --color-tertiary-container: #358438;
+  --color-tertiary-surface: #a3f69c;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #f7fff1;
+
+  /* ── Error ── */
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+
+  /* ── Warning (amber) ── */
+  --color-warning: #f57c00;
+  --color-warning-surface: #fff8e1;
+  --color-warning-text: #e65100;
+
+  /* ── Surfaces ── */
+  --color-surface: #f8f9ff;
+  --color-surface-dim: #d6dae4;
+  --color-surface-bright: #f8f9ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f0f4fd;
+  --color-surface-container: #eaeef8;
+  --color-surface-container-high: #e4e8f2;
+  --color-surface-container-highest: #dee2ec;
+  --color-on-surface: #171c23;
+  --color-on-surface-variant: #584143;
+  --color-inverse-surface: #2c3138;
+  --color-inverse-on-surface: #edf1fb;
+
+  /* ── Outline ── */
+  --color-outline: #8c7072;
+  --color-outline-variant: #e0bfc1;
+  --color-divider: #e6dfdd;
+
+  /* ── Sync Status ── */
+  --color-sync-online-surface: #e8f5e9;
+  --color-sync-online-border: #a5d6a7;
+  --color-sync-online-text: #1b5e20;
+  --color-sync-offline-surface: #ede7f6;
+  --color-sync-offline-border: #d1c4e9;
+  --color-sync-offline-text: #4a148c;
+  --color-sync-pending-surface: #fff8e1;
+  --color-sync-pending-border: #ffe082;
+  --color-sync-pending-text: #e65100;
+
+  /* ── Triage Priority ── */
+  --color-priority-1-bg: #fde8eb;
+  --color-priority-1-stroke: #d94862;
+  --color-priority-1-text: #961b32;
+  --color-priority-2-bg: #fff3e0;
+  --color-priority-2-stroke: #f57c00;
+  --color-priority-2-text: #b24500;
+  --color-priority-3-bg: #ede7f6;
+  --color-priority-3-stroke: #7e57c2;
+  --color-priority-3-text: #4a148c;
+
+  /* ── Typography ── */
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* ── Font Sizes ── */
+  --text-display-hero: 40px;
+  --text-display-hero-mobile: 30px;
+  --text-headline-lg: 32px;
+  --text-headline-lg-mobile: 26px;
+  --text-headline-md: 22px;
+  --text-headline-sm: 19px;
+  --text-body-xl: 20px;
+  --text-body-lg: 17px;
+  --text-body-md: 15px;
+  --text-body-sm: 13px;
+  --text-label-lg: 18px;
+  --text-label-md: 15px;
+  --text-badge: 12px;
+
+  /* ── Spacing ── */
+  --space-xs: 0.375rem;
+  --space-sm: 0.75rem;
+  --space-md: 1.25rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --gutter: 1rem;
+  --gutter-md: 1.5rem;
+  --gutter-lg: 2rem;
+  --margin: 1rem;
+  --margin-md: 1.5rem;
+  --margin-lg: 2.5rem;
+
+  /* ── Border Radius ── */
+  --radius-sm: 0.25rem;
+  --radius: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* ── Elevation ── */
+  --shadow-sm: 0 2px 6px -1px rgba(30, 35, 42, 0.04);
+  --shadow-md: 0 4px 12px -2px rgba(30, 35, 42, 0.08), 0 2px 6px -1px rgba(30, 35, 42, 0.04);
+  --shadow-lg: 0 12px 32px -4px rgba(30, 35, 42, 0.16);
+  --shadow-focus: 0 0 0 3px rgba(217, 72, 98, 0.25);
+
+  /* ── Transitions ── */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 400ms ease;
+}

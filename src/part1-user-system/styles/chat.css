@@ -1,0 +1,237 @@
+/* ============================================================
+   VYNTRA — Regional World Chat Styles
+   Design Reference: Sanctuary Haven Regional World Chat
+   6-Hour Data Cycle & Categorized Geo-Broadcast
+   ============================================================ */
+
+.chat-entry-screen {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.chat-geo-card {
+  background: var(--color-surface-container-lowest);
+  border: 1.5px solid var(--color-outline-variant);
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.range-info-chip {
+  display: inline-block;
+  background: var(--color-secondary-surface);
+  color: var(--color-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  margin-top: 6px;
+}
+
+/* Main District Chat View */
+.district-chat-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--color-surface);
+}
+
+.chat-header-bar {
+  padding: 14px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--color-outline-variant);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+}
+
+.chat-header-title h2 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.chat-header-title p {
+  font-size: 0.75rem;
+  color: var(--color-on-surface-variant);
+  margin: 2px 0 0;
+}
+
+.cycle-period-badge {
+  background: var(--color-secondary-surface);
+  color: var(--color-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Category Filter Bar */
+.category-filter-strip {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--color-surface-container-low);
+  overflow-x: auto;
+  border-bottom: 1px solid var(--color-outline-variant);
+}
+
+.category-filter-chip {
+  padding: 6px 12px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid var(--color-outline-variant);
+  color: var(--color-on-surface);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.category-filter-chip.active {
+  background: var(--color-secondary);
+  color: #ffffff;
+  border-color: var(--color-secondary);
+}
+
+/* Chat Messages Container */
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-message-bubble {
+  background: #ffffff;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  max-width: 90%;
+  align-self: flex-start;
+}
+
+.chat-message-bubble.own-message {
+  align-self: flex-end;
+  background: #fdf5f7;
+  border-color: var(--color-primary-surface-dim);
+}
+
+.message-category-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--color-surface-container);
+  color: var(--color-on-surface-variant);
+  margin-bottom: 6px;
+}
+
+.message-content-text {
+  font-size: 0.9rem;
+  color: var(--color-on-surface);
+  margin: 0 0 6px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.message-footer-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--color-outline);
+}
+
+/* Chat Input Bar */
+.chat-composer-box {
+  background: #ffffff;
+  border-top: 1px solid var(--color-outline-variant);
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.category-picker-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.category-pick-btn {
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--color-outline-variant);
+  background: var(--color-surface-container-low);
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.category-pick-btn.selected {
+  background: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+}
+
+.composer-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.composer-text-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1.5px solid var(--color-outline-variant);
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  outline: none;
+}
+
+.composer-text-input:focus {
+  border-color: var(--color-primary);
+}
+
+.send-msg-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #ffffff;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.15s;
+}
+
+.send-msg-btn:hover {
+  transform: scale(1.05);
+}
+
+.send-msg-btn:disabled {
+  background: var(--color-outline-variant);
+  cursor: not-allowed;
+  transform: none;
+}
