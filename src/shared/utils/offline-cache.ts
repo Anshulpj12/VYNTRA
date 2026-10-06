@@ -2,19 +2,27 @@
  * VYNTRA — Offline Cache (IndexedDB Wrapper)
  * 
  * Provides offline-first data persistence using IndexedDB via the `idb` library.
- * All data operations write to IndexedDB first, then sync to Firebase when online.
+ * Unified storage engine supporting Part 1 (User), Part 2 (Shelter), and Part 3 (Service).
  * 
  * @module shared/utils/offline-cache
  */
 
 import { openDB, type IDBPDatabase } from 'idb';
 
-/** Database name for the VYNTRA application */
 const DB_NAME = 'vyntra-offline-db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 /** Store names mapped to data types */
 export const STORES = {
+  /* Part 1 User Stores */
+  AUTH: 'auth',
+  PROFILE: 'profile',
+  CYCLES: 'cycles',
+  CHAT_CACHE: 'chat-cache',
+  SHELTER_CACHE: 'shelter-cache',
+  PENDING_SYNC: 'pending-sync',
+
+  /* Part 2 Shelter Provider Stores */
   SHELTER_PROVIDERS: 'shelter-providers',
   OCCUPANTS: 'occupants',
   FACILITIES: 'facilities',
@@ -34,101 +42,130 @@ export interface SyncQueueEntry {
   retryCount: number;
 }
 
-/**
- * Opens (or creates) the VYNTRA IndexedDB database with all required stores.
- * 
- * @returns Promise resolving to the database instance
- */
-async function getDb(): Promise<IDBPDatabase> {
-  return openDB(DB_NAME, DB_VERSION, {
-    upgrade(db) {
-      /* Shelter providers store */
-      if (!db.objectStoreNames.contains(STORES.SHELTER_PROVIDERS)) {
-        db.createObjectStore(STORES.SHELTER_PROVIDERS, { keyPath: 'shelterId' });
-      }
+let dbPromise: Promise<IDBPDatabase> | null = null;
 
-      /* Occupants store (keyed by personId, indexed by shelterId) */
-      if (!db.objectStoreNames.contains(STORES.OCCUPANTS)) {
-        const occupantStore = db.createObjectStore(STORES.OCCUPANTS, { keyPath: 'personId' });
-        occupantStore.createIndex('byShelter', 'shelterId');
-        occupantStore.createIndex('byStatus', 'status');
-      }
+/** Opens (or creates) the VYNTRA IndexedDB database with all stores */
+function getDb(): Promise<IDBPDatabase> {
+  if (!dbPromise) {
+    dbPromise = openDB(DB_NAME, DB_VERSION, {
+      upgrade(db) {
+        /* Part 1 Stores */
+        if (!db.objectStoreNames.contains(STORES.AUTH)) {
+          db.createObjectStore(STORES.AUTH, { keyPath: 'key' });
+        }
+        if (!db.objectStoreNames.contains(STORES.PROFILE)) {
+          db.createObjectStore(STORES.PROFILE, { keyPath: 'appId' });
+        }
+        if (!db.objectStoreNames.contains(STORES.CYCLES)) {
+          db.createObjectStore(STORES.CYCLES, { keyPath: 'cycleId' });
+        }
+        if (!db.objectStoreNames.contains(STORES.CHAT_CACHE)) {
+          db.createObjectStore(STORES.CHAT_CACHE, { keyPath: 'cacheKey' });
+        }
+        if (!db.objectStoreNames.contains(STORES.SHELTER_CACHE)) {
+          db.createObjectStore(STORES.SHELTER_CACHE, { keyPath: 'shelterId' });
+        }
+        if (!db.objectStoreNames.contains(STORES.PENDING_SYNC)) {
+          db.createObjectStore(STORES.PENDING_SYNC, { keyPath: 'id', autoIncrement: true });
+        }
 
-      /* Facilities store */
-      if (!db.objectStoreNames.contains(STORES.FACILITIES)) {
-        const facilityStore = db.createObjectStore(STORES.FACILITIES, { keyPath: 'facilityId' });
-        facilityStore.createIndex('byShelter', 'shelterId');
-      }
+        /* Part 2 Stores */
+        if (!db.objectStoreNames.contains(STORES.SHELTER_PROVIDERS)) {
+          db.createObjectStore(STORES.SHELTER_PROVIDERS, { keyPath: 'shelterId' });
+        }
+        if (!db.objectStoreNames.contains(STORES.OCCUPANTS)) {
+          const occupantStore = db.createObjectStore(STORES.OCCUPANTS, { keyPath: 'personId' });
+          occupantStore.createIndex('byShelter', 'shelterId');
+          occupantStore.createIndex('byStatus', 'status');
+        }
+        if (!db.objectStoreNames.contains(STORES.FACILITIES)) {
+          const facilityStore = db.createObjectStore(STORES.FACILITIES, { keyPath: 'facilityId' });
+          facilityStore.createIndex('byShelter', 'shelterId');
+        }
+        if (!db.objectStoreNames.contains(STORES.INVENTORY)) {
+          const inventoryStore = db.createObjectStore(STORES.INVENTORY, { keyPath: 'itemId' });
+          inventoryStore.createIndex('byShelter', 'shelterId');
+        }
+        if (!db.objectStoreNames.contains(STORES.USAGE_LOG)) {
+          const usageStore = db.createObjectStore(STORES.USAGE_LOG, { keyPath: 'logId' });
+          usageStore.createIndex('byItem', 'itemId');
+          usageStore.createIndex('byShelter', 'shelterId');
+        }
+        if (!db.objectStoreNames.contains(STORES.METADATA)) {
+          db.createObjectStore(STORES.METADATA, { keyPath: 'shelterId' });
+        }
+        if (!db.objectStoreNames.contains(STORES.SYNC_QUEUE)) {
+          const syncStore = db.createObjectStore(STORES.SYNC_QUEUE, { keyPath: 'id' });
+          syncStore.createIndex('byTimestamp', 'timestamp');
+        }
+      },
+    });
+  }
+  return dbPromise;
+}
 
-      /* Inventory store */
-      if (!db.objectStoreNames.contains(STORES.INVENTORY)) {
-        const inventoryStore = db.createObjectStore(STORES.INVENTORY, { keyPath: 'itemId' });
-        inventoryStore.createIndex('byShelter', 'shelterId');
-      }
+/* ─── Part 1 Helper Functions ─── */
 
-      /* Usage log store */
-      if (!db.objectStoreNames.contains(STORES.USAGE_LOG)) {
-        const usageStore = db.createObjectStore(STORES.USAGE_LOG, { keyPath: 'logId' });
-        usageStore.createIndex('byItem', 'itemId');
-        usageStore.createIndex('byShelter', 'shelterId');
-      }
+export async function getItem<T>(storeName: string, key: string): Promise<T | undefined> {
+  const db = await getDb();
+  return db.get(storeName, key);
+}
 
-      /* Metadata store */
-      if (!db.objectStoreNames.contains(STORES.METADATA)) {
-        db.createObjectStore(STORES.METADATA, { keyPath: 'shelterId' });
-      }
+export async function putItem<T>(storeName: string, item: T): Promise<void> {
+  const db = await getDb();
+  await db.put(storeName, item);
+}
 
-      /* Sync queue for pending Firebase writes */
-      if (!db.objectStoreNames.contains(STORES.SYNC_QUEUE)) {
-        const syncStore = db.createObjectStore(STORES.SYNC_QUEUE, { keyPath: 'id' });
-        syncStore.createIndex('byTimestamp', 'timestamp');
-      }
-    },
+export async function deleteItem(storeName: string, key: string): Promise<void> {
+  const db = await getDb();
+  await db.delete(storeName, key);
+}
+
+export async function getAllItems<T>(storeName: string): Promise<T[]> {
+  const db = await getDb();
+  return db.getAll(storeName);
+}
+
+export async function addPendingSync(operation: {
+  type: 'create' | 'update' | 'delete';
+  collection: string;
+  docId: string;
+  data?: unknown;
+}): Promise<void> {
+  const db = await getDb();
+  await db.add(STORES.PENDING_SYNC, {
+    ...operation,
+    createdAt: Date.now(),
   });
 }
 
-/**
- * Saves data to a specified IndexedDB store (offline-first write).
- * 
- * @param storeName - Target object store name
- * @param data - Data to persist
- */
+export async function getPendingSyncs(): Promise<unknown[]> {
+  const db = await getDb();
+  return db.getAll(STORES.PENDING_SYNC);
+}
+
+export async function clearPendingSyncs(): Promise<void> {
+  const db = await getDb();
+  await db.clear(STORES.PENDING_SYNC);
+}
+
+/* ─── Part 2 Helper Functions ─── */
+
 export async function saveToCache<T>(storeName: string, data: T): Promise<void> {
   const db = await getDb();
   await db.put(storeName, data);
 }
 
-/**
- * Retrieves a record by key from a specified store.
- * 
- * @param storeName - Source object store name
- * @param key - Primary key of the record
- * @returns The record if found, undefined otherwise
- */
 export async function getFromCache<T>(storeName: string, key: string): Promise<T | undefined> {
   const db = await getDb();
   return db.get(storeName, key) as Promise<T | undefined>;
 }
 
-/**
- * Retrieves all records from a specified store.
- * 
- * @param storeName - Source object store name
- * @returns Array of all records in the store
- */
 export async function getAllFromCache<T>(storeName: string): Promise<T[]> {
   const db = await getDb();
   return db.getAll(storeName) as Promise<T[]>;
 }
 
-/**
- * Retrieves records by index value from a specified store.
- * 
- * @param storeName - Source object store name
- * @param indexName - Name of the index to query
- * @param value - Index value to match
- * @returns Array of matching records
- */
 export async function getByIndex<T>(
   storeName: string,
   indexName: string,
@@ -138,52 +175,26 @@ export async function getByIndex<T>(
   return db.getAllFromIndex(storeName, indexName, value) as Promise<T[]>;
 }
 
-/**
- * Deletes a record by key from a specified store.
- * 
- * @param storeName - Target object store name
- * @param key - Primary key of the record to delete
- */
 export async function deleteFromCache(storeName: string, key: string): Promise<void> {
   const db = await getDb();
   await db.delete(storeName, key);
 }
 
-/**
- * Adds an operation to the sync queue for later Firebase synchronization.
- * 
- * @param entry - The sync queue entry describing the pending operation
- */
 export async function addToSyncQueue(entry: SyncQueueEntry): Promise<void> {
   const db = await getDb();
   await db.put(STORES.SYNC_QUEUE, entry);
 }
 
-/**
- * Retrieves all pending sync operations ordered by timestamp.
- * 
- * @returns Array of pending sync entries
- */
 export async function getPendingSyncEntries(): Promise<SyncQueueEntry[]> {
   const db = await getDb();
   return db.getAllFromIndex(STORES.SYNC_QUEUE, 'byTimestamp') as Promise<SyncQueueEntry[]>;
 }
 
-/**
- * Removes a completed sync entry from the queue.
- * 
- * @param id - ID of the sync entry to remove
- */
 export async function removeSyncEntry(id: string): Promise<void> {
   const db = await getDb();
   await db.delete(STORES.SYNC_QUEUE, id);
 }
 
-/**
- * Clears all data from a specified store.
- * 
- * @param storeName - Store to clear
- */
 export async function clearStore(storeName: string): Promise<void> {
   const db = await getDb();
   await db.clear(storeName);

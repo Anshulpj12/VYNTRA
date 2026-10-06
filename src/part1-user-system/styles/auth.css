@@ -1,0 +1,891 @@
+/* ============================================================
+   VYNTRA — Authentication & Role Selection Styles
+   Design Reference: Stitch "Sanctuary Haven" Login Screen
+   ============================================================ */
+
+.login-screen {
+  min-height: calc(100vh - 35px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 32px 24px 28px;
+  background: linear-gradient(180deg, #fff7f8 0%, var(--color-surface) 35%, var(--color-surface-container-low) 100%);
+  gap: 24px;
+}
+
+.login-hero {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.login-logo-container {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.login-logo-ring {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.login-logo-ring--outer {
+  width: 96px;
+  height: 96px;
+  background: rgba(173, 38, 68, 0.08);
+  animation: pulse-ring 3s infinite ease-in-out;
+}
+
+.login-logo-ring--middle {
+  width: 76px;
+  height: 76px;
+  background: rgba(173, 38, 68, 0.16);
+  animation: pulse-ring 3s infinite ease-in-out 0.5s;
+}
+
+.login-logo-ring--inner {
+  width: 58px;
+  height: 58px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(173, 38, 68, 0.35);
+}
+
+.login-logo-icon {
+  font-size: 28px;
+}
+
+@keyframes pulse-ring {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+
+.login-title {
+  font-family: var(--font-headline);
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--color-primary);
+  margin: 0 0 6px;
+}
+
+.login-tagline {
+  font-family: var(--font-headline);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-on-surface);
+  margin: 0 0 10px;
+}
+
+.login-description {
+  font-size: 0.88rem;
+  color: var(--color-on-surface-variant);
+  max-width: 320px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* Actions Section */
+.login-auth-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.login-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--color-error-container);
+  color: var(--color-on-error-container);
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid rgba(186, 26, 26, 0.2);
+}
+
+.login-error-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.login-offline-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--color-warning-surface);
+  border: 1px solid rgba(245, 124, 0, 0.3);
+  padding: 12px 14px;
+  border-radius: 12px;
+  color: var(--color-warning-text);
+}
+
+.login-offline-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.login-offline-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin: 0 0 2px;
+}
+
+.login-offline-desc {
+  font-size: 0.78rem;
+  margin: 0;
+  line-height: 1.4;
+  opacity: 0.9;
+}
+
+/* Buttons */
+.login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 14px 20px;
+  border-radius: 28px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: var(--font-headline);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  outline: none;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.login-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.login-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.login-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.login-btn--google {
+  background: #ffffff;
+  color: #1f1f1f;
+  border: 1.5px solid #dcdcdc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.login-btn--google:hover:not(:disabled) {
+  background: #fafafa;
+  border-color: #b0b0b0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.login-google-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.login-btn--email {
+  background: var(--color-secondary-surface);
+  color: var(--color-on-secondary-container);
+  border: 1.5px solid var(--color-secondary-surface-dim);
+}
+
+.login-btn--email:hover:not(:disabled) {
+  background: #e2ceff;
+  border-color: var(--color-secondary);
+}
+
+.login-btn--guest {
+  background: var(--color-surface-container-highest);
+  color: var(--color-on-surface);
+  border: 1.5px dashed var(--color-outline);
+}
+
+.login-btn--guest:hover:not(:disabled) {
+  background: #d8deeb;
+  border-color: var(--color-on-surface);
+}
+
+.login-btn--primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: 0 4px 14px rgba(173, 38, 68, 0.3);
+}
+
+.login-btn--primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 6px 0;
+  color: var(--color-outline);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.login-divider span {
+  padding: 0 12px;
+}
+
+/* Emergency & Trust Footers */
+.login-emergency-footer {
+  width: 100%;
+}
+
+.login-emergency-card {
+  background: #fff0f1;
+  border: 1.5px solid #ffccd2;
+  border-radius: 16px;
+  padding: 14px 18px;
+  text-align: center;
+}
+
+.login-emergency-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin: 0 0 6px;
+}
+
+.login-emergency-call {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--color-error);
+  text-decoration: none;
+  padding: 8px 16px;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid rgba(186, 26, 26, 0.2);
+  box-shadow: 0 2px 6px rgba(186, 26, 26, 0.1);
+  transition: all 0.2s;
+}
+
+.login-emergency-call:hover {
+  background: #fff8f8;
+  transform: translateY(-1px);
+}
+
+.login-trust-footer {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-outline);
+}
+
+.login-trust-footer span {
+  background: var(--color-surface-container-low);
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--color-outline-variant);
+}
+
+/* Email / Password Modal */
+.email-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.email-modal-card {
+  background: var(--color-surface-container-lowest);
+  border-radius: 20px;
+  padding: 24px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: 1px solid var(--color-outline-variant);
+  animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.email-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.email-modal-header h3 {
+  margin: 0;
+  font-family: var(--font-headline);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-on-surface);
+}
+
+.email-modal-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--color-outline);
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.email-modal-close:hover {
+  background: var(--color-surface-container-high);
+  color: var(--color-on-surface);
+}
+
+.email-mode-tabs {
+  display: flex;
+  background: var(--color-surface-container-low);
+  padding: 4px;
+  border-radius: 12px;
+  gap: 4px;
+}
+
+.email-tab-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  background: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.email-tab-btn.active {
+  background: #ffffff;
+  color: var(--color-primary);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.email-form-error {
+  background: var(--color-error-container);
+  color: var(--color-on-error-container);
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.email-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.email-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.email-form label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+
+.email-form input {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--color-outline-variant);
+  font-size: 0.92rem;
+  font-family: inherit;
+  background: var(--color-surface-container-lowest);
+  color: var(--color-on-surface);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.email-form input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(173, 38, 68, 0.15);
+}
+
+/* ============================================================
+   VYNTRA — Role Selection & Support Mode (Stitch Serene Sanctuary)
+   ============================================================ */
+
+.role-select-screen {
+  padding: 24px 18px 40px;
+  min-height: calc(100vh - 35px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background-color: #FAF8F5;
+  box-sizing: border-box;
+}
+
+.role-top-badge-container {
+  display: flex;
+  justify-content: center;
+}
+
+.role-safety-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffdadc;
+  color: #8c052e;
+  border: 1px solid #e0bfc1;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(173, 38, 68, 0.08);
+}
+
+.pill-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ad2644;
+  display: inline-block;
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+/* Header */
+.role-hero-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.role-hero-title {
+  font-family: var(--font-headline);
+  font-size: 1.85rem;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #1b1c1a;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.role-hero-subtitle {
+  font-size: 0.88rem;
+  color: #584143;
+  line-height: 1.45;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.role-identity-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 380px;
+  background: #ffffff;
+  border: 1.5px solid #e0bfc1;
+  border-radius: 14px;
+  padding: 8px 14px;
+  margin-top: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.identity-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: #1b1c1a;
+}
+
+.identity-icon {
+  font-size: 18px;
+}
+
+.identity-label {
+  font-family: monospace;
+  font-size: 0.8rem;
+}
+
+.identity-label strong {
+  font-family: var(--font-headline);
+  font-size: 0.85rem;
+  color: #ad2644;
+  letter-spacing: 0.05em;
+}
+
+.identity-copy-btn {
+  background: #f5f3f0;
+  border: 1px solid #dee2ec;
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #4a6267;
+  transition: all 0.2s;
+}
+
+.identity-copy-btn:hover {
+  background: #eae8e5;
+  color: #1b1c1a;
+}
+
+/* Bento Roles Stack */
+.roles-bento-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bento-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 20px 18px;
+  border: 1.5px solid #dee2ec;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+}
+
+.bento-card:hover {
+  transform: translateY(-2px);
+}
+
+.bento-card--user {
+  border-color: #ffb2b9;
+}
+
+.bento-card--user:hover {
+  border-color: #ad2644;
+  box-shadow: 0 8px 24px rgba(173, 38, 68, 0.12);
+}
+
+.bento-card--shelter {
+  border-color: #cde7ed;
+}
+
+.bento-card--shelter:hover {
+  border-color: #2d6a4f;
+  box-shadow: 0 8px 24px rgba(45, 106, 79, 0.12);
+}
+
+.bento-card--service {
+  border-color: #ffdbcf;
+}
+
+.bento-card--service:hover {
+  border-color: #b45309;
+  box-shadow: 0 8px 24px rgba(180, 83, 9, 0.12);
+}
+
+.bento-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.bento-badge {
+  width: 50px;
+  height: 50px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.bento-badge--rose {
+  background: linear-gradient(135deg, #ad2644, #8c052e);
+}
+
+.bento-badge--green {
+  background: linear-gradient(135deg, #2d6a4f, #1b4332);
+}
+
+.bento-badge--amber {
+  background: linear-gradient(135deg, #d97706, #b45309);
+}
+
+.bento-title-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bento-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bento-title {
+  font-family: var(--font-headline);
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #1b1c1a;
+  margin: 0;
+}
+
+.bento-tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.bento-tag--rose {
+  background: #ffdadc;
+  color: #8c052e;
+}
+
+.bento-tag--green {
+  background: #cde7ed;
+  color: #051f23;
+}
+
+.bento-tag--amber {
+  background: #ffdbcf;
+  color: #370e00;
+}
+
+.bento-description {
+  font-size: 0.82rem;
+  color: #584143;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.bento-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid #f0eae6;
+}
+
+.bento-pill {
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: #f5f3f0;
+  color: #1b1c1a;
+  border: 1px solid #e8e4df;
+}
+
+.bento-action-btn {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 14px;
+  font-family: var(--font-headline);
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bento-action-btn:active {
+  transform: scale(0.98);
+}
+
+.btn-arrow {
+  font-size: 1.1rem;
+  transition: transform 0.2s;
+}
+
+.bento-action-btn:hover .btn-arrow {
+  transform: translateX(4px);
+}
+
+.bento-action-btn--rose {
+  background: #ad2644;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(173, 38, 68, 0.28);
+}
+
+.bento-action-btn--rose:hover {
+  background: #8c052e;
+}
+
+.bento-action-btn--green {
+  background: #2d6a4f;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(45, 106, 79, 0.28);
+}
+
+.bento-action-btn--green:hover {
+  background: #1b4332;
+}
+
+.bento-action-btn--amber {
+  background: #b45309;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(180, 83, 9, 0.28);
+}
+
+.bento-action-btn--amber:hover {
+  background: #92400e;
+}
+
+/* Emergency Hotline Card */
+.role-emergency-card {
+  background: #fff5f5;
+  border: 1.5px solid #ffccd2;
+  border-radius: 20px;
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+.role-emergency-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.emergency-title-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.emergency-title-box h3 {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #ad2644;
+  margin: 0;
+}
+
+.emergency-warning-icon {
+  font-size: 18px;
+}
+
+.discreet-toggle-btn {
+  background: #ffffff;
+  border: 1px solid #e0bfc1;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #584143;
+}
+
+.role-emergency-desc {
+  font-size: 0.8rem;
+  color: #584143;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.emergency-dial-btn {
+  width: 100%;
+  min-height: 56px;
+  background: linear-gradient(135deg, #ba1a1a, #93000a);
+  color: #ffffff;
+  border-radius: 16px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  box-shadow: 0 4px 16px rgba(186, 26, 26, 0.3);
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.emergency-dial-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(186, 26, 26, 0.4);
+}
+
+.call-badge {
+  background: rgba(255, 255, 255, 0.22);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.role-trust-strip {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #8c7072;
+  text-align: center;
+  margin-top: 4px;
+}
+

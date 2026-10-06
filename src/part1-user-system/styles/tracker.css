@@ -1,0 +1,213 @@
+/* ============================================================
+   VYNTRA — Menstrual Cycle Health Tracker Styles
+   Design Reference: Sanctuary Haven Cycle Health Tracker
+   Strictly record-keeping, historical log & visual timeline
+   (No predictions, no cramp rating scale)
+   ============================================================ */
+
+.tracker-screen {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cycle-status-card {
+  background: linear-gradient(135deg, #fff3f5 0%, #faeef1 100%);
+  border: 1.5px solid var(--color-primary-surface-dim);
+  border-radius: 20px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 4px 14px rgba(173, 38, 68, 0.08);
+}
+
+.cycle-indicator-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.cycle-indicator-dot.active {
+  background-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(173, 38, 68, 0.2);
+}
+
+.cycle-indicator-dot.inactive {
+  background-color: var(--color-outline);
+}
+
+.cycle-state-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-on-surface);
+  margin: 8px 0 4px;
+}
+
+.cycle-state-subtitle {
+  font-size: 0.85rem;
+  color: var(--color-on-surface-variant);
+  margin-bottom: 20px;
+}
+
+.tracker-action-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tracker-action-btn.start-btn {
+  background: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(173, 38, 68, 0.25);
+}
+
+.tracker-action-btn.start-btn:hover {
+  background: var(--color-primary-hover);
+}
+
+.tracker-action-btn.end-btn {
+  background: var(--color-secondary);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(111, 72, 178, 0.25);
+}
+
+.tracker-action-btn.end-btn:hover {
+  background: var(--color-secondary-hover);
+}
+
+/* Edit Timestamp Modal / Box */
+.timestamp-edit-box {
+  margin-top: 16px;
+  padding: 14px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid var(--color-outline-variant);
+  text-align: left;
+}
+
+.timestamp-edit-box label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-on-surface-variant);
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* Cycle History Graph */
+.cycle-graph-card {
+  background: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 18px;
+  padding: 20px;
+}
+
+.cycle-graph-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.cycle-graph-header h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.bars-chart-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  height: 140px;
+  padding-top: 20px;
+  border-bottom: 2px solid var(--color-surface-container-high);
+}
+
+.bar-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.bar-fill {
+  width: 22px;
+  background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-primary-container) 100%);
+  border-radius: 6px 6px 0 0;
+  min-height: 8px;
+  position: relative;
+  transition: height 0.4s ease;
+}
+
+.bar-days-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  margin-bottom: 4px;
+}
+
+.bar-month-label {
+  font-size: 0.7rem;
+  color: var(--color-outline);
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+/* History Logs & Notes */
+.cycle-logs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cycle-log-item {
+  background: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.log-date-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.log-date-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+
+.log-duration-badge {
+  background: var(--color-primary-surface);
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 8px;
+}
+
+.log-notes-text {
+  font-size: 0.85rem;
+  color: var(--color-on-surface-variant);
+  margin: 6px 0 0;
+  line-height: 1.4;
+  background: var(--color-surface-container-low);
+  padding: 8px 12px;
+  border-radius: 8px;
+}

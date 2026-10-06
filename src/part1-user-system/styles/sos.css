@@ -1,0 +1,375 @@
+/* ============================================================
+   VYNTRA — SOS & Emergency Response Styles
+   Design Reference: Sanctuary Haven Offline SOS Match & Priority Profile
+   ============================================================ */
+
+/* Home Screen & SOS Hub */
+.home-screen {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: calc(100vh - 40px);
+}
+
+.home-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.user-welcome h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--color-on-surface);
+}
+
+.user-welcome p {
+  font-size: 0.82rem;
+  color: var(--color-on-surface-variant);
+  margin: 2px 0 0;
+}
+
+.profile-avatar-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-primary-surface);
+  color: var(--color-primary);
+  border: 1.5px solid var(--color-primary);
+  font-weight: 800;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+/* Big SOS Trigger Section */
+.sos-trigger-card {
+  background: linear-gradient(135deg, #fff2f4 0%, #ffebee 100%);
+  border: 2px solid var(--color-primary);
+  border-radius: 24px;
+  padding: 28px 20px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(173, 38, 68, 0.18);
+  position: relative;
+  overflow: hidden;
+}
+
+.sos-trigger-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(173, 38, 68, 0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.sos-main-btn {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #ad2644, #8f0a30);
+  color: #ffffff;
+  border: 6px solid #ffffff;
+  box-shadow: 0 0 0 8px rgba(173, 38, 68, 0.25), 0 8px 20px rgba(173, 38, 68, 0.4);
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 10px auto 16px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: sos-pulse 2.5s infinite ease-in-out;
+}
+
+.sos-main-btn span {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+  opacity: 0.9;
+}
+
+.sos-main-btn:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 0 12px rgba(173, 38, 68, 0.35), 0 12px 28px rgba(173, 38, 68, 0.5);
+}
+
+.sos-main-btn:active {
+  transform: scale(0.96);
+}
+
+@keyframes sos-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 6px rgba(173, 38, 68, 0.2), 0 6px 18px rgba(173, 38, 68, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 14px rgba(173, 38, 68, 0.3), 0 10px 24px rgba(173, 38, 68, 0.5);
+  }
+}
+
+.sos-caption {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin: 0;
+}
+
+/* Quick Navigation Modules */
+.quick-nav-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.quick-nav-card {
+  background: var(--color-surface-container-lowest);
+  border: 1.5px solid var(--color-outline-variant);
+  border-radius: 16px;
+  padding: 16px;
+  text-decoration: none;
+  color: var(--color-on-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.quick-nav-card:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+.quick-nav-icon {
+  font-size: 28px;
+}
+
+.quick-nav-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.quick-nav-desc {
+  font-size: 0.76rem;
+  color: var(--color-on-surface-variant);
+}
+
+/* Direct Helpline Numbers */
+.emergency-dials-card {
+  background: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.emergency-dials-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-outline);
+  margin-bottom: 12px;
+}
+
+.dials-row {
+  display: flex;
+  gap: 10px;
+}
+
+.dial-chip {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 8px;
+  background: var(--color-surface-container-low);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--color-on-surface);
+  font-weight: 700;
+  font-size: 0.88rem;
+  transition: all 0.2s;
+}
+
+.dial-chip:hover {
+  background: var(--color-primary-surface);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* SOS Conditions Screen */
+.conditions-screen {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 40px);
+}
+
+.conditions-info-box {
+  background: var(--color-primary-surface);
+  border: 1px solid var(--color-primary-surface-dim);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 18px;
+}
+
+.conditions-info-box p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.conditions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.condition-card {
+  background: var(--color-surface-container-lowest);
+  border: 1.5px solid var(--color-outline-variant);
+  border-radius: 14px;
+  padding: 14px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.condition-card.selected {
+  border-color: var(--color-primary);
+  background: #fff5f7;
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.condition-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.condition-code-badge {
+  font-family: monospace;
+  font-size: 0.75rem;
+  font-weight: 800;
+  background: var(--color-surface-container-high);
+  color: var(--color-on-surface);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.condition-card.selected .condition-code-badge {
+  background: var(--color-primary);
+  color: #ffffff;
+}
+
+.condition-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+
+/* Shelter Select Screen */
+.shelter-select-screen {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gps-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--color-tertiary-container);
+  color: var(--color-on-tertiary-container);
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.shelter-card {
+  background: var(--color-surface-container-lowest);
+  border: 1.5px solid var(--color-outline-variant);
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.shelter-card.selected {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary), 0 6px 16px rgba(173, 38, 68, 0.12);
+}
+
+.shelter-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.shelter-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  margin: 0 0 4px;
+}
+
+.shelter-location {
+  font-size: 0.8rem;
+  color: var(--color-on-surface-variant);
+  margin: 0;
+}
+
+.shelter-score-badge {
+  background: var(--color-tertiary-surface);
+  color: var(--color-tertiary);
+  font-weight: 800;
+  font-size: 0.85rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.shelter-stats-row {
+  display: flex;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: var(--color-on-surface-variant);
+  border-top: 1px solid var(--color-surface-container-high);
+  padding-top: 10px;
+}
+
+.shelter-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sms-action-footer {
+  position: sticky;
+  bottom: 16px;
+  background: var(--color-surface);
+  padding: 12px 0 0;
+}

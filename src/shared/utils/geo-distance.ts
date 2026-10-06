@@ -3,55 +3,72 @@
  * 
  * Haversine formula implementation for calculating distances
  * between two geographical coordinate points.
+ * Supports both coordinate object pairs and raw lat/lng arguments.
  * 
  * @module shared/utils/geo-distance
  */
 
+import type { Coordinates, GeoCoordinates } from '../types';
+
 /** Earth's mean radius in kilometers */
 const EARTH_RADIUS_KM = 6371;
 
-/**
- * Converts degrees to radians.
- * 
- * @param degrees - Angle in degrees
- * @returns Angle in radians
- */
 function toRadians(degrees: number): number {
   return degrees * (Math.PI / 180);
 }
 
 /**
- * Calculates the great-circle distance between two points on Earth
- * using the Haversine formula.
- * 
- * @param lat1 - Latitude of point 1 (decimal degrees)
- * @param lng1 - Longitude of point 1 (decimal degrees)
- * @param lat2 - Latitude of point 2 (decimal degrees)
- * @param lng2 - Longitude of point 2 (decimal degrees)
- * @returns Distance in kilometers
- * 
- * @example
- * calculateDistance(12.9716, 77.5946, 13.0827, 80.2707) // ≈ 291 km
+ * Calculates distance using coordinate objects or raw lat/lng.
  */
+export function calculateDistance(from: Coordinates, to: Coordinates): number;
+export function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number;
 export function calculateDistance(
-  lat1: number,
-  lng1: number,
-  lat2: number,
-  lng2: number
+  a: Coordinates | number,
+  b: Coordinates | number,
+  c?: number,
+  d?: number
 ): number {
+  let lat1: number, lng1: number, lat2: number, lng2: number;
+
+  if (typeof a === 'object' && typeof b === 'object') {
+    lat1 = a.lat;
+    lng1 = a.lng;
+    lat2 = b.lat;
+    lng2 = b.lng;
+  } else {
+    lat1 = a as number;
+    lng1 = b as number;
+    lat2 = c as number;
+    lng2 = d as number;
+  }
+
   const dLat = toRadians(lat2 - lat1);
   const dLng = toRadians(lng2 - lng1);
 
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRadians(lat1)) *
-      Math.cos(toRadians(lat2)) *
-      Math.sin(dLng / 2) *
-      Math.sin(dLng / 2);
+  const sinHalfLat = Math.sin(dLat / 2);
+  const sinHalfLng = Math.sin(dLng / 2);
 
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const val =
+    sinHalfLat * sinHalfLat +
+    Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * sinHalfLng * sinHalfLng;
 
-  return EARTH_RADIUS_KM * c;
+  const angle = 2 * Math.atan2(Math.sqrt(val), Math.sqrt(1 - val));
+  return EARTH_RADIUS_KM * angle;
+}
+
+/**
+ * Sorts an array of items by distance from a reference point.
+ */
+export function sortByDistance<T extends { coordinates: GeoCoordinates }>(
+  items: T[],
+  from: GeoCoordinates
+): (T & { distanceKm: number })[] {
+  return items
+    .map((item) => ({
+      ...item,
+      distanceKm: calculateDistance(from, item.coordinates),
+    }))
+    .sort((a, b) => a.distanceKm - b.distanceKm);
 }
 
 /**

@@ -1,0 +1,65 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // ── Users Collection & Subcollections ──
+    match /users/{userId} {
+      allow read, write: if isAuthenticated();
+
+      match /profile/{profileId} {
+        allow read, write: if isAuthenticated();
+      }
+
+      match /cycles/{cycleId} {
+        allow read, write: if isAuthenticated();
+      }
+    }
+
+    // ── Shelter Providers & Inventory ──
+    match /shelter-providers/{shelterId} {
+      // Anyone authenticated can view shelters and their metadata/availability
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+
+      match /{allSubcollections=**} {
+        allow read, write: if isAuthenticated();
+      }
+    }
+
+    // ── Service Providers ──
+    match /service-providers/{providerId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // ── Emergency Resource Orders ──
+    match /orders/{orderId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // ── World Chat (6-Hour District Cycles) ──
+    match /world-chat/{stateCode}/{districtCode}/{recordType} {
+      allow read, write: if isAuthenticated();
+
+      match /{allSubcollections=**} {
+        allow read, write: if isAuthenticated();
+      }
+    }
+
+    // ── District Codes & Mapping ──
+    match /district-codes/{stateCode}/{districtCode} {
+      allow read, write: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // ── SOS Requests ──
+    match /sos-requests/{reqId} {
+      allow read, write: if isAuthenticated();
+    }
+  }
+}

@@ -21,7 +21,7 @@
 export type IdPrefix = 'USR' | 'SHL' | 'SVC' | 'ORD' | 'PRS' | 'FAC' | 'INV' | 'LOG';
 
 /** Alphanumeric character pool for ID generation */
-const CHARSET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const CHARSET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
 /**
  * Generates a cryptographically random alphanumeric string.

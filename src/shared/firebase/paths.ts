@@ -54,3 +54,5 @@ export const FIRESTORE_PATHS = {
   districtCodes: (stateCode: string, districtCode: string) =>
     `district-codes/${stateCode}/${districtCode}`,
 } as const;
+
+export const PATHS = FIRESTORE_PATHS;

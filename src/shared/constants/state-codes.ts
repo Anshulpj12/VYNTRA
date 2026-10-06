@@ -66,20 +66,22 @@ export function getStateRange(stateCode: string): StateCodeRange | undefined {
   return STATE_CODE_RANGES.find((s) => s.stateCode === stateCode);
 }
 
-/**
- * Validates whether a numerical code falls within the valid range for a state.
- * 
- * @param stateCode - Two-letter state code
- * @param numericCode - The numerical code to validate
- * @returns Whether the code is valid for the given state
- */
-export function isValidCodeForState(stateCode: string, numericCode: number): boolean {
+/** Check if a district code falls within the valid range for a state */
+export function isCodeInStateRange(stateCode: string, districtCode: number): boolean {
   const range = getStateRange(stateCode);
   if (!range) return false;
-  return numericCode >= range.rangeStart && numericCode <= range.rangeEnd;
+  return districtCode >= range.rangeStart && districtCode <= range.rangeEnd;
 }
 
-/** Get all state names for dropdown selection */
+/** Validates whether a numerical code falls within the valid range for a state */
+export const isValidCodeForState = isCodeInStateRange;
+
+/** Get list of all state names (for dropdown) */
+export function getStateList(): { code: string; name: string }[] {
+  return STATE_CODE_RANGES.map((s) => ({ code: s.stateCode, name: s.stateName }));
+}
+
+/** All state names for dropdown selection */
 export const ALL_STATES = STATE_CODE_RANGES.map((s) => ({
   name: s.stateName,
   code: s.stateCode,
