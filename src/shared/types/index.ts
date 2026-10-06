@@ -286,3 +286,6 @@ export interface Order {
 
 /** PWA connectivity status */
 export type ConnectivityStatus = 'online-synced' | 'offline-saved' | 'sync-pending';
+
+/* ──────────────────── Validation Schemas ────────────────────────── */
+export * from './schemas';

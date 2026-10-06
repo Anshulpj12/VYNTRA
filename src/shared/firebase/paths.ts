@@ -42,6 +42,10 @@ export const FIRESTORE_PATHS = {
   orders: () => 'orders',
   order: (orderId: string) => `orders/${orderId}`,
 
+  /* ─── SOS Request Paths ─── */
+  sosRequests: () => 'sos-requests',
+  sosRequest: (requestId: string) => `sos-requests/${requestId}`,
+
   /* ─── World Chat Paths ─── */
   worldChatCurrentRecord: (stateCode: string, districtCode: string) =>
     `world-chat/${stateCode}/${districtCode}/current-record`,

@@ -10,7 +10,7 @@
 import { openDB, type IDBPDatabase } from 'idb';
 
 const DB_NAME = 'vyntra-offline-db';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 /** Store names mapped to data types */
 export const STORES = {
@@ -30,6 +30,10 @@ export const STORES = {
   USAGE_LOG: 'usage-log',
   METADATA: 'metadata',
   SYNC_QUEUE: 'sync-queue',
+
+  /* Part 3 Service Provider Stores */
+  SERVICE_PROVIDERS: 'service-providers',
+  ORDERS: 'orders',
 } as const;
 
 /** Sync queue entry for pending Firebase writes */
@@ -97,6 +101,16 @@ function getDb(): Promise<IDBPDatabase> {
         if (!db.objectStoreNames.contains(STORES.SYNC_QUEUE)) {
           const syncStore = db.createObjectStore(STORES.SYNC_QUEUE, { keyPath: 'id' });
           syncStore.createIndex('byTimestamp', 'timestamp');
+        }
+
+        /* Part 3 Stores */
+        if (!db.objectStoreNames.contains(STORES.SERVICE_PROVIDERS)) {
+          db.createObjectStore(STORES.SERVICE_PROVIDERS, { keyPath: 'providerId' });
+        }
+        if (!db.objectStoreNames.contains(STORES.ORDERS)) {
+          const orderStore = db.createObjectStore(STORES.ORDERS, { keyPath: 'orderId' });
+          orderStore.createIndex('byStatus', 'status');
+          orderStore.createIndex('byShelter', 'requestingShelterId');
         }
       },
     });
