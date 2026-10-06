@@ -1,0 +1,198 @@
+/* Dispatch & Delivery Confirmation Styles */
+.dispatch-screen {
+  padding: 16px 20px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Preparation Progress Meter */
+.prep-progress-card {
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(88, 65, 67, 0.1);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.prep-progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.prep-progress-bar-bg {
+  width: 100%;
+  height: 10px;
+  background: var(--color-surface-container-high);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.prep-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-secondary) 0%, var(--color-primary) 100%);
+  border-radius: var(--radius-full);
+  transition: width var(--transition-normal);
+}
+
+.prep-progress-bar-fill.complete {
+  background: var(--color-tertiary);
+}
+
+/* Interactive Verification Checklist */
+.checklist-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.checklist-item {
+  background: var(--color-surface-container-lowest);
+  border: 1.5px solid var(--color-outline-variant);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.checklist-item:hover {
+  background: var(--color-surface-container-low);
+}
+
+.checklist-item.checked {
+  border-color: var(--color-tertiary);
+  background: rgba(24, 106, 34, 0.04);
+}
+
+.checklist-checkbox {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 8px;
+  border: 2.5px solid var(--color-outline);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #fff;
+  transition: all var(--transition-fast);
+}
+
+.checklist-item.checked .checklist-checkbox {
+  background: var(--color-tertiary);
+  border-color: var(--color-tertiary);
+}
+
+.checklist-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.checklist-item-name {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--color-on-surface);
+}
+
+.checklist-item-qty {
+  font-size: 13px;
+  color: var(--color-on-surface-variant);
+}
+
+/* Dispatch Enforcement Gate */
+.dispatch-gate-card {
+  background: var(--color-surface-container-low);
+  border-radius: var(--radius-xl);
+  padding: 18px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.dispatch-gate-message {
+  font-size: 13px;
+  color: var(--color-on-surface-variant);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.dispatch-gate-message.unlocked {
+  color: var(--color-tertiary);
+  font-weight: 600;
+}
+
+/* Delivery Receipt Card */
+.delivery-receipt {
+  background: #fff;
+  border: 2px dashed var(--color-outline);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--shadow-md);
+}
+
+.delivery-receipt-stamp {
+  align-self: flex-end;
+  border: 2px solid var(--color-tertiary);
+  color: var(--color-tertiary);
+  font-family: var(--font-display);
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  transform: rotate(-6deg);
+  font-size: 14px;
+}
+
+/* Auto-Update Banner */
+.auto-update-banner {
+  background: var(--color-sync-online-surface);
+  border: 1.5px solid var(--color-sync-online-border);
+  border-radius: var(--radius-xl);
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.auto-update-banner__icon {
+  font-size: 28px;
+}
+
+.auto-update-banner__content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.auto-update-banner__title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-sync-online-text);
+  margin: 0;
+}
+
+.auto-update-banner__text {
+  font-size: 13px;
+  color: var(--color-sync-online-text);
+  margin: 0;
+  line-height: 1.4;
+}

@@ -1,0 +1,315 @@
+/* ============================================================
+   VYNTRA — Part 3 Base Styles
+   Service Provider, Resource Dispatch & SOS Operations
+   Theme: Serene Sanctuary (Warm Rose-Coral, Slate Spruce, Cream)
+   ============================================================ */
+
+.part3-container {
+  min-height: 100vh;
+  max-width: 520px;
+  margin: 0 auto;
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 90px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Screen Header */
+.part3-top-header {
+  padding: 16px 20px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(88, 65, 67, 0.08);
+  background: var(--color-surface-container-lowest);
+  position: sticky;
+  top: 29px; /* below connectivity badge */
+  z-index: 40;
+}
+
+.part3-top-header__left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.part3-back-btn {
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-outline-variant);
+  background: var(--color-surface-container-low);
+  color: var(--color-on-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.part3-back-btn:hover {
+  background: var(--color-surface-container);
+  transform: translateX(-2px);
+}
+
+.part3-top-header__title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.part3-top-header__title {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--color-on-surface);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.part3-top-header__subtitle {
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+  margin: 2px 0 0 0;
+  font-weight: 500;
+}
+
+/* Bottom Navigation Bar for Part 3 */
+.part3-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 520px;
+  height: 72px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--color-outline-variant);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 8px;
+  z-index: 90;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.part3-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-decoration: none;
+  color: var(--color-on-surface-variant);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 8px 12px;
+  min-height: 48px;
+  min-width: 56px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.part3-nav-item__icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.part3-nav-item.active {
+  color: var(--color-primary);
+  background: var(--color-primary-surface);
+}
+
+.part3-nav-item.sos-urgent {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+/* Card Foundations */
+.part3-card {
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(88, 65, 67, 0.08);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.part3-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Tactical Bento Pill / Badge */
+.part3-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.part3-badge--primary {
+  background: var(--color-primary-surface);
+  color: var(--color-primary);
+}
+
+.part3-badge--secondary {
+  background: var(--color-secondary-surface);
+  color: var(--color-secondary);
+}
+
+.part3-badge--success {
+  background: var(--color-sync-online-surface);
+  color: var(--color-sync-online-text);
+  border: 1px solid var(--color-sync-online-border);
+}
+
+.part3-badge--warning {
+  background: var(--color-warning-surface);
+  color: var(--color-warning-text);
+}
+
+.part3-badge--danger {
+  background: var(--color-priority-1-bg);
+  color: var(--color-priority-1-text);
+  border: 1px solid var(--color-priority-1-stroke);
+}
+
+/* Standard Button Tokens (min 48px, primary 56px, SOS 64px) */
+.part3-btn {
+  min-height: 52px;
+  padding: 0 24px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-normal);
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.part3-btn--primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: 0 4px 16px rgba(173, 38, 68, 0.25);
+}
+
+.part3-btn--primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(173, 38, 68, 0.35);
+}
+
+.part3-btn--secondary {
+  background: var(--color-secondary);
+  color: var(--color-on-secondary);
+}
+
+.part3-btn--secondary:hover:not(:disabled) {
+  background: var(--color-secondary-hover);
+}
+
+.part3-btn--outline {
+  background: transparent;
+  color: var(--color-on-surface);
+  border: 1.5px solid var(--color-outline-variant);
+}
+
+.part3-btn--outline:hover:not(:disabled) {
+  background: var(--color-surface-container-low);
+  border-color: var(--color-outline);
+}
+
+.part3-btn--danger {
+  background: var(--color-priority-1-stroke);
+  color: #fff;
+  min-height: 60px;
+  font-size: 17px;
+}
+
+.part3-btn--danger:hover:not(:disabled) {
+  background: #ad2644;
+  box-shadow: 0 6px 24px rgba(173, 38, 68, 0.4);
+}
+
+.part3-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(40%);
+}
+
+/* Form Inputs */
+.part3-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.part3-form-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-on-surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.part3-form-input,
+.part3-form-select,
+.part3-form-textarea {
+  min-height: 52px;
+  padding: 12px 16px;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--color-outline-variant);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  font-size: 15px;
+  box-sizing: border-box;
+  transition: all var(--transition-fast);
+}
+
+.part3-form-input:focus,
+.part3-form-select:focus,
+.part3-form-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(173, 38, 68, 0.15);
+}
+
+.part3-form-hint {
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+}
+
+.part3-error-alert {
+  padding: 12px 16px;
+  background: var(--color-error-container);
+  color: var(--color-on-error-container);
+  border-radius: var(--radius-lg);
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}

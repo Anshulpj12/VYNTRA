@@ -12,8 +12,17 @@ import SOSConditionsScreen from './part1-user-system/sos/SOSConditionsScreen';
 import SOSShelterSelectScreen from './part1-user-system/sos/SOSShelterSelectScreen';
 import ConnectivityBadge from './part1-user-system/components/ConnectivityBadge';
 
+import ServiceProviderRegistrationScreen from './part3-service-provider/registration/ServiceProviderRegistrationScreen';
+import ServiceDashboardScreen from './part3-service-provider/dashboard/ServiceDashboardScreen';
+import OrderCreationScreen from './part3-service-provider/orders/OrderCreationScreen';
+import OrderDetailScreen from './part3-service-provider/orders/OrderDetailScreen';
+import DispatchScreen from './part3-service-provider/dispatch/DispatchScreen';
+import DeliveryConfirmationScreen from './part3-service-provider/dispatch/DeliveryConfirmationScreen';
+import SOSDecodeScreen from './part3-service-provider/sos-decode/SOSDecodeScreen';
+
 import './shared/design-tokens/tokens.css';
 import './part1-user-system/styles/part1-base.css';
+import './part3-service-provider/styles/part3-base.css';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, vyntraUser, loading } = useAuth();
@@ -47,9 +56,22 @@ function AppRoutes() {
         <Route path="/sos/conditions" element={<ProtectedRoute><SOSConditionsScreen /></ProtectedRoute>} />
         <Route path="/sos/shelters" element={<ProtectedRoute><SOSShelterSelectScreen /></ProtectedRoute>} />
 
-        {/* Placeholder routes for Part 2 & 3 */}
+        {/* Part 2 Placeholder */}
         <Route path="/shelter/*" element={<div className="placeholder-screen"><h2>Shelter Provider Module</h2><p>Part 2 — Coming Soon</p></div>} />
-        <Route path="/service/*" element={<div className="placeholder-screen"><h2>Service Provider Module</h2><p>Part 3 — Coming Soon</p></div>} />
+
+        {/* Part 3: Service Provider, Orders & Dispatch */}
+        <Route path="/service/register" element={<ProtectedRoute><ServiceProviderRegistrationScreen /></ProtectedRoute>} />
+        <Route path="/service/dashboard" element={<ProtectedRoute><ServiceDashboardScreen /></ProtectedRoute>} />
+        <Route path="/service/sos-decode" element={<ProtectedRoute><SOSDecodeScreen /></ProtectedRoute>} />
+        <Route path="/service" element={<Navigate to="/service/dashboard" replace />} />
+
+        {/* Part 3: Orders */}
+        <Route path="/orders/create" element={<ProtectedRoute><OrderCreationScreen /></ProtectedRoute>} />
+        <Route path="/orders/:orderId" element={<ProtectedRoute><OrderDetailScreen /></ProtectedRoute>} />
+
+        {/* Part 3: Dispatch & Delivery */}
+        <Route path="/dispatch/:orderId" element={<ProtectedRoute><DispatchScreen /></ProtectedRoute>} />
+        <Route path="/dispatch/confirm/:orderId" element={<ProtectedRoute><DeliveryConfirmationScreen /></ProtectedRoute>} />
 
         {/* Default redirect */}
         <Route path="/" element={<Navigate to="/auth/login" replace />} />

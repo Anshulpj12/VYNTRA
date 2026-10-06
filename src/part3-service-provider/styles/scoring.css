@@ -1,0 +1,119 @@
+/* Shelter Readiness Scoring Styles */
+.scoring-card {
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(88, 65, 67, 0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.scoring-gauge-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 0;
+}
+
+.scoring-circle {
+  width: 90px;
+  height: 90px;
+  min-width: 90px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-container-low);
+  border: 4px solid var(--color-tertiary);
+  box-shadow: 0 4px 12px rgba(24, 106, 34, 0.15);
+}
+
+.scoring-circle--high {
+  border-color: var(--color-tertiary);
+  color: var(--color-tertiary);
+}
+
+.scoring-circle--medium {
+  border-color: var(--color-warning);
+  color: var(--color-warning-text);
+}
+
+.scoring-circle--low {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.scoring-number {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.scoring-max {
+  font-size: 11px;
+  font-weight: 700;
+  opacity: 0.8;
+  margin-top: 2px;
+}
+
+.scoring-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.scoring-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-on-surface);
+}
+
+.scoring-desc {
+  font-size: 13px;
+  color: var(--color-on-surface-variant);
+  margin: 0;
+  line-height: 1.35;
+}
+
+/* Category Progress Rows */
+.scoring-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.scoring-factor-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.scoring-factor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.scoring-factor-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--color-surface-container-high);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.scoring-factor-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--color-tertiary);
+  transition: width 0.4s ease;
+}
