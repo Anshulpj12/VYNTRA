@@ -9,7 +9,7 @@
  * @part Part 2 — Shelter Provider
  */
 
-import React, { useMemo, useCallback, useState } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import { useShelter } from '../context/ShelterContext';
 import { consolidateMetadata, detectShortages, calculateUtilization } from './metadata-consolidator';
 import { saveMetadata } from './metadata-service';
@@ -24,21 +24,20 @@ export default function MetadataScreen() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<number | null>(null);
 
-  if (!shelter) return null;
-
   /* Consolidate metadata */
   const metadata = useMemo(
-    () => consolidateMetadata(shelter, occupants, facilities, inventory),
+    () => shelter ? consolidateMetadata(shelter, occupants, facilities, inventory) : null,
     [shelter, occupants, facilities, inventory]
   );
 
   const shortages = useMemo(() => detectShortages(inventory), [inventory]);
-  const utilization = useMemo(() => calculateUtilization(metadata), [metadata]);
+  const utilization = useMemo(() => metadata ? calculateUtilization(metadata) : 0, [metadata]);
 
   const activeOccupants = occupants.filter((o) => o.status === 'active');
 
   /** Force sync metadata */
   const handleSync = useCallback(async () => {
+    if (!metadata) return;
     setIsSyncing(true);
     try {
       await saveMetadata(metadata);
@@ -49,6 +48,8 @@ export default function MetadataScreen() {
       setIsSyncing(false);
     }
   }, [metadata]);
+
+  if (!shelter || !metadata) return null;
 
   return (
     <div className="metadata" id="metadata-screen" style={{ animation: 'slideUp var(--vyntra-transition) ease' }}>

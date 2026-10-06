@@ -8,7 +8,7 @@
  * @part Part 2 — Shelter Provider
  */
 
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useShelter } from '../context/ShelterContext';
 import { generateUniqueId } from '../../shared/utils/id-generator';
 import { saveToCache, addToSyncQueue, STORES } from '../../shared/utils/offline-cache';
@@ -33,8 +33,6 @@ export default function BedManagementScreen() {
   const [formError, setFormError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
-  if (!shelter) return null;
-
   const activeOccupants = occupants.filter((o) => o.status === 'active');
   const dischargedOccupants = occupants.filter((o) => o.status === 'discharged');
 
@@ -51,15 +49,17 @@ export default function BedManagementScreen() {
   );
 
   /** Get the next available bed number */
-  const getNextAvailableBed = (): number | undefined => {
+  const getNextAvailableBed = useCallback((): number | undefined => {
+    if (!shelter) return undefined;
     for (let i = 1; i <= shelter.totalBedCapacity; i++) {
       if (!occupiedBedNumbers.has(i)) return i;
     }
     return undefined;
-  };
+  }, [shelter, occupiedBedNumbers]);
 
   /** Handle occupant admission */
   const handleAdmit = useCallback(async () => {
+    if (!shelter) return;
     setFormError('');
 
     if (idMode === 'existing' && !existingAppId.trim()) {
@@ -144,10 +144,11 @@ export default function BedManagementScreen() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [idMode, existingAppId, occupantName, expectedStayDays, selectedBed, shelter, dispatch]);
+  }, [idMode, existingAppId, occupantName, expectedStayDays, selectedBed, shelter, dispatch, getNextAvailableBed]);
 
   /** Handle occupant discharge */
   const handleDischarge = useCallback(async (occupant: Occupant) => {
+    if (!shelter) return;
     const now = Date.now();
     const updated: Occupant = {
       ...occupant,
@@ -183,6 +184,8 @@ export default function BedManagementScreen() {
     const percent = Math.min(100, Math.round((daysIn / occupant.expectedStayDays) * 100));
     return { daysIn, daysLeft, percent };
   };
+
+  if (!shelter) return null;
 
   return (
     <div className="beds" id="bed-management-screen">

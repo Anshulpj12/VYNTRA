@@ -8,7 +8,7 @@
  * @part Part 2 — Shelter Provider
  */
 
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useShelter } from '../context/ShelterContext';
 import { generateUniqueId } from '../../shared/utils/id-generator';
 import { saveToCache, deleteFromCache, addToSyncQueue, STORES } from '../../shared/utils/offline-cache';
@@ -51,8 +51,6 @@ export default function InventoryScreen() {
   const [usagePersonId, setUsagePersonId] = useState('');
   const [usageNotes, setUsageNotes] = useState('');
 
-  if (!shelter) return null;
-
   const lowStockItems = inventory.filter((i) => i.currentQuantity <= i.requiredMinimum);
   const filteredItems = activeCategory === 'all'
     ? inventory
@@ -60,7 +58,7 @@ export default function InventoryScreen() {
 
   /** Add a new inventory item */
   const handleAddItem = useCallback(async () => {
-    if (!newName.trim()) return;
+    if (!shelter || !newName.trim()) return;
     const now = Date.now();
 
     const item: InventoryItem = {
@@ -92,6 +90,7 @@ export default function InventoryScreen() {
 
   /** Record usage of an item */
   const handleRecordUsage = useCallback(async (item: InventoryItem) => {
+    if (!shelter) return;
     const qty = parseInt(usageQty) || 1;
     if (qty <= 0 || qty > item.currentQuantity) return;
 
@@ -161,6 +160,7 @@ export default function InventoryScreen() {
 
   /** Remove an item */
   const handleRemoveItem = useCallback(async (itemId: string) => {
+    if (!shelter) return;
     await deleteFromCache(STORES.INVENTORY, itemId);
     await addToSyncQueue({
       id: `inv-del-${itemId}`,
@@ -184,6 +184,8 @@ export default function InventoryScreen() {
     if (ratio <= 1.5) return { label: 'Safe Margin', className: 'inventory__stock--safe' };
     return { label: 'Stable Stock', className: 'inventory__stock--stable' };
   };
+
+  if (!shelter) return null;
 
   return (
     <div className="inventory" id="inventory-screen">

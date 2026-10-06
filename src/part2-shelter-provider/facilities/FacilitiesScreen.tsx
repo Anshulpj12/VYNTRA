@@ -8,7 +8,7 @@
  * @part Part 2 — Shelter Provider
  */
 
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useShelter } from '../context/ShelterContext';
 import { generateUniqueId } from '../../shared/utils/id-generator';
 import { saveToCache, deleteFromCache, addToSyncQueue, STORES } from '../../shared/utils/offline-cache';
@@ -45,15 +45,13 @@ export default function FacilitiesScreen() {
   const [editCapacity, setEditCapacity] = useState('');
   const [editAvailable, setEditAvailable] = useState('');
 
-  if (!shelter) return null;
-
   const filteredFacilities = filterType === 'all'
     ? facilities
     : facilities.filter((f) => f.type === filterType);
 
   /** Add a new facility */
   const handleAdd = useCallback(async () => {
-    if (!newName.trim()) return;
+    if (!shelter || !newName.trim()) return;
 
     const now = Date.now();
     const capacity = parseInt(newCapacity) || 1;
@@ -125,6 +123,7 @@ export default function FacilitiesScreen() {
 
   /** Remove a facility */
   const handleRemove = useCallback(async (facilityId: string) => {
+    if (!shelter) return;
     await deleteFromCache(STORES.FACILITIES, facilityId);
     await addToSyncQueue({
       id: `fac-del-${facilityId}`,
@@ -137,6 +136,8 @@ export default function FacilitiesScreen() {
 
     dispatch({ type: 'REMOVE_FACILITY', payload: facilityId });
   }, [shelter, dispatch]);
+
+  if (!shelter) return null;
 
   return (
     <div className="facilities" id="facilities-screen">

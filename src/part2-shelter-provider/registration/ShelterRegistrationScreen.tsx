@@ -11,7 +11,7 @@
  * @part Part 2 — Shelter Provider
  */
 
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useShelter } from '../context/ShelterContext';
 import { useConnectivity } from '../context/ConnectivityContext';
 import {

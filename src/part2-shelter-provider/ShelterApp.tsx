@@ -8,7 +8,6 @@
  * @part Part 2 — Shelter Provider
  */
 
-import React from 'react';
 import { ShelterProvider, useShelter, type ShelterTab } from './context/ShelterContext';
 import { ConnectivityProvider, useConnectivity } from './context/ConnectivityContext';
 import { isFirebaseConfigured } from '../shared/firebase/config';

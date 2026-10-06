@@ -7,7 +7,7 @@
  * @module part2-shelter-provider/context/ConnectivityContext
  */
 
-import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import type { ConnectivityStatus } from '../../shared/types';
 import { getPendingSyncEntries } from '../../shared/utils/offline-cache';
 

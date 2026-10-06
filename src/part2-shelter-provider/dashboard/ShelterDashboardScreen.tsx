@@ -8,7 +8,6 @@
  * @part Part 2 — Shelter Provider
  */
 
-import React from 'react';
 import { useShelter } from '../context/ShelterContext';
 import '../styles/dashboard.css';
 
@@ -18,7 +17,7 @@ import '../styles/dashboard.css';
  */
 export default function ShelterDashboardScreen() {
   const { state, dispatch } = useShelter();
-  const { shelter, occupants, facilities, inventory } = state;
+  const { shelter, occupants, inventory } = state;
 
   if (!shelter) return null;
 
