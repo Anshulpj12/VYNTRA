@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400..700;1,400..700&amp;family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-container": "#e7eeff", "primary-fixed": "#ffdadb", "on-tertiary-fixed": "#002113", "on-tertiary-fixed-variant": "#005236", "background": "#f9f9ff", "primary": "#aa2a43", "outline": "#8b7072", "primary-container": "#cc4459", "surface": "#f9f9ff", "on-surface": "#111c2d", "on-secondary-fixed-variant": "#3f465c", "secondary-container": "#dae2fd", "on-tertiary": "#ffffff", "surface-container-high": "#dee8ff", "primary-fixed-dim": "#ffb2b8", "surface-container-low": "#f0f3ff", "on-error": "#ffffff", "surface-container-lowest": "#ffffff", "inverse-primary": "#ffb2b8", "surface-tint": "#ae2d45", "error": "#ba1a1a", "surface-dim": "#cfdaf2", "tertiary-container": "#00855b", "tertiary": "#006947", "on-surface-variant": "#584142", "on-secondary-container": "#5c647a", "on-primary-container": "#fffbff", "surface-variant": "#d8e3fb", "on-primary": "#ffffff", "inverse-surface": "#263143", "on-primary-fixed": "#40000f", "inverse-on-surface": "#ecf1ff", "surface-bright": "#f9f9ff", "secondary-fixed-dim": "#bec6e0", "surface-container-highest": "#d8e3fb", "secondary": "#565e74", "on-tertiary-container": "#f5fff6", "secondary-fixed": "#dae2fd", "outline-variant": "#dfbfc0", "on-secondary": "#ffffff", "on-background": "#111c2d", "on-secondary-fixed": "#131b2e", "tertiary-fixed": "#6ffbbe", "on-error-container": "#93000a", "on-primary-fixed-variant": "#8d112f", "error-container": "#ffdad6", "tertiary-fixed-dim": "#4edea3" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "margin": "2rem", "space-xs": "0.25rem", "space-md": "1rem", "gutter-mobile": "1rem", "gutter": "1.5rem", "space-sm": "0.5rem", "space-lg": "1.5rem", "margin-mobile": "1rem", "space-xl": "2.5rem" }, "fontFamily": { "headline-md": [ "Plus Jakarta Sans" ], "body-md": [ "Atkinson Hyperlegible Next" ], "display-lg": [ "Plus Jakarta Sans" ], "headline-sm": [ "Plus Jakarta Sans" ], "label-md": [ "Atkinson Hyperlegible Next" ], "label-lg": [ "Atkinson Hyperlegible Next" ], "body-lg": [ "Atkinson Hyperlegible Next" ], "body-sm": [ "Atkinson Hyperlegible Next" ], "headline-lg": [ "Plus Jakarta Sans" ], "headline-lg-mobile": [ "Plus Jakarta Sans" ], "display-lg-mobile": [ "Plus Jakarta Sans" ], "counter-number": [ "Plus Jakarta Sans" ] }, "fontSize": { "headline-md": [ "22px", { "lineHeight": "28px", "fontWeight": "600" } ], "body-md": [ "16px", { "lineHeight": "24px", "fontWeight": "400" } ], "display-lg": [ "40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "headline-sm": [ "18px", { "lineHeight": "24px", "fontWeight": "600" } ], "label-md": [ "13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "600" } ], "label-lg": [ "15px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" } ], "body-lg": [ "18px", { "lineHeight": "28px", "fontWeight": "400" } ], "body-sm": [ "14px", { "lineHeight": "20px", "fontWeight": "400" } ], "headline-lg": [ "32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" } ], "headline-lg-mobile": [ "24px", { "lineHeight": "32px", "fontWeight": "700" } ], "display-lg-mobile": [ "30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700" } ], "counter-number": [ "36px", { "lineHeight": "40px", "fontWeight": "800" } ] } } } };</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 h-16 bg-surface-container-lowest border-b border-outline-variant/40 z-50 px-gutter flex items-center justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-sm"><div class="w-9 h-9 rounded-lg bg-primary flex items-center justify-center text-on-primary shadow-sm"><span class="material-symbols-outlined text-[22px]">local_shipping</span></div><div><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight block leading-tight">SafeHaven</span><span class="font-label-md text-label-md text-primary font-semibold uppercase tracking-wider block">Supply &amp; Logistics Mesh</span></div></div><div class="hidden xl:flex items-center gap-space-xs pl-space-md border-l border-outline-variant/50 text-on-surface-variant"><span class="material-symbols-outlined text-[18px] text-secondary">hub</span><span class="font-label-md text-label-md font-semibold text-on-surface">Node:</span><span class="font-label-md text-label-md text-on-surface-variant bg-surface-container px-space-sm py-0.5 rounded">SP-HUB-BLR-04 | South District Depot</span></div></div><div class="flex items-center gap-space-md"><div class="hidden md:flex items-center gap-space-sm"><div class="flex items-center gap-1.5 px-space-sm py-1 rounded-full bg-tertiary-container/15 text-tertiary font-label-md text-label-md"><span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span><span>Firebase Synced</span></div><div class="flex items-center gap-1.5 px-space-sm py-1 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md"><span class="material-symbols-outlined text-[15px] text-tertiary">shield_lock</span><span>Encrypted Cache Ready</span></div></div><div class="flex items-center gap-space-sm pl-space-sm border-l border-outline-variant/40"><div class="text-right hidden sm:block"><div class="font-label-lg text-label-lg font-bold text-on-surface leading-tight">A. Kulkarni</div><div class="font-label-md text-label-md text-on-surface-variant leading-tight">Logistics Director</div></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><aside class="fixed left-0 top-16 bottom-0 w-72 bg-surface-container-low border-r border-outline-variant/40 z-40 flex flex-col justify-between overflow-y-auto"><div class="p-space-md"><div class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider font-semibold px-space-sm mb-space-sm">Supply &amp; Shelter Cycles</div><nav class="flex flex-col gap-1.5" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg shadow-sm"><a class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-sm text-body-sm" data-path="depot-orders-rapid-dispatch" href="#"><span class="material-symbols-outlined text-[20px] text-primary shrink-0">arrows_outward</span><span class="leading-snug">Depot Orders &amp; Rapid Dispatch</span></a><a class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-sm text-body-sm" data-path="shelter-predictive-reorder-restock-console" href="#"><span class="material-symbols-outlined text-[20px] text-primary shrink-0">analytics</span><span class="leading-snug">Shelter Predictive Reorder &amp; Restock</span></a><a class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-sm text-body-sm" data-path="item-consumption-patient-dispense-log" href="#"><span class="material-symbols-outlined text-[20px] text-primary shrink-0">assignment_turned_in</span><span class="leading-snug">Item Consumption &amp; Dispense Log</span></a><a class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-sm text-body-sm" data-path="delivery-handoff-auto-sync-receipt" href="#"><span class="material-symbols-outlined text-[20px] text-primary shrink-0">verified</span><span class="leading-snug">Delivery Handoff &amp; Auto-Sync Receipt</span></a><a class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-sm text-body-sm" data-path="service-provider-network-geo-routing" href="#"><span class="material-symbols-outlined text-[20px] text-primary shrink-0">distance</span><span class="leading-snug">Provider Network &amp; Geo-Routing</span></a></nav></div><div class="p-space-md border-t border-outline-variant/30 bg-surface-container/60"><div class="bg-surface-container-lowest p-space-sm rounded-lg border border-outline-variant/40"><div class="flex items-center justify-between mb-1"><span class="font-label-md text-label-md font-bold text-on-surface">Depot Capacity</span><span class="font-label-md text-label-md font-bold text-primary">88%</span></div><div class="w-full bg-surface-container-highest rounded-full h-1.5 overflow-hidden"><div class="bg-primary h-1.5 rounded-full w-[88%]"></div></div><div class="flex items-center justify-between mt-2 text-on-surface-variant font-label-md text-label-md"><span>Active Couriers: 14</span><span>Pending: 6</span></div></div></div></aside><div class="pl-72"><main class="w-full pt-16 bg-surface min-h-screen px-gutter py-space-lg"><div class="flex flex-col w-full gap-space-lg">
+<!-- Cryptographic Gate Security & Vehicle Arrival Banner -->
+<div class="relative overflow-hidden rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
+<div class="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-tertiary-container/10 blur-3xl pointer-events-none"></div>
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex items-start sm:items-center gap-space-md min-w-0">
+<div class="w-14 h-14 rounded-xl bg-tertiary/10 flex items-center justify-center shrink-0 text-tertiary">
+<span class="material-symbols-outlined text-[32px]">format_image_left</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-2 mb-1 flex-wrap">
+<span class="px-2.5 py-0.5 rounded-full bg-tertiary-container text-on-tertiary-container font-label-md text-label-md font-bold tracking-wide uppercase">Gate Arrival Verified</span>
+<span class="font-label-md text-label-md text-on-surface-variant font-semibold">Manifest Hash: 0x9f4a...e12d</span>
+<span class="inline-flex items-center gap-1 text-tertiary font-label-md text-label-md">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span> Live Sync Ready
+            </span>
+</div>
+<div class="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight truncate">
+            Inbound Restock · Order #ORD-REQ-8894
+          </div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+            Dispatched via Rapid Logistics Hub BLR-04 · SafeHaven Emergency Shelter Gate 02 (North Shore)
+          </p>
+</div>
+</div>
+<!-- Shelter Cryptographic Handshake Passcode -->
+<div class="flex items-center gap-space-md bg-surface-container-low px-space-md py-space-sm rounded-xl shrink-0">
+<div class="text-right">
+<div class="font-label-md text-label-md text-on-surface-variant font-medium">Gate Security Token</div>
+<div class="font-label-md text-label-md text-tertiary font-semibold">Show to Driver</div>
+</div>
+<div class="bg-surface-container-lowest px-4 py-2 rounded-lg shadow-inner text-center">
+<span class="font-headline-md text-headline-md font-extrabold text-primary tracking-widest font-mono">SH-7749</span>
+</div>
+</div>
+</div>
+<!-- Logistics Transit Context Bar -->
+<div class="mt-space-lg grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-sm">
+<div class="flex items-center gap-3 p-space-sm rounded-lg bg-surface-container-low">
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-primary shadow-xs">
+<span class="material-symbols-outlined text-[22px]">local_shipping</span>
+</div>
+<div class="min-w-0">
+<div class="font-label-md text-label-md text-on-surface-variant">Transport Asset</div>
+<div class="font-label-lg text-label-lg text-on-surface font-bold truncate">Van KA-04-G-3829</div>
+</div>
+</div>
+<div class="flex items-center gap-3 p-space-sm rounded-lg bg-surface-container-low">
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-tertiary shadow-xs">
+<span class="material-symbols-outlined text-[22px]">person_check</span>
+</div>
+<div class="min-w-0">
+<div class="font-label-md text-label-md text-on-surface-variant">Authorized Courier</div>
+<div class="font-label-lg text-label-lg text-on-surface font-bold truncate">Rajesh G. Gowda</div>
+</div>
+</div>
+<div class="flex items-center gap-3 p-space-sm rounded-lg bg-surface-container-low">
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-secondary shadow-xs">
+<span class="material-symbols-outlined text-[22px]">thermostat</span>
+</div>
+<div class="min-w-0">
+<div class="font-label-md text-label-md text-on-surface-variant">Cold Chain Sensor</div>
+<div class="font-label-lg text-label-lg text-tertiary font-bold truncate">+4.2°C (Optimal)</div>
+</div>
+</div>
+<div class="flex items-center gap-3 p-space-sm rounded-lg bg-surface-container-low">
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-primary-container shadow-xs">
+<span class="material-symbols-outlined text-[22px]">lock_clock</span>
+</div>
+<div class="min-w-0">
+<div class="font-label-md text-label-md text-on-surface-variant">Docking Timestamp</div>
+<div class="font-label-lg text-label-lg text-on-surface font-bold truncate">14:26:08 UTC</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Primary Interactive Verification & Ledger Projection Panel -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-space-lg items-start">
+<!-- Left Column: Item Manifest & Inspection Grid (7 Cols) -->
+<div class="xl:col-span-7 flex flex-col gap-space-lg">
+<div class="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
+<div class="flex items-center justify-between pb-space-sm mb-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[24px]">fact_check</span>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Physical Manifest Verification</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Cross-check pallet codes and seals against the cryptographic manifest</p>
+</div>
+</div>
+<span class="px-3 py-1 rounded-full bg-surface-container text-on-surface font-label-md text-label-md font-semibold">3 Items Enclosed</span>
+</div>
+<!-- Verification Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant font-label-md text-label-md">
+<th class="py-3 px-4 rounded-l-lg">Item Description &amp; SKU</th>
+<th class="py-3 px-3 text-center">Ordered</th>
+<th class="py-3 px-3 text-center">Manifest</th>
+<th class="py-3 px-3 text-center">Inspected</th>
+<th class="py-3 px-4 text-right rounded-r-lg">Integrity Status</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm text-on-surface">
+<!-- Item 1 -->
+<tr class="transition-colors hover:bg-surface-container-low/50">
+<td class="py-4 px-4">
+<div class="font-label-lg text-label-lg text-on-surface font-bold">High-Absorbency Menstrual Packs</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">SKU: HYG-MNST-120 · Pallet Lot: #PLT-9811</div>
+</td>
+<td class="py-4 px-3 text-center font-label-lg text-label-lg text-on-surface-variant">120</td>
+<td class="py-4 px-3 text-center font-label-lg text-label-lg text-on-surface font-semibold">120</td>
+<td class="py-4 px-3 text-center">
+<span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-tertiary/10 text-tertiary font-bold font-label-lg text-label-lg">120</span>
+</td>
+<td class="py-4 px-4 text-right">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-container text-on-tertiary-container font-label-md text-label-md font-semibold">
+<span class="material-symbols-outlined text-[16px]">verified</span> Seal Intact
+                  </span>
+</td>
+</tr>
+<!-- Item 2 -->
+<tr class="transition-colors hover:bg-surface-container-low/50">
+<td class="py-4 px-4">
+<div class="font-label-lg text-label-lg text-on-surface font-bold">Infant Formula 400g (Stage 1)</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">SKU: PED-NUTR-400 · Exp: 18 Months Valid</div>
+</td>
+<td class="py-4 px-3 text-center font-label-lg text-label-lg text-on-surface-variant">35</td>
+<td class="py-4 px-3 text-center font-label-lg text-label-lg text-on-surface font-semibold">35</td>
+<td class="py-4 px-3 text-center">
+<span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-tertiary/10 text-tertiary font-bold font-label-lg text-label-lg">35</span>
+</td>
+<td class="py-4 px-4 text-right">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-container text-on-tertiary-container font-label-md text-label-md font-semibold">
+<span class="material-symbols-outlined text-[16px]">verified</span> Expiry Valid
+                  </span>
+</td>
+</tr>
+<!-- Item 3 -->
+<tr class="transition-colors hover:bg-surface-container-low/50">
+<td class="py-4 px-4">
+<div class="font-label-lg text-label-lg text-on-surface font-bold">Obstetric Safe Delivery Kits</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">SKU: MED-OBS-010 · Sterilized Box Batch 44</div>
+</td>
+<td class="py-4 px-3 text-center font-label-lg text-label-lg text-on-surface-variant">10</td>
+<td class="py-4 px-3 text-center font-label-lg text-label-lg text-on-surface font-semibold">10</td>
+<td class="py-4 px-3 text-center">
+<span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-tertiary/10 text-tertiary font-bold font-label-lg text-label-lg">10</span>
+</td>
+<td class="py-4 px-4 text-right">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-container text-on-tertiary-container font-label-md text-label-md font-semibold">
+<span class="material-symbols-outlined text-[16px]">verified</span> Tamper-Proof
+                  </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Shelter Physical Unloading Photo Proof -->
+<div class="mt-space-md p-space-md bg-surface-container-low rounded-xl flex flex-col sm:flex-row items-center gap-space-md">
+<div class="w-full sm:w-32 h-24 rounded-lg overflow-hidden shrink-0 shadow-xs relative">
+<img class="w-full h-full object-cover" data-alt="Emergency shelter intake dock showing warehouse staff receiving verified pallets of medical hygiene and infant supplies under high ceiling shelter warehouse lighting with SafeHaven barcode labels" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVl38QpCdID5zarfynJT7GuPYmS6AIfp6LIVCWEB_B49uk1HmM_D7Q3GJ0_EOVCX2YlK6N-r7eQK9Xl-bbVz-6FB4KzgBkjmSPnFEMMnRM4h1_eypIRW2Q83NJSVWa9VRURkp6VzVAnVkyDAB8JtE5OC8SqGRW28e87jQd2E-NjYda_FLneumvFZvDxqdIz46foGThIo2BqF6Ba3fBDnHdGRzcOAYA8IAydGDmwG5e5mI3ZLzudn4K6w"/>
+<div class="absolute bottom-1 right-1 bg-on-surface/80 text-surface-container-lowest px-1.5 py-0.5 rounded font-label-md text-label-md font-mono">Dock 2</div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="font-label-lg text-label-lg text-on-surface font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-tertiary">photo_camera</span>
+              Gate Dock Image Verification Active
+            </div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+              Automated image ingest confirms unbroken tamper stickers across pallet series #PLT-9811 and clean outer containers.
+            </p>
+</div>
+<button class="shrink-0 px-3 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high font-label-md text-label-md text-on-surface font-semibold transition-colors" type="button">
+            Inspect Cargo Photo
+          </button>
+</div>
+</div>
+<!-- Real-Time Supply Chain Continuity SVG Graph -->
+<div class="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
+<div class="flex items-center justify-between mb-space-md">
+<div>
+<div class="font-headline-sm text-headline-sm text-on-surface font-bold">Shelter Stock Depletion vs Influx Projection</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Immediate inventory cushion extension post auto-sync</p>
+</div>
+<div class="flex items-center gap-space-sm text-label-md font-label-md text-on-surface-variant">
+<span class="flex items-center gap-1.5"><span class="w-3 h-1 rounded-full bg-primary"></span> Pre-Delivery</span>
+<span class="flex items-center gap-1.5"><span class="w-3 h-1 rounded-full bg-tertiary"></span> Post-Sync Cushion</span>
+</div>
+</div>
+<!-- Inline SVG Visualization -->
+<div class="w-full h-36 flex items-end">
+<svg class="w-full h-full text-on-surface-variant overflow-visible" fill="none" preserveaspectratio="none" viewbox="0 0 600 130">
+<!-- Grid lines -->
+<line stroke="currentColor" stroke-dasharray="4 4" stroke-opacity="0.1" x1="0" x2="600" y1="20" y2="20"></line>
+<line stroke="currentColor" stroke-dasharray="4 4" stroke-opacity="0.1" x1="0" x2="600" y1="65" y2="65"></line>
+<line stroke="currentColor" stroke-opacity="0.1" x1="0" x2="600" y1="110" y2="110"></line>
+<!-- Historical Depletion Path -->
+<path d="M0,40 Q80,60 180,85 T280,108" fill="none" stroke="#aa2a43" stroke-linecap="round" stroke-width="2.5"></path>
+<!-- Influx Step -->
+<line stroke="#00855b" stroke-dasharray="2 3" stroke-linecap="round" stroke-width="2.5" x1="280" x2="280" y1="108" y2="24"></line>
+<circle class="animate-ping opacity-75" cx="280" cy="24" fill="#00855b" r="5"></circle>
+<circle cx="280" cy="24" fill="#00855b" r="4"></circle>
+<!-- Post Sync Restock Trajectory -->
+<path d="M280,24 Q380,35 480,48 T600,68" fill="none" stroke="#00855b" stroke-linecap="round" stroke-width="3"></path>
+<!-- Labels within graph -->
+<text class="font-label-md text-label-md" fill="#584142" style="font-size: 11px;" x="10" y="32">Critical Buffer Threshold</text>
+<text class="font-label-md text-label-md font-bold" fill="#006947" style="font-size: 11px;" x="290" y="18">+165 Units Confirmed Influx</text>
+<text class="font-label-md text-label-md" fill="#565e74" style="font-size: 11px;" x="490" y="105">14.5 Days Cushion</text>
+</svg>
+</div>
+<div class="flex justify-between font-label-md text-label-md text-on-surface-variant pt-2">
+<span>72h Ago (Depleting)</span>
+<span class="text-tertiary font-bold">T-0: Confirmation Dock</span>
+<span>+14 Days (Stable Supply Envelope)</span>
+</div>
+</div>
+</div>
+<!-- Right Column: Automatic Ledger Increment & Confirmation Action (5 Cols) -->
+<div class="xl:col-span-5 flex flex-col gap-space-lg">
+<!-- Ledger Increment Preview Card -->
+<div class="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
+<div class="flex items-center justify-between mb-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-tertiary text-[24px]">account_balance_wallet</span>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Ledger Increment Preview</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Live stock computation applied instantly upon sign-off</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-tertiary/10 text-tertiary font-label-md text-label-md font-bold uppercase">Zero-Entry Auto</span>
+</div>
+<div class="space-y-space-md">
+<!-- Item Metric 1 -->
+<div class="p-space-md rounded-xl bg-surface-container-low transition-all">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-lg text-label-lg font-bold text-on-surface">Menstrual Supply Packs</span>
+<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-md text-label-md font-bold">Critical 1.2d Left</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm">
+<span class="font-mono">Current: <strong class="text-on-surface">18 packs</strong></span>
+<span class="text-tertiary font-bold font-mono">+120 inbound</span>
+</div>
+<!-- Progress Bar Comparison -->
+<div class="w-full bg-surface-container-highest rounded-full h-3 mt-2 overflow-hidden flex">
+<div class="bg-primary h-3" style="width: 13%;"></div>
+<div class="bg-tertiary h-3" style="width: 87%;"></div>
+</div>
+<div class="flex items-center justify-between mt-2 pt-2 text-on-surface">
+<span class="font-label-md text-label-md text-on-surface-variant">Resulting Storage Balance:</span>
+<span class="font-label-lg text-label-lg font-extrabold text-tertiary">138 packs (14.5 Days)</span>
+</div>
+</div>
+<!-- Item Metric 2 -->
+<div class="p-space-md rounded-xl bg-surface-container-low transition-all">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-lg text-label-lg font-bold text-on-surface">Infant Formula 400g</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-secondary font-label-md text-label-md font-semibold">Low Buffer</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm">
+<span class="font-mono">Current: <strong class="text-on-surface">42 cans</strong></span>
+<span class="text-tertiary font-bold font-mono">+35 inbound</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-3 mt-2 overflow-hidden flex">
+<div class="bg-secondary h-3" style="width: 54%;"></div>
+<div class="bg-tertiary h-3" style="width: 46%;"></div>
+</div>
+<div class="flex items-center justify-between mt-2 pt-2 text-on-surface">
+<span class="font-label-md text-label-md text-on-surface-variant">Resulting Storage Balance:</span>
+<span class="font-label-lg text-label-lg font-extrabold text-tertiary">77 cans (Healthy Buffer)</span>
+</div>
+</div>
+<!-- Item Metric 3 -->
+<div class="p-space-md rounded-xl bg-surface-container-low transition-all">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-lg text-label-lg font-bold text-on-surface">Obstetric Safe Kits</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-secondary font-label-md text-label-md font-semibold">Moderate</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm">
+<span class="font-mono">Current: <strong class="text-on-surface">8 kits</strong></span>
+<span class="text-tertiary font-bold font-mono">+10 inbound</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-3 mt-2 overflow-hidden flex">
+<div class="bg-secondary h-3" style="width: 44%;"></div>
+<div class="bg-tertiary h-3" style="width: 56%;"></div>
+</div>
+<div class="flex items-center justify-between mt-2 pt-2 text-on-surface">
+<span class="font-label-md text-label-md text-on-surface-variant">Resulting Storage Balance:</span>
+<span class="font-label-lg text-label-lg font-extrabold text-tertiary">18 kits (Clinical Standard)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Reception Confirmation Action Panel -->
+<div class="rounded-xl bg-surface-container-lowest p-space-lg shadow-md relative overflow-hidden" id="confirmation-block">
+<div class="flex items-center gap-space-sm mb-space-md">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">assignment_turned_in</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Explicit Shelter Sign-Off</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Atomic stock increment requires explicit personnel authorization</p>
+</div>
+</div>
+<div class="space-y-space-md">
+<!-- Authorized Signer Info Card -->
+<div class="p-space-sm rounded-lg bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[22px]">badge</span>
+<div>
+<div class="font-label-md text-label-md text-on-surface-variant">Authorized Shelter Receiver</div>
+<div class="font-label-lg text-label-lg text-on-surface font-bold">C. Vance, MSW (Head Triage Lead)</div>
+</div>
+</div>
+<span class="font-label-md text-label-md text-tertiary bg-tertiary/10 px-2 py-0.5 rounded font-mono font-semibold">KA-4821</span>
+</div>
+<!-- Physical Condition Checkbox -->
+<label class="flex items-start gap-3 p-3 rounded-lg bg-surface-container-low hover:bg-surface-container cursor-pointer transition-colors select-none">
+<input checked="" class="mt-0.5 w-5 h-5 rounded text-primary focus:ring-primary accent-primary cursor-pointer" id="inspection-checkbox" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface leading-tight">
+              I have physically verified all seals, checked temperature logs, confirmed clinical hygiene standards, and verified zero carton damage.
+            </span>
+</label>
+<!-- Success Notification Banner (Initially Hidden) -->
+<div class="hidden p-space-md rounded-xl bg-tertiary-container text-on-tertiary-container shadow-sm animate-fade-in" id="sync-success-state">
+<div class="flex items-center gap-2 font-headline-sm text-headline-sm font-bold mb-1">
+<span class="material-symbols-outlined text-[24px]">task_alt</span>
+              Stock Auto-Increment Complete!
+            </div>
+<p class="font-body-sm text-body-sm opacity-95">
+              165 items successfully committed to Room B Medical Shelving. Inbound Order #ORD-REQ-8894 marked COMPLETED across central network.
+            </p>
+<div class="mt-2 text-label-md font-label-md font-mono bg-on-tertiary-container/10 px-2 py-1 rounded">
+              Tx: 0xb7291a...88310c · Sync latency: 142ms
+            </div>
+</div>
+<!-- Master Action Button -->
+<button class="w-full min-h-[52px] px-space-lg py-3 rounded-xl bg-primary text-on-primary hover:bg-primary-container active:scale-[0.99] font-label-lg text-label-lg font-bold shadow-md transition-all flex flex-col items-center justify-center gap-0.5" id="confirm-delivery-btn" type="button">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">system_update_alt</span>
+<span>Confirm Delivery Received &amp; Auto-Update Stock</span>
+</div>
+<span class="font-label-md text-label-md text-on-primary/80 font-normal">Triggers zero-reentry database transaction across logistics mesh</span>
+</button>
+<!-- Micro Explainer -->
+<div class="flex items-center gap-2 text-on-surface-variant font-label-md text-label-md justify-center">
+<span class="material-symbols-outlined text-[16px] text-tertiary">lock</span>
+<span>Cryptographically sealed record · Immediate Depot acknowledgment</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Past Completed Deliveries & Cryptographic Ledger Audit Log -->
+<div class="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm mb-space-md pb-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-secondary text-[24px]">history_edu</span>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Past Completed Deliveries &amp; Audit Log</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Immutable receipt archive of verified restock handoffs at SafeHaven KA-4821</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-md text-label-md text-tertiary bg-tertiary-container px-3 py-1 rounded-full font-semibold">Ledger Hash Synchronized</span>
+<button class="p-2 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface" type="button">
+<span class="material-symbols-outlined text-[20px]">filter_list</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant font-label-md text-label-md">
+<th class="py-3 px-4 rounded-l-lg">Order ID &amp; Source</th>
+<th class="py-3 px-4">Delivery Timestamp</th>
+<th class="py-3 px-4">Total SKUs Ingested</th>
+<th class="py-3 px-4">Authorized Receiver</th>
+<th class="py-3 px-4">Cryptographic Hash</th>
+<th class="py-3 px-4 text-right rounded-r-lg">Dispatch Receipt</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm text-on-surface">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-4 px-4">
+<div class="font-label-lg text-label-lg text-on-surface font-bold">#ORD-REQ-8812</div>
+<div class="font-label-md text-label-md text-on-surface-variant">Central Depot Bengaluru East</div>
+</td>
+<td class="py-4 px-4">
+<div class="font-label-md text-label-md text-on-surface font-semibold">Yesterday, 18:34</div>
+<div class="font-label-md text-label-md text-on-surface-variant">Gate 02 · Van KA-04-E-1922</div>
+</td>
+<td class="py-4 px-4">
+<span class="font-label-md text-label-md font-bold text-on-surface bg-surface-container px-2.5 py-1 rounded">280 Units (Bedding &amp; Hygiene)</span>
+</td>
+<td class="py-4 px-4">
+<div class="font-label-md text-label-md text-on-surface font-medium">M. Sundaram, RN</div>
+<div class="font-label-md text-label-md text-on-surface-variant">Night Charge Coordinator</div>
+</td>
+<td class="py-4 px-4 font-mono text-label-md text-label-md text-tertiary">
+<span class="inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">lock</span> 0x8a21...f903
+              </span>
+</td>
+<td class="py-4 px-4 text-right">
+<button class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-secondary-container text-on-surface font-label-md text-label-md font-semibold transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px] text-primary">download</span> Receipt PDF
+              </button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-4 px-4">
+<div class="font-label-lg text-label-lg text-on-surface font-bold">#ORD-REQ-8740</div>
+<div class="font-label-md text-label-md text-on-surface-variant">Emergency Medical Logistics Node 01</div>
+</td>
+<td class="py-4 px-4">
+<div class="font-label-md text-label-md text-on-surface font-semibold">3 Days Ago, 11:15</div>
+<div class="font-label-md text-label-md text-on-surface-variant">Rapid Dispatch Truck DL-01-A-4491</div>
+</td>
+<td class="py-4 px-4">
+<span class="font-label-md text-label-md font-bold text-on-surface bg-surface-container px-2.5 py-1 rounded">50 Kits (Trauma Dressing &amp; Vials)</span>
+</td>
+<td class="py-4 px-4">
+<div class="font-label-md text-label-md text-on-surface font-medium">C. Vance, MSW</div>
+<div class="font-label-md text-label-md text-on-surface-variant">Head Triage Lead</div>
+</td>
+<td class="py-4 px-4 font-mono text-label-md text-label-md text-tertiary">
+<span class="inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">lock</span> 0x4e77...2b19
+              </span>
+</td>
+<td class="py-4 px-4 text-right">
+<button class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-secondary-container text-on-surface font-label-md text-label-md font-semibold transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px] text-primary">download</span> Receipt PDF
+              </button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-4 px-4">
+<div class="font-label-lg text-label-lg text-on-surface font-bold">#ORD-REQ-8692</div>
+<div class="font-label-md text-label-md text-on-surface-variant">South District Community Kitchen Depot</div>
+</td>
+<td class="py-4 px-4">
+<div class="font-label-md text-label-md text-on-surface font-semibold">Oct 24, 09:40</div>
+<div class="font-label-md text-label-md text-on-surface-variant">Refrigerated Carrier KA-04-C-9901</div>
+</td>
+<td class="py-4 px-4">
+<span class="font-label-md text-label-md font-bold text-on-surface bg-surface-container px-2.5 py-1 rounded">120 Packets (Infant Nutrition)</span>
+</td>
+<td class="py-4 px-4">
+<div class="font-label-md text-label-md text-on-surface font-medium">P. Nayak</div>
+<div class="font-label-md text-label-md text-on-surface-variant">Inventory Custodian</div>
+</td>
+<td class="py-4 px-4 font-mono text-label-md text-label-md text-tertiary">
+<span class="inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">lock</span> 0x22c4...e880
+              </span>
+</td>
+<td class="py-4 px-4 text-right">
+<button class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-secondary-container text-on-surface font-label-md text-label-md font-semibold transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px] text-primary">download</span> Receipt PDF
+              </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    const confirmBtn = document.getElementById('confirm-delivery-btn');
+    const successBanner = document.getElementById('sync-success-state');
+    const inspectionCheckbox = document.getElementById('inspection-checkbox');
+
+    if (confirmBtn && successBanner) {
+      confirmBtn.addEventListener('click', function() {
+        if (!inspectionCheckbox.checked) {
+          alert('Please verify and check the physical integrity verification checkbox prior to handoff confirmation.');
+          inspectionCheckbox.focus();
+          return;
+        }
+
+        // Show updating state
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined animate-spin text-[20px]">sync</span>
+            <span>Committing Ledger Update to Firebase...</span>
+          </div>
+          <span class="font-label-md text-label-md text-on-primary/70">Executing atomic inventory increment</span>
+        `;
+        confirmBtn.classList.remove('bg-primary');
+        confirmBtn.classList.add('bg-secondary');
+
+        // Simulate database commit
+        setTimeout(() => {
+          confirmBtn.classList.add('hidden');
+          successBanner.classList.remove('hidden');
+        }, 1100);
+      });
+    }
+  })();
+</script></main></div></body></html>

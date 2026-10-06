@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400..700;1,400..700&amp;family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-container": "#e7eeff", "primary-fixed": "#ffdadb", "on-tertiary-fixed": "#002113", "on-tertiary-fixed-variant": "#005236", "background": "#f9f9ff", "primary": "#aa2a43", "outline": "#8b7072", "primary-container": "#cc4459", "surface": "#f9f9ff", "on-surface": "#111c2d", "on-secondary-fixed-variant": "#3f465c", "secondary-container": "#dae2fd", "on-tertiary": "#ffffff", "surface-container-high": "#dee8ff", "primary-fixed-dim": "#ffb2b8", "surface-container-low": "#f0f3ff", "on-error": "#ffffff", "surface-container-lowest": "#ffffff", "inverse-primary": "#ffb2b8", "surface-tint": "#ae2d45", "error": "#ba1a1a", "surface-dim": "#cfdaf2", "tertiary-container": "#00855b", "tertiary": "#006947", "on-surface-variant": "#584142", "on-secondary-container": "#5c647a", "on-primary-container": "#fffbff", "surface-variant": "#d8e3fb", "on-primary": "#ffffff", "inverse-surface": "#263143", "on-primary-fixed": "#40000f", "inverse-on-surface": "#ecf1ff", "surface-bright": "#f9f9ff", "secondary-fixed-dim": "#bec6e0", "surface-container-highest": "#d8e3fb", "secondary": "#565e74", "on-tertiary-container": "#f5fff6", "secondary-fixed": "#dae2fd", "outline-variant": "#dfbfc0", "on-secondary": "#ffffff", "on-background": "#111c2d", "on-secondary-fixed": "#131b2e", "tertiary-fixed": "#6ffbbe", "on-error-container": "#93000a", "on-primary-fixed-variant": "#8d112f", "error-container": "#ffdad6", "tertiary-fixed-dim": "#4edea3" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "margin": "2rem", "space-xs": "0.25rem", "space-md": "1rem", "gutter-mobile": "1rem", "gutter": "1.5rem", "space-sm": "0.5rem", "space-lg": "1.5rem", "margin-mobile": "1rem", "space-xl": "2.5rem" }, "fontFamily": { "headline-md": [ "Plus Jakarta Sans" ], "body-md": [ "Atkinson Hyperlegible Next" ], "display-lg": [ "Plus Jakarta Sans" ], "headline-sm": [ "Plus Jakarta Sans" ], "label-md": [ "Atkinson Hyperlegible Next" ], "label-lg": [ "Atkinson Hyperlegible Next" ], "body-lg": [ "Atkinson Hyperlegible Next" ], "body-sm": [ "Atkinson Hyperlegible Next" ], "headline-lg": [ "Plus Jakarta Sans" ], "headline-lg-mobile": [ "Plus Jakarta Sans" ], "display-lg-mobile": [ "Plus Jakarta Sans" ], "counter-number": [ "Plus Jakarta Sans" ] }, "fontSize": { "headline-md": [ "22px", { "lineHeight": "28px", "fontWeight": "600" } ], "body-md": [ "16px", { "lineHeight": "24px", "fontWeight": "400" } ], "display-lg": [ "40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "headline-sm": [ "18px", { "lineHeight": "24px", "fontWeight": "600" } ], "label-md": [ "13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "600" } ], "label-lg": [ "15px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" } ], "body-lg": [ "18px", { "lineHeight": "28px", "fontWeight": "400" } ], "body-sm": [ "14px", { "lineHeight": "20px", "fontWeight": "400" } ], "headline-lg": [ "32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" } ], "headline-lg-mobile": [ "24px", { "lineHeight": "32px", "fontWeight": "700" } ], "display-lg-mobile": [ "30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700" } ], "counter-number": [ "36px", { "lineHeight": "40px", "fontWeight": "800" } ] } } } };</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 h-16 bg-surface-container-lowest border-b border-outline-variant/40 z-50 px-gutter flex items-center justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-sm"><div class="w-9 h-9 rounded-lg bg-primary flex items-center justify-center text-on-primary shadow-sm"><span class="material-symbols-outlined text-[22px]">local_shipping</span></div><div><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight block leading-tight">SafeHaven</span><span class="font-label-md text-label-md text-primary font-semibold uppercase tracking-wider block">Supply &amp; Logistics Mesh</span></div></div><div class="hidden xl:flex items-center gap-space-xs pl-space-md border-l border-outline-variant/50 text-on-surface-variant"><span class="material-symbols-outlined text-[18px] text-secondary">hub</span><span class="font-label-md text-label-md font-semibold text-on-surface">Node:</span><span class="font-label-md text-label-md text-on-surface-variant bg-surface-container px-space-sm py-0.5 rounded">SP-HUB-BLR-04 | South District Depot</span></div></div><div class="flex items-center gap-space-md"><div class="hidden md:flex items-center gap-space-sm"><div class="flex items-center gap-1.5 px-space-sm py-1 rounded-full bg-tertiary-container/15 text-tertiary font-label-md text-label-md"><span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span><span>Firebase Synced</span></div><div class="flex items-center gap-1.5 px-space-sm py-1 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md"><span class="material-symbols-outlined text-[15px] text-tertiary">shield_lock</span><span>Encrypted Cache Ready</span></div></div><div class="flex items-center gap-space-sm pl-space-sm border-l border-outline-variant/40"><div class="text-right hidden sm:block"><div class="font-label-lg text-label-lg font-bold text-on-surface leading-tight">A. Kulkarni</div><div class="font-label-md text-label-md text-on-surface-variant leading-tight">Logistics Director</div></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><aside class="fixed left-0 top-16 bottom-0 w-72 bg-surface-container-low border-r border-outline-variant/40 z-40 flex flex-col justify-between overflow-y-auto"><div class="p-space-md"><div class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider font-semibold px-space-sm mb-space-sm">Supply &amp; Shelter Cycles</div><nav class="flex flex-col gap-1.5" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg shadow-sm"><a class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-sm text-body-sm" data-path="depot-orders-rapid-dispatch" href="#"><span class="material-symbols-outlined text-[20px] text-primary shrink-0">arrows_outward</span><span class="leading-snug">Depot Orders &amp; Rapid Dispatch</span></a><a class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-sm text-body-sm" data-path="shelter-predictive-reorder-restock-console" href="#"><span class="material-symbols-outlined text-[20px] text-primary shrink-0">analytics</span><span class="leading-snug">Shelter Predictive Reorder &amp; Restock</span></a><a class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-sm text-body-sm" data-path="item-consumption-patient-dispense-log" href="#"><span class="material-symbols-outlined text-[20px] text-primary shrink-0">assignment_turned_in</span><span class="leading-snug">Item Consumption &amp; Dispense Log</span></a><a class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-sm text-body-sm" data-path="delivery-handoff-auto-sync-receipt" href="#"><span class="material-symbols-outlined text-[20px] text-primary shrink-0">verified</span><span class="leading-snug">Delivery Handoff &amp; Auto-Sync Receipt</span></a><a class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-sm text-body-sm" data-path="service-provider-network-geo-routing" href="#"><span class="material-symbols-outlined text-[20px] text-primary shrink-0">distance</span><span class="leading-snug">Provider Network &amp; Geo-Routing</span></a></nav></div><div class="p-space-md border-t border-outline-variant/30 bg-surface-container/60"><div class="bg-surface-container-lowest p-space-sm rounded-lg border border-outline-variant/40"><div class="flex items-center justify-between mb-1"><span class="font-label-md text-label-md font-bold text-on-surface">Depot Capacity</span><span class="font-label-md text-label-md font-bold text-primary">88%</span></div><div class="w-full bg-surface-container-highest rounded-full h-1.5 overflow-hidden"><div class="bg-primary h-1.5 rounded-full w-[88%]"></div></div><div class="flex items-center justify-between mt-2 text-on-surface-variant font-label-md text-label-md"><span>Active Couriers: 14</span><span>Pending: 6</span></div></div></div></aside><div class="pl-72"><main class="w-full pt-16 bg-surface min-h-screen px-gutter py-space-lg"><div class="flex flex-col w-full gap-space-lg">
+<!-- Sub-header Alert & Operational Synchronizer -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md p-space-md rounded-xl bg-surface-container-low shadow-sm">
+<div class="flex items-center gap-space-md">
+<div class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-on-primary shadow-sm shrink-0">
+<span class="material-symbols-outlined text-[26px]">inventory_2</span>
+</div>
+<div>
+<div class="flex items-center gap-space-sm flex-wrap">
+<span class="font-headline-sm text-headline-sm text-on-surface">Shelter Inventory Dispense Desk</span>
+<span class="px-2 py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-label-md text-label-md flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span> Live Ledger Synced
+          </span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-on-surface-variant font-label-md text-label-md">
+            Node: BLR-SHELTER-04A
+          </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+          Real-time deduction engine linking clinical dispensations directly to bed allocations and automatic run-out telemetries.
+        </p>
+</div>
+</div>
+<!-- Telemetry status pills -->
+<div class="flex items-center gap-space-sm self-start lg:self-center shrink-0">
+<div class="bg-surface-container-lowest px-space-md py-2 rounded-lg shadow-sm flex items-center gap-space-sm">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">IndexedDB Cache</span>
+<span class="font-label-lg text-label-lg font-bold text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-tertiary">lock</span>
+            Write-Locked (0 Pending)
+          </span>
+</div>
+</div>
+<div class="bg-surface-container-lowest px-space-md py-2 rounded-lg shadow-sm flex items-center gap-space-sm">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Depot Mirror</span>
+<span class="font-label-lg text-label-lg font-bold text-tertiary flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">cloud_sync</span>
+            14ms Latency
+          </span>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Grid: Dispense Action Panel & Telemetry Charts -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-space-lg items-start">
+<!-- LEFT 7 COLS: Quick Dispense Action Form -->
+<div class="xl:col-span-7 flex flex-col gap-space-lg">
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-md relative overflow-hidden">
+<!-- Accent top stripe indicator -->
+<div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary via-primary-container to-tertiary"></div>
+<div class="flex items-center justify-between pb-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-primary-fixed flex items-center justify-center text-on-primary-fixed">
+<span class="material-symbols-outlined text-[20px]">assignment_turned_in</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Quick Dispense Transaction</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Instant stock reduction and patient clinical attribution</p>
+</div>
+</div>
+<span class="bg-primary/10 text-primary px-2.5 py-1 rounded-full font-label-md text-label-md font-semibold">
+            Protocol: SEC-MED-77
+          </span>
+</div>
+<form class="flex flex-col gap-space-md" id="dispenseForm" onsubmit="event.preventDefault(); recordTransaction();">
+<!-- Item Selection & Live Stock Gauge -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-lg text-label-lg text-on-surface flex items-center justify-between" for="itemSelect">
+<span class="flex items-center gap-1">
+<span>Select Supply Category or Emergency Kit</span>
+<span class="text-primary">*</span>
+</span>
+<span class="text-tertiary font-label-md text-label-md flex items-center gap-1 font-semibold" id="stockAvailabilityBadge">
+<span class="material-symbols-outlined text-[14px]">inventory</span>
+                Remaining in Shelter Depot: 38 Packs
+              </span>
+</label>
+<div class="relative">
+<select class="w-full h-[52px] px-space-md bg-surface-container-low text-on-surface font-body-md text-body-md rounded-lg focus:outline-none focus:ring-2 focus:ring-primary appearance-none cursor-pointer" id="itemSelect" onchange="updateItemMetrics()">
+<option value="sanitary_pads">High-Absorbency Sanitary Pads (Packs of 10) - Shelf D-04 [Critical Maternal/Hygiene]</option>
+<option value="infant_formula">Infant Care Formula Stage 1 (800g Tins) - Cold Shelf B-01 [Infant Nutrition]</option>
+<option value="obstetric_kit">Sterile Obstetric Care Delivery Kit - Emergency Tray E-2 [Tier-1 Clinical]</option>
+<option value="water_carboys">20L Potable Water Sealed Carboys - Common Storage Staging [Water Security]</option>
+<option value="linen_kit">Hypoallergenic Bed Linen &amp; Thermal Blanket - Dorm Ward Linen Rack</option>
+<option value="dextrose_saline">500ml 0.9% Normal Saline + Infusion Line - Clinical Refrigerator 03</option>
+</select>
+<div class="absolute right-space-md top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">unfold_more</span>
+</div>
+</div>
+</div>
+<!-- Quantity Stepper & Run-Out Projection Preview -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md items-center bg-surface-container-low p-space-md rounded-xl">
+<div class="flex flex-col gap-1">
+<span class="font-label-md text-label-md text-on-surface font-semibold uppercase tracking-wider">Quantity Consumed</span>
+<div class="flex items-center gap-space-sm mt-1">
+<button class="w-12 h-12 rounded-lg bg-surface-container text-on-surface flex items-center justify-center hover:bg-surface-container-high active:scale-95 transition-all text-xl font-bold shadow-sm" onclick="adjustQty(-1)" type="button">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<div class="h-12 px-space-lg flex items-center justify-center bg-surface-container-lowest rounded-lg shadow-inner min-w-[100px]">
+<span class="font-counter-number text-counter-number text-on-surface" id="qtyDisplay">4</span>
+<span class="font-label-md text-label-md text-on-surface-variant ml-1.5 uppercase" id="unitLabel">Packs</span>
+</div>
+<button class="w-12 h-12 rounded-lg bg-surface-container text-on-surface flex items-center justify-center hover:bg-surface-container-high active:scale-95 transition-all text-xl font-bold shadow-sm" onclick="adjustQty(1)" type="button">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col justify-center p-space-sm bg-surface-container-lowest rounded-lg shadow-sm">
+<div class="flex items-center justify-between text-on-surface-variant font-label-md text-label-md">
+<span>Predicted Shelter Stockout</span>
+<span class="font-bold text-primary" id="stockoutProjection">6.4 Days (Nominal)</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-2 mt-2 overflow-hidden">
+<div class="bg-primary h-2 rounded-full transition-all duration-300 w-[64%]" id="stockoutBar"></div>
+</div>
+<span class="text-xs text-on-surface-variant mt-1.5">Consumption rate adjusted for 34 shelter occupants.</span>
+</div>
+</div>
+<!-- Resident Attribution Toggle Switch -->
+<div class="flex flex-col gap-2 pt-1">
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">Attribution &amp; Recipient Category</span>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-sm">
+<label class="cursor-pointer">
+<input checked="" class="peer sr-only" name="attributionType" onchange="toggleAttributionView()" type="radio" value="patient"/>
+<div class="p-space-md rounded-xl bg-surface-container-low peer-checked:bg-primary-fixed peer-checked:text-on-primary-fixed transition-all flex items-start gap-space-sm shadow-sm">
+<div class="w-6 h-6 rounded-full flex items-center justify-center bg-surface-container-highest peer-checked:bg-primary peer-checked:text-on-primary mt-0.5 shrink-0">
+<span class="material-symbols-outlined text-[16px]">person</span>
+</div>
+<div>
+<div class="font-headline-sm text-headline-sm leading-snug">Individual Resident</div>
+<div class="font-body-sm text-body-sm opacity-80 mt-0.5">Link to Resident APP-ID, bed allocation, and medical care log.</div>
+</div>
+</div>
+</label>
+<label class="cursor-pointer">
+<input class="peer sr-only" name="attributionType" onchange="toggleAttributionView()" type="radio" value="communal"/>
+<div class="p-space-md rounded-xl bg-surface-container-low peer-checked:bg-secondary-container peer-checked:text-on-secondary-container transition-all flex items-start gap-space-sm shadow-sm">
+<div class="w-6 h-6 rounded-full flex items-center justify-center bg-surface-container-highest peer-checked:bg-secondary peer-checked:text-on-secondary mt-0.5 shrink-0">
+<span class="material-symbols-outlined text-[16px]">domain</span>
+</div>
+<div>
+<div class="font-headline-sm text-headline-sm leading-snug">General Facility Use</div>
+<div class="font-body-sm text-body-sm opacity-80 mt-0.5">Communal sanitation, central water purification, dining &amp; upkeep.</div>
+</div>
+</div>
+</label>
+</div>
+</div>
+<!-- Dynamic Subsection: Individual Resident Search & Occupant Identification -->
+<div class="p-space-md bg-surface-container-low rounded-xl flex flex-col gap-space-sm transition-all duration-300" id="patientSelectionContainer">
+<label class="font-label-lg text-label-lg text-on-surface flex items-center justify-between" for="residentSearch">
+<span>Resident Lookup (APP-ID / Name / Bed)</span>
+<span class="font-label-md text-label-md text-primary font-semibold">Active Bed Assignment</span>
+</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-space-md top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full h-[52px] pl-11 pr-space-md bg-surface-container-lowest text-on-surface font-body-md text-body-md rounded-lg focus:outline-none focus:ring-2 focus:ring-primary shadow-inner" id="residentSearch" placeholder="Scan QR badge or type resident ID..." type="text" value="APP-KA-7819 (Elena Rostova - 2nd Trimester, Bed A-04)"/>
+</div>
+<!-- Identified Patient Card Preview -->
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-sm mt-1">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-headline-sm">
+                  ER
+                </div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface">Elena Rostova</span>
+<span class="text-xs bg-error-container text-on-error-container px-2 py-0.5 rounded font-bold uppercase tracking-wider">High Vulnerability</span>
+</div>
+<div class="flex items-center gap-space-sm font-label-md text-label-md text-on-surface-variant mt-0.5">
+<span>APP-ID: APP-KA-7819</span>
+<span>•</span>
+<span class="text-on-surface font-semibold">Bed: Dorm A, Bay 04</span>
+<span>•</span>
+<span class="text-primary font-medium">Obstetric Triage Grade II</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-1.5 self-end sm:self-center">
+<span class="px-2 py-1 rounded bg-surface-container-high text-on-surface-variant font-label-md text-label-md">Verified Intake</span>
+</div>
+</div>
+</div>
+<!-- Dynamic Subsection: Communal Location Target (Hidden by default) -->
+<div class="hidden p-space-md bg-surface-container-low rounded-xl flex flex-col gap-space-sm transition-all duration-300" id="communalLocationContainer">
+<label class="font-label-lg text-label-lg text-on-surface" for="facilityZone">Shelter Communal Sector</label>
+<select class="w-full h-[52px] px-space-md bg-surface-container-lowest text-on-surface font-body-md text-body-md rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" id="facilityZone">
+<option>Central Sanitization Block (Common Washrooms 1-6)</option>
+<option>Community Hydration Station - Dining Hall Corridor</option>
+<option>Dormitory Pod B - Floor Disinfection &amp; Waste Disposal</option>
+<option>Paramedical Resuscitation Corner - Emergency Triage Bay</option>
+</select>
+</div>
+<!-- Clinical Usage Reason / Case Note -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-lg text-label-lg text-on-surface" for="clinicalNote">
+              Usage Reason &amp; Clinical Field Note
+            </label>
+<textarea class="w-full p-space-md bg-surface-container-low text-on-surface font-body-md text-body-md rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none shadow-inner" id="clinicalNote" rows="2">Post-admission hygienic care kit issued for 3-day recovery stay. Supervised dispense completed by duty triage nurse.</textarea>
+</div>
+<!-- Submit Bar & Instant Commit Action -->
+<div class="pt-space-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-space-md">
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[18px] text-tertiary">verified_user</span>
+<span>Deducts immediately &amp; signals Depot Replenishment Mesh</span>
+</div>
+<button class="h-[52px] px-space-lg rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg font-bold flex items-center justify-center gap-space-sm shadow-md transition-all active:scale-[0.98]" id="commitBtn" type="submit">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+<span>Record Usage &amp; Deduct Stock</span>
+<span class="ml-1 bg-on-primary/20 text-on-primary px-2 py-0.5 rounded-full text-xs font-semibold" id="buttonDeductBadge">
+                -4 Units
+              </span>
+</button>
+</div>
+</form>
+</div>
+<!-- Live Burn-Rate Telemetry Card -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-md flex flex-col gap-space-md">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+<div>
+<div class="flex items-center gap-2">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Dynamic Stock Burn-Rate Telemetry</h3>
+<span class="px-2 py-0.5 bg-surface-container-high rounded text-on-surface-variant font-label-md text-label-md">24h Run-Time</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+              Hourly consumption peaks mapping intake rushes (08:00 - 10:00) against nightly sanitation turnover.
+            </p>
+</div>
+<div class="flex items-center gap-space-sm">
+<div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant">
+<span class="w-3 h-3 rounded-sm bg-primary"></span> Patient Direct
+            </div>
+<div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant">
+<span class="w-3 h-3 rounded-sm bg-secondary"></span> Communal
+            </div>
+</div>
+</div>
+<!-- Inline SVG Visualization Chart (Burn Rate Histogram & Trendline) -->
+<div class="w-full bg-surface-container-low rounded-xl p-space-md flex flex-col gap-2">
+<div class="h-44 w-full relative">
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 600 160">
+<defs>
+<lineargradient id="primaryAreaGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#aa2a43" stop-opacity="0.35"></stop>
+<stop offset="100%" stop-color="#aa2a43" stop-opacity="0.0"></stop>
+</lineargradient>
+</defs>
+<!-- Grid horizontal markers -->
+<line stroke="#dee8ff" stroke-dasharray="4 4" stroke-width="1" x1="0" x2="600" y1="20" y2="20"></line>
+<line stroke="#dee8ff" stroke-dasharray="4 4" stroke-width="1" x1="0" x2="600" y1="60" y2="60"></line>
+<line stroke="#dee8ff" stroke-dasharray="4 4" stroke-width="1" x1="0" x2="600" y1="100" y2="100"></line>
+<line stroke="#dee8ff" stroke-width="1" x1="0" x2="600" y1="140" y2="140"></line>
+<!-- Bar pairs for Hourly consumption (Morning surge to afternoon) -->
+<!-- 06:00 -->
+<rect fill="#565e74" height="25" rx="3" width="14" x="25" y="115"></rect>
+<rect fill="#aa2a43" height="45" rx="3" width="14" x="42" y="95"></rect>
+<!-- 08:00 (Surge Peak) -->
+<rect fill="#565e74" height="70" rx="3" width="14" x="110" y="70"></rect>
+<rect fill="#aa2a43" height="110" rx="3" width="14" x="127" y="30"></rect>
+<!-- 10:00 -->
+<rect fill="#565e74" height="55" rx="3" width="14" x="195" y="85"></rect>
+<rect fill="#aa2a43" height="95" rx="3" width="14" x="212" y="45"></rect>
+<!-- 12:00 -->
+<rect fill="#565e74" height="75" rx="3" width="14" x="280" y="65"></rect>
+<rect fill="#aa2a43" height="65" rx="3" width="14" x="297" y="75"></rect>
+<!-- 14:00 (Current) -->
+<rect fill="#565e74" height="50" rx="3" width="14" x="365" y="90"></rect>
+<rect fill="#aa2a43" height="85" rx="3" width="14" x="382" y="55"></rect>
+<!-- 16:00 (Projected) -->
+<rect fill="#bec6e0" height="35" opacity="0.6" rx="3" width="14" x="450" y="105"></rect>
+<rect fill="#ffb2b8" height="60" opacity="0.6" rx="3" width="14" x="467" y="80"></rect>
+<!-- 18:00 (Evening sanitation projection) -->
+<rect fill="#bec6e0" height="90" opacity="0.6" rx="3" width="14" x="535" y="50"></rect>
+<rect fill="#ffb2b8" height="70" opacity="0.6" rx="3" width="14" x="552" y="70"></rect>
+<!-- Overlay Trend Spline -->
+<path d="M 50,85 C 130,20 200,40 300,70 C 390,50 460,75 560,60" fill="none" stroke="#00855b" stroke-width="2.5"></path>
+<!-- Surge Indicator Pin -->
+<circle cx="134" cy="30" fill="#00855b" r="4.5" stroke="#ffffff" stroke-width="2"></circle>
+</svg>
+</div>
+<!-- Bottom Time Markers -->
+<div class="flex justify-between items-center px-4 font-label-md text-label-md text-on-surface-variant">
+<span>06:00 (Dawn Shift)</span>
+<span>08:00 (Surge Intake)</span>
+<span>10:00 (Clinic Hours)</span>
+<span>12:00 (Lunch Prep)</span>
+<span class="text-primary font-bold">14:00 (Now)</span>
+<span class="italic text-on-surface-variant/70">16:00 (Proj)</span>
+<span class="italic text-on-surface-variant/70">18:00 (Night Cycle)</span>
+</div>
+</div>
+<!-- Telemetry Summary Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+<div class="bg-surface-container-low p-space-md rounded-lg flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[22px]">trending_up</span>
+</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Burn Rate Index</div>
+<div class="font-counter-number text-headline-sm font-bold text-on-surface">18.4 <span class="text-xs font-normal text-on-surface-variant">units/hr</span></div>
+</div>
+</div>
+<div class="bg-surface-container-low p-space-md rounded-lg flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-tertiary shrink-0">
+<span class="material-symbols-outlined text-[22px]">nest_clock_farsight_analog</span>
+</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Safe Run-Out Margin</div>
+<div class="font-counter-number text-headline-sm font-bold text-tertiary">42 Hours</div>
+</div>
+</div>
+<div class="bg-surface-container-low p-space-md rounded-lg flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-[22px]">local_shipping</span>
+</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Auto-Reorder Triggers</div>
+<div class="font-counter-number text-headline-sm font-bold text-on-surface">2 Active</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT 5 COLS: Audit Trail of Today's Dispensations & Quick Metrics -->
+<div class="xl:col-span-5 flex flex-col gap-space-lg">
+<!-- Operational Summary & Shelter Intake Context Banner -->
+<div class="bg-inverse-surface text-inverse-on-surface rounded-xl p-space-lg shadow-md relative overflow-hidden">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md uppercase tracking-widest text-primary-fixed font-bold">Depot Dispatch Context</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest/15 text-xs text-white">Live Node Session</span>
+</div>
+<div class="mt-space-sm">
+<div class="font-display-lg text-display-lg-mobile md:text-headline-lg font-bold text-white tracking-tight leading-tight">
+            182 Units Logged
+          </div>
+<p class="font-body-sm text-body-sm text-inverse-on-surface/80 mt-1">
+            41 distinct resident distributions fulfilled since 06:00 shift handover. 0 compliance warnings detected.
+          </p>
+</div>
+<div class="grid grid-cols-2 gap-space-sm mt-space-md pt-space-md bg-white/5 p-space-sm rounded-lg">
+<div>
+<div class="text-xs text-inverse-on-surface/60 font-semibold uppercase">Maternal Hygiene</div>
+<div class="font-headline-sm text-headline-sm font-bold text-white">58 Issued</div>
+</div>
+<div>
+<div class="text-xs text-inverse-on-surface/60 font-semibold uppercase">Infant Care/Formula</div>
+<div class="font-headline-sm text-headline-sm font-bold text-primary-fixed">24 Units</div>
+</div>
+</div>
+</div>
+<!-- Today's Dispense Audit Trail -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-md flex flex-col gap-space-md">
+<div class="flex items-center justify-between pb-space-sm">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Dispense &amp; Consumption Audit</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Immutable sequence ledger verified on local DB</p>
+</div>
+<button class="p-2 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center transition-colors" onclick="filterAuditLogs()" title="Filter log entries">
+<span class="material-symbols-outlined text-[20px]">filter_list</span>
+</button>
+</div>
+<!-- Ledger Items List -->
+<div class="flex flex-col gap-space-sm" id="auditTrailList">
+<!-- Entry 1 -->
+<div class="p-space-md bg-surface-container-low rounded-xl flex flex-col gap-space-xs hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="w-8 h-8 rounded-lg bg-primary-fixed text-on-primary-fixed flex items-center justify-center font-bold text-label-md">
+                  14:10
+                </span>
+<div>
+<span class="font-label-lg text-label-lg font-bold text-on-surface">Elena Rostova</span>
+<span class="ml-1 text-xs text-on-surface-variant bg-surface-container-highest px-1.5 py-0.5 rounded">APP-KA-7819</span>
+</div>
+</div>
+<span class="font-headline-sm text-headline-sm text-primary font-bold">4x</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm pl-10">
+<span class="font-semibold text-on-surface">High-Absorbency Sanitary Pads XL</span>
+<span class="bg-surface-container px-2 py-0.5 rounded text-xs">Bed A-04</span>
+</div>
+<div class="text-xs text-on-surface-variant/80 pl-10 italic">
+              "Post-admission hygienic care kit issued for 3-day recovery stay."
+            </div>
+</div>
+<!-- Entry 2 -->
+<div class="p-space-md bg-surface-container-low rounded-xl flex flex-col gap-space-xs hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="w-8 h-8 rounded-lg bg-surface-container text-on-secondary-container flex items-center justify-center font-bold text-label-md">
+                  13:25
+                </span>
+<div>
+<span class="font-label-lg text-label-lg font-bold text-on-surface">Baby Vance (Guardian: Sarah V.)</span>
+<span class="ml-1 text-xs text-on-surface-variant bg-surface-container-highest px-1.5 py-0.5 rounded">APP-KA-9914</span>
+</div>
+</div>
+<span class="font-headline-sm text-headline-sm text-primary font-bold">2x</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm pl-10">
+<span class="font-semibold text-on-surface">Sterilized Infant Milk Bottles (250ml)</span>
+<span class="bg-surface-container px-2 py-0.5 rounded text-xs">Nursery Pod 2</span>
+</div>
+<div class="text-xs text-on-surface-variant/80 pl-10 italic">
+              "Pediatric feeding schedule fulfillment. Checked sealed cap integrity."
+            </div>
+</div>
+<!-- Entry 3 (Communal) -->
+<div class="p-space-md bg-surface-container-low rounded-xl flex flex-col gap-space-xs hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="w-8 h-8 rounded-lg bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-bold text-label-md">
+                  11:40
+                </span>
+<div>
+<span class="font-label-lg text-label-lg font-bold text-on-surface">General Facility (Communal)</span>
+<span class="ml-1 text-xs text-tertiary bg-tertiary-container/20 px-1.5 py-0.5 rounded font-semibold">Bulk Sanitation</span>
+</div>
+</div>
+<span class="font-headline-sm text-headline-sm text-secondary font-bold">6x</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm pl-10">
+<span class="font-semibold text-on-surface">20L Potable Water Sealed Carboys</span>
+<span class="bg-surface-container px-2 py-0.5 rounded text-xs">Dining &amp; Kitchen</span>
+</div>
+<div class="text-xs text-on-surface-variant/80 pl-10 italic">
+              "Mid-day meal preparation and direct resident hydration replenishment."
+            </div>
+</div>
+<!-- Entry 4 -->
+<div class="p-space-md bg-surface-container-low rounded-xl flex flex-col gap-space-xs hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="w-8 h-8 rounded-lg bg-surface-container text-on-secondary-container flex items-center justify-center font-bold text-label-md">
+                  09:15
+                </span>
+<div>
+<span class="font-label-lg text-label-lg font-bold text-on-surface">Marcus Thornton</span>
+<span class="ml-1 text-xs text-on-surface-variant bg-surface-container-highest px-1.5 py-0.5 rounded">APP-KA-5502</span>
+</div>
+</div>
+<span class="font-headline-sm text-headline-sm text-primary font-bold">1x</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm pl-10">
+<span class="font-semibold text-on-surface">Clean Bed Linen &amp; Hypoallergenic Set</span>
+<span class="bg-surface-container px-2 py-0.5 rounded text-xs">Dorm C-02</span>
+</div>
+<div class="text-xs text-on-surface-variant/80 pl-10 italic">
+              "Bedding changeover post-admission sanitization protocol."
+            </div>
+</div>
+</div>
+<!-- Ledger Footer Action -->
+<div class="pt-space-xs flex items-center justify-between text-on-surface-variant font-label-md text-label-md">
+<span class="flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+            Ledger Hash: <span class="font-mono text-xs">#SHA-9b48f...</span>
+</span>
+<button class="text-primary hover:underline font-semibold flex items-center gap-1">
+<span>Export CSV Audit</span>
+<span class="material-symbols-outlined text-[16px]">download</span>
+</button>
+</div>
+</div>
+<!-- Quick Supply Shelf Visual Guide -->
+<div class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-lg text-label-lg font-bold text-on-surface">Depot Shelf Zone Status</span>
+<span class="font-label-md text-label-md text-primary font-semibold">Bay A to F</span>
+</div>
+<div class="grid grid-cols-3 gap-2 text-center">
+<div class="bg-surface-container-lowest p-2 rounded-lg shadow-sm">
+<div class="text-xs text-on-surface-variant">Shelf D (Hygiene)</div>
+<div class="font-headline-sm text-headline-sm text-on-surface font-bold mt-0.5">38 Pks</div>
+<div class="text-[11px] text-tertiary font-semibold">Sufficient</div>
+</div>
+<div class="bg-surface-container-lowest p-2 rounded-lg shadow-sm">
+<div class="text-xs text-on-surface-variant">Shelf B (Infant)</div>
+<div class="font-headline-sm text-headline-sm text-primary font-bold mt-0.5">9 Tins</div>
+<div class="text-[11px] text-error font-semibold">Low Threshold</div>
+</div>
+<div class="bg-surface-container-lowest p-2 rounded-lg shadow-sm">
+<div class="text-xs text-on-surface-variant">Water Staging</div>
+<div class="font-headline-sm text-headline-sm text-on-surface font-bold mt-0.5">24 Carboys</div>
+<div class="text-[11px] text-tertiary font-semibold">Optimal</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Notification Toast (Hidden by default, triggered on Dispense) -->
+<div class="fixed bottom-6 right-6 bg-inverse-surface text-inverse-on-surface p-space-md rounded-xl shadow-xl z-50 flex items-center gap-space-md transform translate-y-32 transition-transform duration-300 pointer-events-none" id="toastNotification">
+<div class="w-10 h-10 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[24px]">done_all</span>
+</div>
+<div>
+<div class="font-label-lg text-label-lg font-bold text-white" id="toastTitle">Stock Deducted &amp; Synced</div>
+<div class="font-body-sm text-body-sm text-inverse-on-surface/80" id="toastMessage">Elena Rostova linked to -4 Sanitary Pads XL.</div>
+</div>
+</div>
+</div>
+<script>
+  let currentQty = 4;
+  const stockInventory = {
+    sanitary_pads: { name: 'High-Absorbency Sanitary Pads XL', remaining: 38, unit: 'Packs', defaultUse: 'Post-admission hygienic care kit issued for 3-day recovery stay.' },
+    infant_formula: { name: 'Infant Care Formula Stage 1', remaining: 9, unit: 'Tins', defaultUse: 'Critical supplementary infant feeding kit issued for nursery resident.' },
+    obstetric_kit: { name: 'Sterile Obstetric Care Delivery Kit', remaining: 4, unit: 'Kits', defaultUse: 'Pre-labor emergency staging supply kit.' },
+    water_carboys: { name: '20L Potable Water Sealed Carboys', remaining: 24, unit: 'Carboys', defaultUse: 'Dining hall filtration replenishment and hydration dispenser.' },
+    linen_kit: { name: 'Hypoallergenic Bed Linen Set', remaining: 19, unit: 'Sets', defaultUse: 'Bed turnaround and sanitized linen changeout.' },
+    dextrose_saline: { name: '500ml 0.9% Normal Saline + Line', remaining: 15, unit: 'Bags', defaultUse: 'Clinical triage rehydration under doctor observation.' }
+  };
+
+  function adjustQty(delta) {
+    currentQty = Math.max(1, currentQty + delta);
+    document.getElementById('qtyDisplay').innerText = currentQty;
+    document.getElementById('buttonDeductBadge').innerText = '-' + currentQty + ' Units';
+    
+    // Update projection indicator mock
+    const projection = Math.max(1.2, (6.4 - (currentQty * 0.4))).toFixed(1);
+    document.getElementById('stockoutProjection').innerText = projection + ' Days';
+    const barWidth = Math.max(10, Math.min(100, 64 - (currentQty * 4)));
+    document.getElementById('stockoutBar').style.width = barWidth + '%';
+  }
+
+  function updateItemMetrics() {
+    const select = document.getElementById('itemSelect');
+    const selectedKey = select.value;
+    const item = stockInventory[selectedKey];
+    
+    if (item) {
+      document.getElementById('stockAvailabilityBadge').innerHTML = 
+        '<span class="material-symbols-outlined text-[14px]">inventory</span> Remaining in Shelter Depot: ' + item.remaining + ' ' + item.unit;
+      document.getElementById('unitLabel').innerText = item.unit;
+      document.getElementById('clinicalNote').value = item.defaultUse;
+    }
+  }
+
+  function toggleAttributionView() {
+    const radios = document.getElementsByName('attributionType');
+    let selected = 'patient';
+    for (const r of radios) {
+      if (r.checked) selected = r.value;
+    }
+
+    const patientContainer = document.getElementById('patientSelectionContainer');
+    const communalContainer = document.getElementById('communalLocationContainer');
+
+    if (selected === 'patient') {
+      patientContainer.classList.remove('hidden');
+      communalContainer.classList.add('hidden');
+    } else {
+      patientContainer.classList.add('hidden');
+      communalContainer.classList.remove('hidden');
+    }
+  }
+
+  function recordTransaction() {
+    const select = document.getElementById('itemSelect');
+    const selectedKey = select.value;
+    const item = stockInventory[selectedKey];
+    const qty = currentQty;
+    const now = new Date();
+    const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+    
+    const radios = document.getElementsByName('attributionType');
+    let isPatient = true;
+    for (const r of radios) {
+      if (r.checked && r.value === 'communal') isPatient = false;
+    }
+
+    const recipient = isPatient ? 'Elena Rostova (APP-KA-7819)' : 'General Facility (Communal)';
+    const location = isPatient ? 'Bed A-04' : 'Central Washrooms';
+    const note = document.getElementById('clinicalNote').value;
+
+    // Deduct local memory
+    if (item.remaining >= qty) {
+      item.remaining -= qty;
+    }
+    updateItemMetrics();
+
+    // Create Audit Ledger DOM entry
+    const auditList = document.getElementById('auditTrailList');
+    const newEntry = document.createElement('div');
+    newEntry.className = 'p-space-md bg-surface-container rounded-xl flex flex-col gap-space-xs transition-all duration-300 transform scale-98 animate-pulse';
+    
+    newEntry.innerHTML = `
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-space-sm">
+          <span class="w-8 h-8 rounded-lg ${isPatient ? 'bg-primary-fixed text-on-primary-fixed' : 'bg-secondary-fixed text-on-secondary-fixed'} flex items-center justify-center font-bold text-label-md">
+            ${timeStr}
+          </span>
+          <div>
+            <span class="font-label-lg text-label-lg font-bold text-on-surface">${recipient}</span>
+            <span class="ml-1 text-xs text-tertiary bg-tertiary-container/20 px-1.5 py-0.5 rounded font-semibold">Just Logged</span>
+          </div>
+        </div>
+        <span class="font-headline-sm text-headline-sm text-primary font-bold">${qty}x</span>
+      </div>
+      <div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm pl-10">
+        <span class="font-semibold text-on-surface">${item.name}</span>
+        <span class="bg-surface-container-highest px-2 py-0.5 rounded text-xs">${location}</span>
+      </div>
+      <div class="text-xs text-on-surface-variant/80 pl-10 italic">
+        "${note}"
+      </div>
+    `;
+
+    auditList.prepend(newEntry);
+    setTimeout(() => {
+      newEntry.classList.remove('animate-pulse');
+      newEntry.classList.remove('bg-surface-container');
+      newEntry.classList.add('bg-surface-container-low');
+    }, 1200);
+
+    // Show confirmation Toast
+    const toast = document.getElementById('toastNotification');
+    document.getElementById('toastTitle').innerText = 'Stock Deducted & Recorded';
+    document.getElementById('toastMessage').innerText = qty + 'x ' + item.name + ' logged to ' + recipient;
+    toast.classList.remove('translate-y-32');
+    toast.classList.add('translate-y-0');
+
+    setTimeout(() => {
+      toast.classList.remove('translate-y-0');
+      toast.classList.add('translate-y-32');
+    }, 3800);
+  }
+
+  function filterAuditLogs() {
+    alert("Audit Filter: Filter by 'Obstetric', 'Infant formula', 'Communal Sanitation', or specific Resident APP-ID.");
+  }
+</script></main></div></body></html>
