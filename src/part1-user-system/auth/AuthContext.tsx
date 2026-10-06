@@ -5,7 +5,13 @@
  */
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { signInWithPopup, onAuthStateChanged, type User } from 'firebase/auth';
+import {
+  signInWithPopup,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  type User,
+} from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, googleProvider, db } from '../../shared/firebase/config';
 import { generateUniqueId } from '../../shared/utils/id-generator';
@@ -20,6 +26,8 @@ interface AuthState {
   isOnline: boolean;
   error: string | null;
   signInWithGoogle: () => Promise<void>;
+  signInWithEmail: (email: string, password: string) => Promise<void>;
+  signUpWithEmail: (email: string, password: string) => Promise<void>;
   signInAsGuest: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -147,6 +155,107 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const signInWithEmail = async (email: string, password: string) => {
+    if (!isOnline) {
+      setError('Internet connection required for email login.');
+      return;
+    }
+    setError(null);
+    try {
+      const result = await signInWithEmailAndPassword(auth, email.trim(), password);
+      const firebaseUser = result.user;
+
+      const userRef = doc(db, 'users', firebaseUser.uid);
+      let userData: VyntraUser;
+      try {
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          userData = userSnap.data() as VyntraUser;
+          await setDoc(userRef, { ...userData, lastLoginAt: Timestamp.now() });
+        } else {
+          const appId = generateUniqueId('USR');
+          userData = {
+            appId,
+            googleUid: firebaseUser.uid,
+            role: 'user',
+            createdAt: Timestamp.now(),
+            lastLoginAt: Timestamp.now(),
+          };
+          await setDoc(userRef, userData);
+        }
+      } catch {
+        const appId = generateUniqueId('USR');
+        userData = {
+          appId,
+          googleUid: firebaseUser.uid,
+          role: 'user',
+          createdAt: Timestamp.now(),
+          lastLoginAt: Timestamp.now(),
+        };
+      }
+      setVyntraUser(userData);
+      await putItem(STORES.AUTH, { key: 'current-user', data: userData });
+    } catch (err: unknown) {
+      const authErr = err as { code?: string; message?: string };
+      if (
+        authErr.code === 'auth/user-not-found' ||
+        authErr.code === 'auth/wrong-password' ||
+        authErr.code === 'auth/invalid-credential'
+      ) {
+        setError('Incorrect email or password. Please try again.');
+      } else if (authErr.code === 'auth/invalid-email') {
+        setError('Please enter a valid email address.');
+      } else if (authErr.code === 'auth/too-many-requests') {
+        setError('Too many unsuccessful attempts. Please try again later.');
+      } else {
+        setError(authErr.message || 'Email sign-in failed.');
+      }
+      throw err;
+    }
+  };
+
+  const signUpWithEmail = async (email: string, password: string) => {
+    if (!isOnline) {
+      setError('Internet connection required to create an account.');
+      return;
+    }
+    setError(null);
+    try {
+      const result = await createUserWithEmailAndPassword(auth, email.trim(), password);
+      const firebaseUser = result.user;
+
+      const appId = generateUniqueId('USR');
+      const newUser: VyntraUser = {
+        appId,
+        googleUid: firebaseUser.uid,
+        role: 'user',
+        createdAt: Timestamp.now(),
+        lastLoginAt: Timestamp.now(),
+      };
+
+      const userRef = doc(db, 'users', firebaseUser.uid);
+      try {
+        await setDoc(userRef, newUser);
+      } catch (err) {
+        console.warn('Firestore write warning:', err);
+      }
+      setVyntraUser(newUser);
+      await putItem(STORES.AUTH, { key: 'current-user', data: newUser });
+    } catch (err: unknown) {
+      const authErr = err as { code?: string; message?: string };
+      if (authErr.code === 'auth/email-already-in-use') {
+        setError('This email is already registered. Please sign in instead.');
+      } else if (authErr.code === 'auth/weak-password') {
+        setError('Password should be at least 6 characters long.');
+      } else if (authErr.code === 'auth/invalid-email') {
+        setError('Please enter a valid email address.');
+      } else {
+        setError(authErr.message || 'Failed to create account.');
+      }
+      throw err;
+    }
+  };
+
   const signInAsGuest = async () => {
     setError(null);
     try {
@@ -185,6 +294,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isOnline,
       error,
       signInWithGoogle,
+      signInWithEmail,
+      signUpWithEmail,
       signInAsGuest,
       signOut: handleSignOut,
     }}>

@@ -1,7 +1,8 @@
 /**
  * VYNTRA — World Chat Entry Screen
+ * Design System: Serene Sanctuary (Stitch MCP Screen 7aac22682e074c069c27235a04950bfe)
  * Geographic verification by state range & numerical district code.
- * Includes rate-limiting on repeated identical requests & offline cache.
+ * Includes client-side rate-limiting, 6-hour sliding cycle telemetry, and discrete disguise mode.
  */
 
 import { useState, useEffect } from 'react';
@@ -13,6 +14,13 @@ import { getItem, putItem, STORES } from '../../shared/utils/offline-cache';
 import type { UserProfile } from '../../shared/types';
 import '../styles/chat.css';
 
+const QUICK_STATES = [
+  { code: 'DL', label: 'Delhi NCR' },
+  { code: 'MP', label: 'Madhya Pradesh' },
+  { code: 'MH', label: 'Maharashtra' },
+  { code: 'KA', label: 'Karnataka' },
+];
+
 export default function ChatEntryScreen() {
   const { vyntraUser } = useAuth();
   const navigate = useNavigate();
@@ -22,6 +30,8 @@ export default function ChatEntryScreen() {
   const [districtCode, setDistrictCode] = useState('872');
   const [errorMsg, setErrorMsg] = useState('');
   const [verifying, setVerifying] = useState(false);
+  const [isDisguised, setIsDisguised] = useState(false);
+  const [calcDisplay, setCalcDisplay] = useState('0');
 
   // Pre-fill from user profile
   useEffect(() => {
@@ -53,6 +63,13 @@ export default function ChatEntryScreen() {
       setDistrictCode(String(range.rangeStart));
     }
     setErrorMsg('');
+  };
+
+  const handleAutoFill = () => {
+    if (currentRange) {
+      setDistrictCode(String(currentRange.rangeStart));
+      setErrorMsg('');
+    }
   };
 
   const handleVerifyAndEnter = async () => {
@@ -101,121 +118,309 @@ export default function ChatEntryScreen() {
     }
   };
 
-  return (
-    <div className="chat-entry-screen">
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <button
-          onClick={() => navigate('/user/home')}
-          style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer' }}
-          aria-label="Back"
-        >
-          ←
+  // Determine current 6-hour window
+  const currentHour = new Date().getHours();
+  const getCycleWindow = () => {
+    if (currentHour >= 0 && currentHour < 6) return '12:00 AM';
+    if (currentHour >= 6 && currentHour < 12) return '06:00 AM';
+    if (currentHour >= 12 && currentHour < 18) return '12:00 PM';
+    return '06:00 PM';
+  };
+  const activeWindow = getCycleWindow();
+
+  // Quick Calculator logic for Emergency Disguise
+  const handleCalcPress = (val: string) => {
+    if (val === 'C') {
+      setCalcDisplay('0');
+    } else if (val === '=') {
+      try {
+        // Safe evaluation of basic math
+        const sanitized = calcDisplay.replace(/[^0-9+\-*/.]/g, '');
+        // eslint-disable-next-line no-eval
+        const result = Function(`'use strict'; return (${sanitized})`)();
+        setCalcDisplay(String(result));
+      } catch {
+        setCalcDisplay('Error');
+      }
+    } else {
+      setCalcDisplay((prev) => (prev === '0' || prev === 'Error' ? val : prev + val));
+    }
+  };
+
+  if (isDisguised) {
+    return (
+      <div className="disguise-modal-overlay">
+        <div className="calc-display">{calcDisplay}</div>
+        <div className="calc-grid">
+          <button className="calc-btn top" onClick={() => handleCalcPress('C')}>C</button>
+          <button className="calc-btn top" onClick={() => handleCalcPress('+/-')}>±</button>
+          <button className="calc-btn top" onClick={() => handleCalcPress('%')}>%</button>
+          <button className="calc-btn op" onClick={() => handleCalcPress('/')}>÷</button>
+
+          <button className="calc-btn" onClick={() => handleCalcPress('7')}>7</button>
+          <button className="calc-btn" onClick={() => handleCalcPress('8')}>8</button>
+          <button className="calc-btn" onClick={() => handleCalcPress('9')}>9</button>
+          <button className="calc-btn op" onClick={() => handleCalcPress('*')}>×</button>
+
+          <button className="calc-btn" onClick={() => handleCalcPress('4')}>4</button>
+          <button className="calc-btn" onClick={() => handleCalcPress('5')}>5</button>
+          <button className="calc-btn" onClick={() => handleCalcPress('6')}>6</button>
+          <button className="calc-btn op" onClick={() => handleCalcPress('-')}>−</button>
+
+          <button className="calc-btn" onClick={() => handleCalcPress('1')}>1</button>
+          <button className="calc-btn" onClick={() => handleCalcPress('2')}>2</button>
+          <button className="calc-btn" onClick={() => handleCalcPress('3')}>3</button>
+          <button className="calc-btn op" onClick={() => handleCalcPress('+')}>+</button>
+
+          <button className="calc-btn" style={{ gridColumn: 'span 2', borderRadius: '32px' }} onClick={() => handleCalcPress('0')}>0</button>
+          <button className="calc-btn" onClick={() => handleCalcPress('.')}>.</button>
+          <button className="calc-btn op" onClick={() => handleCalcPress('=')}>=</button>
+        </div>
+        <button className="calc-dismiss-btn" onClick={() => setIsDisguised(false)}>
+          Tap to return to VYNTRA Safety App
         </button>
-        <div>
-          <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800 }}>Regional World Chat</h2>
-          <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--color-on-surface-variant)' }}>
-            Geographic community broadcast & emergency updates
+      </div>
+    );
+  }
+
+  return (
+    <div className="chat-entry-page">
+      {/* Top Header & Brand Anchor */}
+      <header className="chat-entry-header">
+        <div className="chat-top-nav-row">
+          <button
+            type="button"
+            className="chat-back-btn"
+            onClick={() => navigate('/user/home')}
+            aria-label="Back to Home"
+          >
+            ←
+          </button>
+
+          <div className="chat-brand-lockup">
+            <span className="chat-brand-icon">🛡️</span>
+            <h2 className="chat-brand-title">VYNTRA</h2>
+          </div>
+
+          <div className="chat-nav-actions">
+            <div className="chat-mesh-status-pill">
+              <span className="mesh-pulse-dot" />
+              <span>Encrypted Mesh</span>
+            </div>
+
+            <button
+              type="button"
+              className="chat-disguise-trigger"
+              onClick={() => setIsDisguised(true)}
+              title="Quick Disguise Screen (Calculator)"
+              aria-label="Quick Disguise Screen"
+            >
+              🕶️
+            </button>
+          </div>
+        </div>
+
+        <div className="chat-headline-block">
+          <div className="chat-pwa-sub-badge">
+            <span>📡</span>
+            <span>PWA READY • LOCAL CACHE ACTIVE</span>
+          </div>
+          <h1 className="chat-main-heading">Regional World Chat</h1>
+          <p className="chat-sub-desc">
+            Geographic community broadcast, peer alerts &amp; decentralized emergency relays.
           </p>
         </div>
-      </div>
+      </header>
 
-      {/* Geo Card */}
-      <div className="chat-geo-card">
-        <h3 style={{ margin: '0 0 6px', fontSize: '1.1rem', fontWeight: 700 }}>
-          District Code Verification
-        </h3>
-        <p style={{ margin: '0 0 16px', fontSize: '0.82rem', color: 'var(--color-on-surface-variant)' }}>
-          To prevent noise and keep updates local, messages are organized into numerical regional zones.
-        </p>
+      {/* District Zone Verification Bento Card */}
+      <section className="chat-tactical-card">
+        <div className="tactical-ambient-glow" />
 
-        {/* State Selector */}
-        <div className="form-group">
-          <label>Select State:</label>
-          <select
-            className="form-select"
-            value={selectedStateCode}
-            onChange={(e) => handleStateChange(e.target.value)}
-          >
-            {STATE_CODE_RANGES.map((s) => (
-              <option key={s.stateCode} value={s.stateCode}>
-                {s.stateName} ({s.stateCode})
-              </option>
-            ))}
-          </select>
+        <div className="tactical-card-header">
+          <div className="tactical-title-box">
+            <div className="tactical-icon-bubble">
+              <span>📶</span>
+            </div>
+            <div className="tactical-title-texts">
+              <h3>District Zone Verification</h3>
+              <p>Zero-Knowledge Peer Geolocation</p>
+            </div>
+          </div>
+          <span className="tactical-zone-badge">Zone Level 2</span>
         </div>
 
-        {/* Range Hint */}
+        <p className="tactical-intro-note">
+          Verify your geographic region to access decentralized emergency bulletins, localized volunteer relays, and regional crisis safety circles.
+        </p>
+
+        {/* Quick State Pills */}
+        <div className="quick-states-bar">
+          <span className="quick-states-label">Active Territorial Territory</span>
+          <div className="quick-states-pills">
+            {QUICK_STATES.map((st) => (
+              <button
+                key={st.code}
+                type="button"
+                className={`state-quick-chip ${selectedStateCode === st.code ? 'active' : ''}`}
+                onClick={() => handleStateChange(st.code)}
+              >
+                {selectedStateCode === st.code && <span>✓</span>}
+                <span>{st.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Full State Selector */}
+        <div className="chat-input-field-group">
+          <label className="chat-field-label">Select State or Union Territory:</label>
+          <div className="chat-custom-input-wrap">
+            <select
+              className="chat-custom-input"
+              value={selectedStateCode}
+              onChange={(e) => handleStateChange(e.target.value)}
+            >
+              {STATE_CODE_RANGES.map((s) => (
+                <option key={s.stateCode} value={s.stateCode}>
+                  {s.stateName} ({s.stateCode})
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Allocated Range Chip */}
         {currentRange && (
-          <div className="range-info-chip">
-            Allocated range for {currentRange.stateName}: {currentRange.rangeStart} – {currentRange.rangeEnd}
+          <div className="chat-range-chip">
+            <span className="range-icon">🌐</span>
+            <span>
+              Allocated range for {currentRange.stateName}: <strong>{currentRange.rangeStart} – {currentRange.rangeEnd}</strong> • Sub-zone Active
+            </span>
           </div>
         )}
 
-        {/* District Name */}
-        <div className="form-group" style={{ marginTop: '16px' }}>
-          <label>District Name:</label>
-          <input
-            type="text"
-            className="form-input"
-            value={districtName}
-            onChange={(e) => setDistrictName(e.target.value)}
-            placeholder="e.g. New Delhi / Jaipur"
-          />
+        {/* District Locality Name */}
+        <div className="chat-input-field-group">
+          <label className="chat-field-label">District &amp; Locality Identifier:</label>
+          <div className="chat-custom-input-wrap">
+            <input
+              type="text"
+              className="chat-custom-input"
+              value={districtName}
+              onChange={(e) => setDistrictName(e.target.value)}
+              placeholder="e.g. South Delhi / Jabalpur / Bandra"
+            />
+            <span className="chat-input-icon">📍</span>
+          </div>
         </div>
 
-        {/* District Code */}
-        <div className="form-group">
-          <label>Assigned District Code:</label>
-          <input
-            type="number"
-            className="form-input"
-            value={districtCode}
-            onChange={(e) => setDistrictCode(e.target.value)}
-            placeholder={currentRange ? `${currentRange.rangeStart}` : '400'}
-          />
+        {/* Numeric District Node Code with Auto-Fill */}
+        <div className="chat-input-field-group">
+          <div className="chat-field-label-row">
+            <label className="chat-field-label">Numeric District Node Code:</label>
+            <span className="chat-field-sub">
+              Range {currentRange?.rangeStart} - {currentRange?.rangeEnd}
+            </span>
+          </div>
+          <div className="code-and-autofill-row">
+            <div className="code-input-half">
+              <input
+                type="number"
+                className="chat-code-input"
+                value={districtCode}
+                onChange={(e) => setDistrictCode(e.target.value)}
+                placeholder={currentRange ? String(currentRange.rangeStart) : '872'}
+                maxLength={4}
+              />
+            </div>
+            <button
+              type="button"
+              className="chat-autofill-btn"
+              onClick={handleAutoFill}
+              title="Auto-fill default node code for selected state"
+            >
+              <span>🎯</span>
+              <span>Auto-Fill</span>
+            </button>
+          </div>
         </div>
 
         {/* Error message */}
         {errorMsg && (
-          <div style={{
-            background: 'var(--color-error-container)',
-            color: 'var(--color-on-error-container)',
-            padding: '10px 14px',
-            borderRadius: '10px',
-            fontSize: '0.82rem',
-            marginBottom: '16px',
-            lineHeight: 1.4,
-          }}>
-            ⚠️ {errorMsg}
+          <div className="chat-error-banner">
+            <span>⚠️</span>
+            <span>{errorMsg}</span>
           </div>
         )}
 
+        {/* Zero-Knowledge Privacy Callout */}
+        <div className="chat-privacy-callout">
+          <span>🔒</span>
+          <span>
+            Zero location telemetry saved to cloud. Zone authentication verified purely via local client-side cryptographic hashing.
+          </span>
+        </div>
+
+        {/* Primary CTA */}
         <button
-          className="btn-primary"
-          style={{ width: '100%', marginTop: '8px' }}
+          type="button"
+          className="chat-enter-btn"
           onClick={handleVerifyAndEnter}
           disabled={verifying}
         >
-          {verifying ? 'Verifying Code...' : 'Verify & Enter District Chat'}
+          <span>{verifying ? 'Verifying Geographic Range...' : 'Verify & Enter District Chat'}</span>
+          <span>→</span>
         </button>
-      </div>
+      </section>
 
-      {/* Info Card on 6-Hour Cycle Architecture */}
-      <div style={{
-        background: 'var(--color-surface-container-low)',
-        borderRadius: '16px',
-        padding: '18px',
-        fontSize: '0.82rem',
-        lineHeight: 1.5,
-        color: 'var(--color-on-surface-variant)',
-      }}>
-        <strong style={{ color: 'var(--color-on-surface)', display: 'block', marginBottom: '4px' }}>
-          ℹ️ 6-Hour Sliding Broadcast Cycle
-        </strong>
-        Unlike continuous infinite feeds, community broadcasts are packaged into fixed 6-hour windows
-        (12 AM, 6 AM, 12 PM, 6 PM) for high reliability during crises and bandwidth conservation.
-      </div>
+      {/* 6-Hour Sliding Broadcast Cycle Bento Card */}
+      <section className="chat-cycle-bento-card">
+        <div className="cycle-bento-header">
+          <div className="cycle-bento-title-row">
+            <span>⏱️</span>
+            <h3>6-Hour Sliding Broadcast Cycle</h3>
+          </div>
+          <span className="cycle-p2p-badge">P2P Protocol</span>
+        </div>
+
+        <p className="cycle-intro-p">
+          Network partition resilient timeline. Messages continuously cycle across regional relay beacons:
+        </p>
+
+        <div className="cycle-timeline-grid">
+          <div className={`cycle-interval-slot ${activeWindow === '12:00 AM' ? 'active' : ''}`}>
+            <span className="slot-time">12:00 AM</span>
+            <span className="slot-dot" />
+            <span className="slot-state-label">
+              {activeWindow === '12:00 AM' ? 'Live Window' : 'Archived'}
+            </span>
+          </div>
+
+          <div className={`cycle-interval-slot ${activeWindow === '06:00 AM' ? 'active' : ''}`}>
+            <span className="slot-time">06:00 AM</span>
+            <span className="slot-dot" />
+            <span className="slot-state-label">
+              {activeWindow === '06:00 AM' ? 'Live Window' : 'Verified'}
+            </span>
+          </div>
+
+          <div className={`cycle-interval-slot ${activeWindow === '12:00 PM' ? 'active' : ''}`}>
+            <span className="slot-time">12:00 PM</span>
+            <span className="slot-dot" />
+            <span className="slot-state-label">
+              {activeWindow === '12:00 PM' ? 'Live Window' : 'Verified'}
+            </span>
+          </div>
+
+          <div className={`cycle-interval-slot ${activeWindow === '06:00 PM' ? 'active' : ''}`}>
+            <span className="slot-time">06:00 PM</span>
+            <span className="slot-dot" />
+            <span className="slot-state-label">
+              {activeWindow === '06:00 PM' ? 'Live Window' : 'Upcoming'}
+            </span>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

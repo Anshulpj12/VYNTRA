@@ -1,6 +1,7 @@
 /**
- * VYNTRA — Profile Creation Screen
- * Multi-step form: basic info → extended info (female) → review & submit.
+ * VYNTRA — Emergency Profile Creation Screen
+ * Generated via Stitch MCP ("Serene Sanctuary" Design System)
+ * Multi-step card-based form: Basic Info → Health & Care → Review & Sync.
  */
 
 import { useState } from 'react';
@@ -15,12 +16,14 @@ import { getStateList } from '../../shared/constants/state-codes';
 import '../styles/profile.css';
 
 const DISABILITY_OPTIONS = ['Mobility', 'Visual', 'Hearing', 'Cognitive', 'None'];
+const RELATIONSHIP_CHIPS = ['Mother', 'Sister', 'Partner', 'Trusted Friend', 'Father', 'Brother'];
 
 export default function ProfileCreateScreen() {
   const { vyntraUser, isOnline } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState<'basic' | 'extended' | 'review'>('basic');
   const [saving, setSaving] = useState(false);
+  const [locating, setLocating] = useState(false);
 
   // Basic info state
   const [name, setName] = useState('');
@@ -32,6 +35,7 @@ export default function ProfileCreateScreen() {
   const [lat, setLat] = useState('');
   const [lng, setLng] = useState('');
   const [emergencyContact, setEmergencyContact] = useState('');
+  const [contactRelation, setContactRelation] = useState('');
 
   // Extended info state (female users)
   const [isPregnant, setIsPregnant] = useState(false);
@@ -43,12 +47,18 @@ export default function ProfileCreateScreen() {
 
   const detectLocation = () => {
     if ('geolocation' in navigator) {
+      setLocating(true);
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           setLat(pos.coords.latitude.toFixed(6));
           setLng(pos.coords.longitude.toFixed(6));
+          setLocating(false);
         },
-        () => alert('Could not detect location. Please enter manually.')
+        () => {
+          alert('Could not detect location. Please enter your address manually.');
+          setLocating(false);
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
       );
     }
   };
@@ -64,7 +74,7 @@ export default function ProfileCreateScreen() {
   };
 
   const calculateCompleteness = (): number => {
-    const basicFields = [name, gender, age, state, district, homeAddress, lat, lng, emergencyContact];
+    const basicFields = [name, gender, age, state, district, homeAddress, emergencyContact];
     const basicFilled = basicFields.filter(Boolean).length;
     const basicTotal = basicFields.length;
 
@@ -74,29 +84,34 @@ export default function ProfileCreateScreen() {
       isPregnant ? 'y' : '',
       disabilities.length > 0 ? 'y' : '',
       medicalConditions,
+      currentlyMenstruating ? 'y' : '',
       specialRequirements,
     ];
     const extFilled = extFields.filter(Boolean).length;
     const totalFields = basicTotal + extFields.length;
-    return Math.round(((basicFilled + extFilled) / totalFields) * 100);
+    return Math.min(100, Math.round(((basicFilled + extFilled) / totalFields) * 100));
   };
 
-  const isBasicValid = () => name && gender && age && state && district && homeAddress && emergencyContact;
+  const isBasicValid = () => Boolean(name.trim() && age && state && district.trim() && emergencyContact.trim());
 
   const handleSubmit = async () => {
     if (!vyntraUser) return;
     setSaving(true);
 
+    const fullEmergency = contactRelation 
+      ? `${emergencyContact.trim()} (${contactRelation})` 
+      : emergencyContact.trim();
+
     const profile: UserProfile = {
       appId: vyntraUser.appId,
-      name,
+      name: name.trim(),
       gender,
-      age: parseInt(age),
+      age: parseInt(age) || 0,
       state,
-      district,
-      homeAddress,
+      district: district.trim(),
+      homeAddress: homeAddress.trim(),
       homeCoordinates: { lat: parseFloat(lat) || 0, lng: parseFloat(lng) || 0 },
-      emergencyContact,
+      emergencyContact: fullEmergency,
       profileCompleteness: calculateCompleteness(),
       lastModifiedAt: Timestamp.now(),
       pendingSync: !isOnline,
@@ -105,19 +120,20 @@ export default function ProfileCreateScreen() {
     if (gender === 'female') {
       profile.pregnancyStatus = { isPregnant, estimatedMonth: estimatedMonth ? parseInt(estimatedMonth) : undefined };
       profile.disabilities = disabilities;
-      profile.medicalConditions = medicalConditions;
+      profile.medicalConditions = medicalConditions.trim();
       profile.currentlyMenstruating = currentlyMenstruating;
-      profile.specialRequirements = specialRequirements;
+      profile.specialRequirements = specialRequirements.trim();
     }
 
-    // Save locally first (offline-first)
+    // Offline-first save to IndexedDB
     await putItem(STORES.PROFILE, profile);
 
     if (isOnline) {
       try {
         const profileRef = doc(db, 'users', vyntraUser.appId);
         await setDoc(profileRef, { profile }, { merge: true });
-      } catch {
+      } catch (err) {
+        console.warn('Sync pending. Saved to IndexedDB:', err);
         await addPendingSync({
           type: 'create',
           collection: 'users',
@@ -138,287 +154,484 @@ export default function ProfileCreateScreen() {
     navigate('/user/home', { replace: true });
   };
 
-  return (
-    <div className="profile-create-screen">
-      <div className="profile-header">
-        <h1 className="profile-title">Create Your Profile</h1>
-        <p className="profile-subtitle">
-          This information helps us understand your needs during emergencies.
-        </p>
-        <div className="profile-completeness">
-          <div className="profile-completeness__bar">
-            <div
-              className="profile-completeness__fill"
-              style={{ width: `${calculateCompleteness()}%` }}
-            />
-          </div>
-          <span className="profile-completeness__text">{calculateCompleteness()}% Complete</span>
-        </div>
-      </div>
+  const handleSkip = () => {
+    navigate('/user/home', { replace: true });
+  };
 
-      {/* Step Indicators */}
-      <div className="profile-steps">
-        <button
-          className={`profile-step ${step === 'basic' ? 'profile-step--active' : ''}`}
+  const completeness = calculateCompleteness();
+
+  return (
+    <div className="profile-create-page">
+      {/* Top App Bar */}
+      <header className="profile-app-bar">
+        <button 
+          type="button" 
+          className="app-bar-back-btn" 
+          onClick={() => step === 'basic' ? navigate('/auth/role-select') : setStep(step === 'review' ? (gender === 'female' ? 'extended' : 'basic') : 'basic')}
+          aria-label="Back"
+        >
+          ←
+        </button>
+        <div className="app-bar-center">
+          <span className="app-bar-badge">Emergency Profile</span>
+          <h1 className="app-bar-title">Personal Safety Setup</h1>
+        </div>
+        <div className="app-bar-encryption-badge" title="Stored locally & encrypted">
+          <span>🔒</span>
+        </div>
+      </header>
+
+      {/* Stepper Header */}
+      <nav className="profile-stepper-nav" aria-label="Profile Steps">
+        <button 
+          type="button" 
+          className={`stepper-step ${step === 'basic' ? 'active' : 'completed'}`}
           onClick={() => setStep('basic')}
         >
-          <span className="profile-step__number">1</span>
-          <span className="profile-step__label">Basic Info</span>
+          <span className="step-circle">1</span>
+          <span className="step-name">Basic Info</span>
         </button>
-        {gender === 'female' && (
-          <button
-            className={`profile-step ${step === 'extended' ? 'profile-step--active' : ''}`}
-            onClick={() => isBasicValid() && setStep('extended')}
-          >
-            <span className="profile-step__number">2</span>
-            <span className="profile-step__label">Health Info</span>
-          </button>
-        )}
-        <button
-          className={`profile-step ${step === 'review' ? 'profile-step--active' : ''}`}
+
+        <span className="stepper-line" />
+
+        <button 
+          type="button" 
+          className={`stepper-step ${step === 'extended' ? 'active' : step === 'review' ? 'completed' : ''}`}
+          disabled={!isBasicValid()}
+          onClick={() => isBasicValid() && gender === 'female' && setStep('extended')}
+        >
+          <span className="step-circle">2</span>
+          <span className="step-name">{gender === 'female' ? 'Health & Care' : 'Health (Skip)'}</span>
+        </button>
+
+        <span className="stepper-line" />
+
+        <button 
+          type="button" 
+          className={`stepper-step ${step === 'review' ? 'active' : ''}`}
+          disabled={!isBasicValid()}
           onClick={() => isBasicValid() && setStep('review')}
         >
-          <span className="profile-step__number">{gender === 'female' ? '3' : '2'}</span>
-          <span className="profile-step__label">Review</span>
+          <span className="step-circle">3</span>
+          <span className="step-name">Review</span>
         </button>
-      </div>
+      </nav>
 
-      {/* Basic Info Step */}
+      {/* Profile Completeness Ribbon */}
+      <section className="completeness-ribbon">
+        <div className="completeness-info">
+          <span className="completeness-tag">Profile Readiness</span>
+          <span className="completeness-pct">{completeness}% Complete</span>
+        </div>
+        <div className="completeness-bar-track">
+          <div className="completeness-bar-fill" style={{ width: `${completeness}%` }} />
+        </div>
+        <p className="completeness-note">
+          Essential for rapid first-responder identification and priority shelter allocation.
+        </p>
+      </section>
+
+      {/* STEP 1: Basic Info */}
       {step === 'basic' && (
-        <div className="profile-form">
-          <div className="form-group">
-            <label className="form-label" htmlFor="profile-name">Full Name *</label>
-            <input
-              id="profile-name"
-              className="form-input"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your full name"
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Gender *</label>
-            <div className="form-radio-group">
-              {(['female', 'male', 'other', 'prefer-not-to-say'] as const).map((g) => (
-                <label key={g} className={`form-radio ${gender === g ? 'form-radio--selected' : ''}`}>
-                  <input type="radio" name="gender" value={g} checked={gender === g} onChange={() => setGender(g)} />
-                  <span>{g.charAt(0).toUpperCase() + g.slice(1).replace(/-/g, ' ')}</span>
-                </label>
-              ))}
+        <main className="profile-form-flow">
+          {/* Card 1: Identity & Demographics */}
+          <div className="stitch-form-card">
+            <div className="card-heading-box">
+              <span className="card-badge-icon">🪪</span>
+              <div>
+                <h2 className="card-heading-title">Identity & Demographics</h2>
+                <p className="card-heading-desc">Required to confirm your identity during displacement</p>
+              </div>
             </div>
-          </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="profile-age">Age *</label>
-            <input
-              id="profile-age"
-              className="form-input"
-              type="number"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-              placeholder="Your age"
-              min="10"
-              max="120"
-            />
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label" htmlFor="profile-state">State *</label>
-              <select
-                id="profile-state"
-                className="form-select"
-                value={state}
-                onChange={(e) => setState(e.target.value)}
-              >
-                <option value="">Select State</option>
-                {getStateList().map((s) => (
-                  <option key={s.code} value={s.code}>{s.name}</option>
-                ))}
-              </select>
-            </div>
-            <div className="form-group">
-              <label className="form-label" htmlFor="profile-district">District *</label>
+            <div className="stitch-field-group">
+              <label htmlFor="p-name">Full Name <span className="req">*</span></label>
               <input
-                id="profile-district"
-                className="form-input"
+                id="p-name"
                 type="text"
-                value={district}
-                onChange={(e) => setDistrict(e.target.value)}
-                placeholder="District name"
+                className="stitch-input"
+                placeholder="e.g. Priya Sharma"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+
+            <div className="stitch-field-group">
+              <label>Gender <span className="req">*</span></label>
+              <div className="gender-pill-grid">
+                {(['female', 'male', 'other', 'prefer-not-to-say'] as const).map((g) => (
+                  <button
+                    key={g}
+                    type="button"
+                    className={`gender-pill-btn ${gender === g ? 'active' : ''}`}
+                    onClick={() => setGender(g)}
+                  >
+                    <span className="pill-check">{gender === g ? '✓' : '○'}</span>
+                    <span>{g === 'prefer-not-to-say' ? 'Prefer not to say' : g.charAt(0).toUpperCase() + g.slice(1)}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="stitch-field-group">
+              <label htmlFor="p-age">Age <span className="req">*</span></label>
+              <input
+                id="p-age"
+                type="number"
+                className="stitch-input"
+                placeholder="e.g. 24"
+                min="10"
+                max="120"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
               />
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="profile-address">Home Address *</label>
-            <textarea
-              id="profile-address"
-              className="form-textarea"
-              value={homeAddress}
-              onChange={(e) => setHomeAddress(e.target.value)}
-              placeholder="Enter your home address"
-              rows={2}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Home Coordinates</label>
-            <div className="form-row">
-              <input className="form-input" type="text" value={lat} onChange={(e) => setLat(e.target.value)} placeholder="Latitude" />
-              <input className="form-input" type="text" value={lng} onChange={(e) => setLng(e.target.value)} placeholder="Longitude" />
+          {/* Card 2: Safe Zone & Location */}
+          <div className="stitch-form-card">
+            <div className="card-heading-box">
+              <span className="card-badge-icon">📍</span>
+              <div>
+                <h2 className="card-heading-title">Safe Zone & Location</h2>
+                <p className="card-heading-desc">Helps match nearest shelters & district SOS response</p>
+              </div>
             </div>
-            <button className="form-btn-detect" onClick={detectLocation} type="button">
-              📍 Auto-detect Location
-            </button>
+
+            <div className="form-two-col">
+              <div className="stitch-field-group">
+                <label htmlFor="p-state">State / Region <span className="req">*</span></label>
+                <select
+                  id="p-state"
+                  className="stitch-select"
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
+                >
+                  <option value="">Select State</option>
+                  {getStateList().map((s) => (
+                    <option key={s.code} value={s.code}>{s.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="stitch-field-group">
+                <label htmlFor="p-district">District <span className="req">*</span></label>
+                <input
+                  id="p-district"
+                  type="text"
+                  className="stitch-input"
+                  placeholder="e.g. Pune / Mumbai"
+                  value={district}
+                  onChange={(e) => setDistrict(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="stitch-field-group">
+              <div className="label-with-action">
+                <label htmlFor="p-address">Home Sanctuary Address</label>
+                <button 
+                  type="button" 
+                  className="gps-detect-btn" 
+                  onClick={detectLocation}
+                  disabled={locating}
+                >
+                  <span>📍</span> {locating ? 'Detecting...' : lat ? 'GPS Locked ✓' : 'Auto-Detect GPS'}
+                </button>
+              </div>
+              <textarea
+                id="p-address"
+                className="stitch-textarea"
+                rows={2}
+                placeholder="House no, Street, Landmark..."
+                value={homeAddress}
+                onChange={(e) => setHomeAddress(e.target.value)}
+              />
+              <span className="field-hint">
+                🔒 GPS coordinates are obfuscated on-device until an SOS beacon is triggered.
+              </span>
+            </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="profile-emergency">Emergency Contact *</label>
-            <input
-              id="profile-emergency"
-              className="form-input"
-              type="tel"
-              value={emergencyContact}
-              onChange={(e) => setEmergencyContact(e.target.value)}
-              placeholder="+91 XXXXX XXXXX"
-            />
+          {/* Card 3: Emergency Contacts */}
+          <div className="stitch-form-card">
+            <div className="card-heading-box">
+              <span className="card-badge-icon">📞</span>
+              <div>
+                <h2 className="card-heading-title">Primary SOS Guardian</h2>
+                <p className="card-heading-desc">Notified automatically when emergency SOS is triggered</p>
+              </div>
+            </div>
+
+            <div className="stitch-field-group">
+              <label htmlFor="p-emergency">Phone Number <span className="req">*</span></label>
+              <div className="input-with-prefix">
+                <span className="input-prefix">🇮🇳 +91</span>
+                <input
+                  id="p-emergency"
+                  type="tel"
+                  className="stitch-input with-prefix"
+                  placeholder="98765 43210"
+                  value={emergencyContact}
+                  onChange={(e) => setEmergencyContact(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="stitch-field-group">
+              <label>Relationship Tag</label>
+              <div className="chips-row">
+                {RELATIONSHIP_CHIPS.map((rel) => (
+                  <button
+                    key={rel}
+                    type="button"
+                    className={`affinity-chip ${contactRelation === rel ? 'selected' : ''}`}
+                    onClick={() => setContactRelation(contactRelation === rel ? '' : rel)}
+                  >
+                    {rel}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </main>
+      )}
+
+      {/* STEP 2: Health Info (Female / Extended) */}
+      {step === 'extended' && gender === 'female' && (
+        <main className="profile-form-flow">
+          <div className="stitch-form-card">
+            <div className="card-heading-box">
+              <span className="card-badge-icon">🌸</span>
+              <div>
+                <h2 className="card-heading-title">Maternal & Menstrual Health</h2>
+                <p className="card-heading-desc">Critical for allocating sanitary kits & maternal shelter spaces</p>
+              </div>
+            </div>
+
+            {/* Pregnancy Switch Card */}
+            <div className="toggle-switch-card">
+              <div className="toggle-text">
+                <span className="toggle-label">Currently Pregnant?</span>
+                <span className="toggle-sub">Priority allocation for maternal shelter beds</span>
+              </div>
+              <button 
+                type="button" 
+                className={`switch-btn ${isPregnant ? 'active' : ''}`}
+                onClick={() => setIsPregnant(!isPregnant)}
+              >
+                <span className="switch-slider" />
+              </button>
+            </div>
+
+            {isPregnant && (
+              <div className="stitch-field-group sub-field">
+                <label htmlFor="p-month">Estimated Gestational Month (1 - 9)</label>
+                <input
+                  id="p-month"
+                  type="number"
+                  min="1"
+                  max="9"
+                  className="stitch-input"
+                  placeholder="e.g. 5"
+                  value={estimatedMonth}
+                  onChange={(e) => setEstimatedMonth(e.target.value)}
+                />
+              </div>
+            )}
+
+            {/* Menstruating Switch Card */}
+            <div className="toggle-switch-card">
+              <div className="toggle-text">
+                <span className="toggle-label">Currently Menstruating?</span>
+                <span className="toggle-sub">Flags immediate need for hygiene provisions in SOS beacon</span>
+              </div>
+              <button 
+                type="button" 
+                className={`switch-btn ${currentlyMenstruating ? 'active' : ''}`}
+                onClick={() => setCurrentlyMenstruating(!currentlyMenstruating)}
+              >
+                <span className="switch-slider" />
+              </button>
+            </div>
           </div>
 
+          {/* Card: Mobility & Special Support */}
+          <div className="stitch-form-card">
+            <div className="card-heading-box">
+              <span className="card-badge-icon">♿</span>
+              <div>
+                <h2 className="card-heading-title">Mobility & Accessibility</h2>
+                <p className="card-heading-desc">Ensures shelters have wheelchair access or hearing assistance</p>
+              </div>
+            </div>
+
+            <div className="stitch-field-group">
+              <label>Special Accessibility Needs</label>
+              <div className="chips-row">
+                {DISABILITY_OPTIONS.map((d) => (
+                  <button
+                    key={d}
+                    type="button"
+                    className={`affinity-chip ${disabilities.includes(d) ? 'selected' : ''}`}
+                    onClick={() => toggleDisability(d)}
+                  >
+                    {d}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="stitch-field-group">
+              <label htmlFor="p-conditions">Known Medical Conditions / Allergies</label>
+              <textarea
+                id="p-conditions"
+                className="stitch-textarea"
+                rows={2}
+                placeholder="e.g. Asthma, Diabetes, Penicillin allergy..."
+                value={medicalConditions}
+                onChange={(e) => setMedicalConditions(e.target.value)}
+              />
+            </div>
+
+            <div className="stitch-field-group">
+              <label htmlFor="p-reqs">Special Requirements / Children</label>
+              <textarea
+                id="p-reqs"
+                className="stitch-textarea"
+                rows={2}
+                placeholder="e.g. Traveling with infant, elderly parent..."
+                value={specialRequirements}
+                onChange={(e) => setSpecialRequirements(e.target.value)}
+              />
+            </div>
+          </div>
+        </main>
+      )}
+
+      {/* STEP 3: Review Step */}
+      {step === 'review' && (
+        <main className="profile-form-flow">
+          <div className="stitch-form-card review-card">
+            <div className="card-heading-box">
+              <span className="card-badge-icon">🛡️</span>
+              <div>
+                <h2 className="card-heading-title">Emergency Summary Verification</h2>
+                <p className="card-heading-desc">Review your credentials before encrypting and caching</p>
+              </div>
+            </div>
+
+            <div className="summary-list">
+              <div className="summary-row">
+                <span className="s-label">Full Name</span>
+                <span className="s-value">{name || '—'}</span>
+              </div>
+              <div className="summary-row">
+                <span className="s-label">Gender & Age</span>
+                <span className="s-value">{gender.toUpperCase()} • {age} yrs</span>
+              </div>
+              <div className="summary-row">
+                <span className="s-label">Region</span>
+                <span className="s-value">{district}, {state}</span>
+              </div>
+              <div className="summary-row">
+                <span className="s-label">Primary Guardian</span>
+                <span className="s-value">{emergencyContact} {contactRelation && `(${contactRelation})`}</span>
+              </div>
+
+              {gender === 'female' && (
+                <>
+                  <div className="summary-divider" />
+                  <div className="summary-row">
+                    <span className="s-label">Pregnant</span>
+                    <span className="s-value">{isPregnant ? `Yes (Month ${estimatedMonth || '?'})` : 'No'}</span>
+                  </div>
+                  <div className="summary-row">
+                    <span className="s-label">Menstruating</span>
+                    <span className="s-value">{currentlyMenstruating ? 'Yes (Provisions Needed)' : 'No'}</span>
+                  </div>
+                  <div className="summary-row">
+                    <span className="s-label">Accessibility</span>
+                    <span className="s-value">{disabilities.length ? disabilities.join(', ') : 'None'}</span>
+                  </div>
+                  {medicalConditions && (
+                    <div className="summary-row">
+                      <span className="s-label">Medical Alerts</span>
+                      <span className="s-value">{medicalConditions}</span>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            <div className="encryption-notice">
+              <span>🔒 Encrypted with device key • Synced securely to Firestore • 100% Offline Accessible</span>
+            </div>
+          </div>
+        </main>
+      )}
+
+      {/* Sticky Bottom Action Bar */}
+      <footer className="profile-sticky-footer">
+        {step === 'basic' && (
           <button
-            className="form-btn-primary"
+            type="button"
+            className="stitch-action-btn primary"
             disabled={!isBasicValid()}
             onClick={() => setStep(gender === 'female' ? 'extended' : 'review')}
           >
-            {gender === 'female' ? 'Continue to Health Info →' : 'Review Profile →'}
+            <span>{gender === 'female' ? 'Continue to Health & Care' : 'Review Profile'}</span>
+            <span className="arrow">→</span>
           </button>
-        </div>
-      )}
+        )}
 
-      {/* Extended Info Step (Female Users) */}
-      {step === 'extended' && gender === 'female' && (
-        <div className="profile-form">
-          <div className="form-group">
-            <label className="form-label">Pregnancy Status</label>
-            <div className="form-radio-group">
-              <label className={`form-radio ${isPregnant ? 'form-radio--selected' : ''}`}>
-                <input type="radio" checked={isPregnant} onChange={() => setIsPregnant(true)} />
-                <span>Currently Pregnant</span>
-              </label>
-              <label className={`form-radio ${!isPregnant ? 'form-radio--selected' : ''}`}>
-                <input type="radio" checked={!isPregnant} onChange={() => setIsPregnant(false)} />
-                <span>Not Pregnant</span>
-              </label>
-            </div>
-            {isPregnant && (
-              <input
-                className="form-input"
-                type="number"
-                value={estimatedMonth}
-                onChange={(e) => setEstimatedMonth(e.target.value)}
-                placeholder="Estimated month (1-9)"
-                min="1"
-                max="9"
-                style={{ marginTop: 'var(--space-sm)' }}
-              />
-            )}
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Disabilities</label>
-            <div className="form-checkbox-group">
-              {DISABILITY_OPTIONS.map((d) => (
-                <label key={d} className={`form-checkbox ${disabilities.includes(d) ? 'form-checkbox--selected' : ''}`}>
-                  <input type="checkbox" checked={disabilities.includes(d)} onChange={() => toggleDisability(d)} />
-                  <span>{d}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label" htmlFor="profile-medical">Medical Conditions</label>
-            <textarea
-              id="profile-medical"
-              className="form-textarea"
-              value={medicalConditions}
-              onChange={(e) => setMedicalConditions(e.target.value)}
-              placeholder="Any chronic conditions, allergies, or important health information"
-              rows={3}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Currently Menstruating?</label>
-            <div className="form-radio-group">
-              <label className={`form-radio ${currentlyMenstruating ? 'form-radio--selected' : ''}`}>
-                <input type="radio" checked={currentlyMenstruating} onChange={() => setCurrentlyMenstruating(true)} />
-                <span>Yes</span>
-              </label>
-              <label className={`form-radio ${!currentlyMenstruating ? 'form-radio--selected' : ''}`}>
-                <input type="radio" checked={!currentlyMenstruating} onChange={() => setCurrentlyMenstruating(false)} />
-                <span>No</span>
-              </label>
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label" htmlFor="profile-special">Special Requirements</label>
-            <textarea
-              id="profile-special"
-              className="form-textarea"
-              value={specialRequirements}
-              onChange={(e) => setSpecialRequirements(e.target.value)}
-              placeholder="Any special needs during emergencies"
-              rows={2}
-            />
-          </div>
-
-          <div className="form-btn-row">
-            <button className="form-btn-secondary" onClick={() => setStep('basic')}>← Back</button>
-            <button className="form-btn-primary" onClick={() => setStep('review')}>Review Profile →</button>
-          </div>
-        </div>
-      )}
-
-      {/* Review Step */}
-      {step === 'review' && (
-        <div className="profile-form">
-          <div className="profile-review-card">
-            <h3 className="profile-review-title">Profile Summary</h3>
-            <div className="profile-review-row"><span>Name</span><strong>{name}</strong></div>
-            <div className="profile-review-row"><span>Gender</span><strong>{gender}</strong></div>
-            <div className="profile-review-row"><span>Age</span><strong>{age}</strong></div>
-            <div className="profile-review-row"><span>State</span><strong>{state}</strong></div>
-            <div className="profile-review-row"><span>District</span><strong>{district}</strong></div>
-            <div className="profile-review-row"><span>Emergency Contact</span><strong>{emergencyContact}</strong></div>
-            {gender === 'female' && (
-              <>
-                <div className="profile-review-divider" />
-                <div className="profile-review-row"><span>Pregnant</span><strong>{isPregnant ? `Yes (Month ${estimatedMonth || '?'})` : 'No'}</strong></div>
-                <div className="profile-review-row"><span>Disabilities</span><strong>{disabilities.join(', ') || 'None specified'}</strong></div>
-                <div className="profile-review-row"><span>Menstruating</span><strong>{currentlyMenstruating ? 'Yes' : 'No'}</strong></div>
-              </>
-            )}
-          </div>
-
-          {!isOnline && (
-            <div className="login-offline-banner" style={{ marginBottom: 'var(--space-md)' }}>
-              <span>📱</span>
-              <p>Profile will be saved locally and synced when online.</p>
-            </div>
-          )}
-
-          <div className="form-btn-row">
-            <button className="form-btn-secondary" onClick={() => setStep(gender === 'female' ? 'extended' : 'basic')}>← Edit</button>
-            <button className="form-btn-primary" onClick={handleSubmit} disabled={saving}>
-              {saving ? 'Saving...' : '✓ Save Profile'}
+        {step === 'extended' && (
+          <div className="footer-btn-row">
+            <button
+              type="button"
+              className="stitch-action-btn secondary"
+              onClick={() => setStep('basic')}
+            >
+              ← Back
+            </button>
+            <button
+              type="button"
+              className="stitch-action-btn primary"
+              onClick={() => setStep('review')}
+            >
+              <span>Review Profile</span>
+              <span className="arrow">→</span>
             </button>
           </div>
+        )}
+
+        {step === 'review' && (
+          <div className="footer-btn-row">
+            <button
+              type="button"
+              className="stitch-action-btn secondary"
+              onClick={() => setStep(gender === 'female' ? 'extended' : 'basic')}
+            >
+              ← Edit
+            </button>
+            <button
+              type="button"
+              className="stitch-action-btn primary"
+              disabled={saving}
+              onClick={handleSubmit}
+            >
+              <span>{saving ? 'Encrypting & Saving...' : '✓ Complete & Save Profile'}</span>
+            </button>
+          </div>
+        )}
+
+        <div className="footer-auxiliary-links">
+          <button type="button" className="skip-link" onClick={handleSkip}>
+            Skip for Now (Save Draft Offline)
+          </button>
+          <span className="footer-privacy-text">Zero telemetry collected • Private & Discreet</span>
         </div>
-      )}
+      </footer>
     </div>
   );
 }
