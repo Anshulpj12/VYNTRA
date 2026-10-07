@@ -1,7 +1,6 @@
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './part1-user-system/auth/AuthContext';
-import LoginScreen from './part1-user-system/auth/LoginScreen';
 import RoleSelectScreen from './part1-user-system/auth/RoleSelectScreen';
 import HomeScreen from './part1-user-system/sos/HomeScreen';
 import ProfileCreateScreen from './part1-user-system/profile/ProfileCreateScreen';
@@ -28,19 +27,20 @@ import './part1-user-system/styles/part1-base.css';
 import './part3-service-provider/styles/part3-base.css';
 
 /**
- * Protected route wrapper — redirects to login if no auth.
+ * Protected route wrapper — redirects to role-select if no auth.
  */
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, vyntraUser, loading } = useAuth();
   if (loading) return <div className="loading-screen"><div className="loading-spinner" /></div>;
-  if (!user && !vyntraUser) return <Navigate to="/auth/login" replace />;
+  if (!user && !vyntraUser) return <Navigate to="/auth/role-select" replace />;
   return <>{children}</>;
 }
 
 /**
  * Smart default route — directs user based on active role and existing data.
  * If user has profile/registration data → go to their dashboard.
- * If not → go to role select screen.
+ * If user is signed in but no data → go to role select screen.
+ * If not signed in → go to role select screen (which is now the landing page).
  */
 function SmartDefaultRoute() {
   const { vyntraUser, activeRole, roleData, loading, roleDataLoading } = useAuth();
@@ -50,7 +50,7 @@ function SmartDefaultRoute() {
   }
 
   if (!vyntraUser) {
-    return <Navigate to="/auth/login" replace />;
+    return <Navigate to="/auth/role-select" replace />;
   }
 
   // If the user has data for their active role, go directly to their dashboard
@@ -76,9 +76,11 @@ function AppRoutes() {
       <TopRoleSwitcher />
       <ConnectivityBadge />
       <Routes>
-        {/* Auth Routes */}
-        <Route path="/auth/login" element={<LoginScreen />} />
-        <Route path="/auth/role-select" element={<ProtectedRoute><RoleSelectScreen /></ProtectedRoute>} />
+        {/* Role Select — LANDING PAGE (no auth required) */}
+        <Route path="/auth/role-select" element={<RoleSelectScreen />} />
+
+        {/* Legacy login route — redirect to role-select */}
+        <Route path="/auth/login" element={<Navigate to="/auth/role-select" replace />} />
 
         {/* User Routes (Part 1) */}
         <Route path="/user/home" element={<ProtectedRoute><HomeScreen /></ProtectedRoute>} />
