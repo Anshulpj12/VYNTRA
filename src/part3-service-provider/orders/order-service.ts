@@ -5,7 +5,7 @@
  */
 
 import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, orderBy } from 'firebase/firestore';
-import { db } from '../../shared/firebase/config';
+import { db, withFirestoreTimeout } from '../../shared/firebase/config';
 import { PATHS } from '../../shared/firebase/paths';
 import { generateUniqueId } from '../../shared/utils/id-generator';
 import type { Order, OrderItem, GeoCoordinates } from '../../shared/types';
@@ -71,14 +71,14 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
   cached.unshift(newOrder);
   saveLocalOrders(cached);
 
-  // 2. Sync to Firestore if online
+  // 2. Sync to Firestore if online in background with safety timeout
   if (navigator.onLine) {
-    try {
+    withFirestoreTimeout(async () => {
       const orderRef = doc(db, PATHS.order(orderId));
       await setDoc(orderRef, newOrder);
-    } catch (err) {
+    }, 1500).catch((err) => {
       console.warn('Firestore order write delayed (offline):', err);
-    }
+    });
   }
 
   return newOrder;
@@ -95,8 +95,8 @@ export async function getOrderById(orderId: string): Promise<Order | null> {
   if (navigator.onLine) {
     try {
       const orderRef = doc(db, PATHS.order(orderId));
-      const snap = await getDoc(orderRef);
-      if (snap.exists()) {
+      const snap = await withFirestoreTimeout(getDoc(orderRef), 1500);
+      if (snap && snap.exists()) {
         return snap.data() as Order;
       }
     } catch (err) {
@@ -121,21 +121,23 @@ export async function getIncomingPendingOrders(providerId: string): Promise<Orde
   if (navigator.onLine) {
     try {
       const q = query(collection(db, PATHS.orders()), orderBy('createdAt', 'desc'));
-      const snapshot = await getDocs(q);
-      const onlineOrders: Order[] = [];
-      snapshot.forEach((d) => {
-        const order = d.data() as Order;
-        if (
-          order.status === 'pending' &&
-          (order.targetProviderIds.includes(providerId) || order.targetProviderIds.length === 0)
-        ) {
-          onlineOrders.push(order);
-        }
-      });
-      // Merge unique orders
-      for (const ord of onlineOrders) {
-        if (!localOrders.some((l) => l.orderId === ord.orderId)) {
-          localOrders.unshift(ord);
+      const snapshot = await withFirestoreTimeout(getDocs(q), 1500);
+      if (snapshot) {
+        const onlineOrders: Order[] = [];
+        snapshot.forEach((d) => {
+          const order = d.data() as Order;
+          if (
+            order.status === 'pending' &&
+            (order.targetProviderIds.includes(providerId) || order.targetProviderIds.length === 0)
+          ) {
+            onlineOrders.push(order);
+          }
+        });
+        // Merge unique orders
+        for (const ord of onlineOrders) {
+          if (!localOrders.some((l) => l.orderId === ord.orderId)) {
+            localOrders.unshift(ord);
+          }
         }
       }
     } catch (err) {
@@ -157,13 +159,15 @@ export async function getActiveOrdersForProvider(providerId: string): Promise<Or
   if (navigator.onLine) {
     try {
       const q = query(collection(db, PATHS.orders()), orderBy('createdAt', 'desc'));
-      const snapshot = await getDocs(q);
-      snapshot.forEach((d) => {
-        const order = d.data() as Order;
-        if (order.acceptedByProviderId === providerId && !local.some((l) => l.orderId === order.orderId)) {
-          local.push(order);
-        }
-      });
+      const snapshot = await withFirestoreTimeout(getDocs(q), 1500);
+      if (snapshot) {
+        snapshot.forEach((d) => {
+          const order = d.data() as Order;
+          if (order.acceptedByProviderId === providerId && !local.some((l) => l.orderId === order.orderId)) {
+            local.push(order);
+          }
+        });
+      }
     } catch (e) {
       console.warn('Could not fetch active orders from Firestore:', e);
     }
@@ -207,18 +211,18 @@ export async function acceptOrderFirst(
   );
   saveLocalOrders(cached);
 
-  // Sync to Firestore
+  // Sync to Firestore in background
   if (navigator.onLine) {
-    try {
+    withFirestoreTimeout(async () => {
       const orderRef = doc(db, PATHS.order(orderId));
       await updateDoc(orderRef, {
         status: 'accepted',
         acceptedByProviderId: providerId,
         acceptedAt: now,
       });
-    } catch (err) {
+    }, 1500).catch((err) => {
       console.warn('Offline: order accepted locally and queued for sync:', err);
-    }
+    });
   }
 
   return { success: true, message: 'Order accepted successfully!', order: acceptedOrder };

@@ -14,7 +14,7 @@ import { db, isFirebaseConfigured } from '../../shared/firebase/config';
 import { FIRESTORE_PATHS } from '../../shared/firebase/paths';
 import { generateUniqueId } from '../../shared/utils/id-generator';
 import { saveToCache, addToSyncQueue, STORES } from '../../shared/utils/offline-cache';
-import type { ShelterProvider, Facility } from '../../shared/types';
+import type { ShelterProvider, Facility, ShelterMetadata } from '../../shared/types';
 
 /** Registration form data before ID generation */
 export interface RegistrationFormData {
@@ -89,7 +89,39 @@ export async function registerShelter(
     await saveToCache(STORES.FACILITIES, facility);
   }
 
-  /* Step 3: Attempt Firebase sync only if configured */
+  /* Step 3: Create consolidated ShelterMetadata for discovery by Part 1 & Part 3 */
+  const metadata: ShelterMetadata = {
+    shelterId,
+    shelterName: shelter.shelterName,
+    coordinates: shelter.coordinates,
+    registeredMobile: shelter.registeredMobile,
+    state: shelter.state,
+    district: shelter.district,
+    city: shelter.location,
+    totalBedCapacity: shelter.totalBedCapacity,
+    occupiedBeds: 0,
+    availableBeds: shelter.totalBedCapacity,
+    currentOccupants: [],
+    facilities: facilityRecords.map((f) => ({
+      facilityId: f.facilityId,
+      facilityName: f.facilityName,
+      type: f.type,
+      totalCapacity: f.totalCapacity,
+      currentAvailable: f.currentAvailable,
+    })),
+    inventorySummary: [
+      { itemName: 'Dignity & Sanitary Pad Bundles', currentQuantity: 40, requiredMinimum: 20 },
+      { itemName: 'Trauma & Medical First Aid Kits', currentQuantity: 10, requiredMinimum: 5 },
+    ],
+    shelterScore: 88,
+    lastUpdatedAt: now,
+  };
+
+  /* Save to both METADATA and SHELTER_CACHE so Part 1's SOS immediately discovers this shelter */
+  await saveToCache(STORES.METADATA, metadata);
+  await saveToCache(STORES.SHELTER_CACHE, metadata);
+
+  /* Step 4: Attempt Firebase sync only if configured */
   if (isFirebaseConfigured()) {
     try {
       if (navigator.onLine) {
@@ -102,6 +134,10 @@ export async function registerShelter(
             const facRef = doc(db, FIRESTORE_PATHS.shelterFacility(shelterId, facility.facilityId));
             await setDoc(facRef, facility);
           }
+
+          /* Sync consolidated metadata */
+          const metaRef = doc(db, FIRESTORE_PATHS.shelterMetadata(shelterId));
+          await setDoc(metaRef, metadata);
         })();
 
         /* 3-second safety timeout prevents infinite hang */

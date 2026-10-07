@@ -8,7 +8,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { doc, setDoc } from 'firebase/firestore';
-import { db } from '../../shared/firebase/config';
+import { db, withFirestoreTimeout } from '../../shared/firebase/config';
+import { generateUniqueId } from '../../shared/utils/id-generator';
 import { putItem, STORES, addPendingSync } from '../../shared/utils/offline-cache';
 import type { UserProfile } from '../../shared/types';
 import { Timestamp } from 'firebase/firestore';
@@ -95,63 +96,81 @@ export default function ProfileCreateScreen() {
   const isBasicValid = () => Boolean(name.trim() && age && state && district.trim() && emergencyContact.trim());
 
   const handleSubmit = async () => {
-    if (!vyntraUser) return;
     setSaving(true);
 
-    const fullEmergency = contactRelation 
-      ? `${emergencyContact.trim()} (${contactRelation})` 
-      : emergencyContact.trim();
+    try {
+      const effectiveAppId = vyntraUser?.appId || generateUniqueId('USR');
 
-    const profile: UserProfile = {
-      appId: vyntraUser.appId,
-      name: name.trim(),
-      gender,
-      age: parseInt(age) || 0,
-      state,
-      district: district.trim(),
-      homeAddress: homeAddress.trim(),
-      homeCoordinates: { lat: parseFloat(lat) || 0, lng: parseFloat(lng) || 0 },
-      emergencyContact: fullEmergency,
-      profileCompleteness: calculateCompleteness(),
-      lastModifiedAt: Timestamp.now(),
-      pendingSync: !isOnline,
-    };
+      const fullEmergency = contactRelation 
+        ? `${emergencyContact.trim()} (${contactRelation})` 
+        : emergencyContact.trim();
 
-    if (gender === 'female') {
-      profile.pregnancyStatus = { isPregnant, estimatedMonth: estimatedMonth ? parseInt(estimatedMonth) : undefined };
-      profile.disabilities = disabilities;
-      profile.medicalConditions = medicalConditions.trim();
-      profile.currentlyMenstruating = currentlyMenstruating;
-      profile.specialRequirements = specialRequirements.trim();
-    }
+      const profile: UserProfile = {
+        appId: effectiveAppId,
+        name: name.trim() || 'Emergency User',
+        gender,
+        age: parseInt(age) || 0,
+        state: state || 'National',
+        district: district.trim() || 'General',
+        homeAddress: homeAddress.trim(),
+        homeCoordinates: { lat: parseFloat(lat) || 0, lng: parseFloat(lng) || 0 },
+        emergencyContact: fullEmergency,
+        profileCompleteness: calculateCompleteness(),
+        lastModifiedAt: Timestamp.now(),
+        pendingSync: !isOnline,
+      };
 
-    // Offline-first save to IndexedDB
-    await putItem(STORES.PROFILE, profile);
+      if (gender === 'female') {
+        profile.pregnancyStatus = { isPregnant, estimatedMonth: estimatedMonth ? parseInt(estimatedMonth) : undefined };
+        profile.disabilities = disabilities;
+        profile.medicalConditions = medicalConditions.trim();
+        profile.currentlyMenstruating = currentlyMenstruating;
+        profile.specialRequirements = specialRequirements.trim();
+      }
 
-    if (isOnline) {
+      // 1. Offline-first save to IndexedDB
       try {
-        const profileRef = doc(db, 'users', vyntraUser.appId);
-        await setDoc(profileRef, { profile }, { merge: true });
-      } catch (err) {
-        console.warn('Sync pending. Saved to IndexedDB:', err);
+        await putItem(STORES.PROFILE, profile);
+      } catch (e) {
+        console.warn('IndexedDB profile save warning:', e);
+      }
+
+      // 2. Snapshot to localStorage for instant offline access
+      try {
+        localStorage.setItem(`vyntra_profile_${effectiveAppId}`, JSON.stringify(profile));
+        localStorage.setItem('vyntra_active_profile', JSON.stringify(profile));
+      } catch {}
+
+      // 3. Background sync to Firestore with safety timeout (NEVER block user flow)
+      if (isOnline) {
+        withFirestoreTimeout(async () => {
+          const profileRef = doc(db, 'users', effectiveAppId);
+          await setDoc(profileRef, { profile }, { merge: true });
+        }, 1500).catch((err) => {
+          console.warn('Sync pending. Saved to IndexedDB:', err);
+          addPendingSync({
+            type: 'create',
+            collection: 'users',
+            docId: effectiveAppId,
+            data: { profile },
+          });
+        });
+      } else {
         await addPendingSync({
           type: 'create',
           collection: 'users',
-          docId: vyntraUser.appId,
+          docId: effectiveAppId,
           data: { profile },
         });
       }
-    } else {
-      await addPendingSync({
-        type: 'create',
-        collection: 'users',
-        docId: vyntraUser.appId,
-        data: { profile },
-      });
-    }
 
-    setSaving(false);
-    navigate('/user/home', { replace: true });
+      setSaving(false);
+      navigate('/user/home', { replace: true });
+    } catch (err) {
+      console.error('Profile creation error, proceeding safely:', err);
+      setSaving(false);
+      navigate('/user/home', { replace: true });
+    }
   };
 
   const handleSkip = () => {

@@ -13,7 +13,7 @@ import { CHAT_CATEGORIES } from '../../shared/constants/chat-categories';
 import { isRequestAllowed } from '../../shared/utils/rate-limiter';
 import { getItem, putItem, STORES, addPendingSync } from '../../shared/utils/offline-cache';
 import type { ChatMessage, SixHourRecord } from '../../shared/types';
-import { db } from '../../shared/firebase/config';
+import { db, withFirestoreTimeout } from '../../shared/firebase/config';
 import { doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
 import '../styles/chat.css';
 
@@ -97,12 +97,12 @@ export default function DistrictChatScreen() {
         setMessages(cached.record.messages);
       }
 
-      // 2. If online, fetch from Firestore
+      // 2. If online, fetch from Firestore with safety timeout
       if (isOnline) {
         try {
           const docRef = doc(db, `world-chat/${stateCode}/${districtCode}/current-record`);
-          const snap = await getDoc(docRef);
-          if (snap.exists()) {
+          const snap = await withFirestoreTimeout(getDoc(docRef), 1500);
+          if (snap && snap.exists()) {
             const data = snap.data() as SixHourRecord;
             if (data.messages) {
               setMessages(data.messages);
@@ -200,20 +200,20 @@ export default function DistrictChatScreen() {
       updatedAt: Date.now(),
     });
 
-    // Sync to Firestore
+    // Sync to Firestore in background with safety timeout
     if (isOnline) {
-      try {
+      withFirestoreTimeout(async () => {
         const docRef = doc(db, `world-chat/${stateCode}/${districtCode}/current-record`);
         await setDoc(docRef, currentRecord);
-      } catch (err) {
+      }, 1500).catch((err) => {
         console.warn('Chat remote sync failed, queued offline', err);
-        await addPendingSync({
+        addPendingSync({
           type: 'update',
           collection: `world-chat/${stateCode}/${districtCode}`,
           docId: 'current-record',
           data: currentRecord,
         });
-      }
+      });
     } else {
       await addPendingSync({
         type: 'update',

@@ -34,6 +34,30 @@ export function isFirebaseConfigured(): boolean {
     firebaseConfig.apiKey.length > 0;
 }
 
+/**
+ * Wraps any Firestore write/read operation with a safety timeout (default 2000ms).
+ * In an offline-first PWA, local cache (IndexedDB / localStorage) is the source
+ * of truth. A slow, hanging, or permission-denied Firestore operation MUST NEVER
+ * freeze the UI, block form submission, or stall navigation.
+ */
+export async function withFirestoreTimeout<T>(
+  promiseOrFn: Promise<T> | (() => Promise<T>),
+  timeoutMs = 2000
+): Promise<T | null> {
+  const promise = typeof promiseOrFn === 'function' ? promiseOrFn() : promiseOrFn;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<null>((_, reject) =>
+        setTimeout(() => reject(new Error('Firestore timeout')), timeoutMs)
+      ),
+    ]);
+  } catch (err) {
+    console.warn('[VYNTRA Offline-First] Firestore operation bypassed or deferred:', err);
+    return null;
+  }
+}
+
 // Safe Analytics initialization for browser environments
 let analytics: Analytics | null = null;
 if (typeof window !== 'undefined') {

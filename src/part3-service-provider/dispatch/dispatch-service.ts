@@ -6,7 +6,7 @@
  */
 
 import { doc, getDoc, updateDoc, setDoc, collection, getDocs } from 'firebase/firestore';
-import { db } from '../../shared/firebase/config';
+import { db, withFirestoreTimeout } from '../../shared/firebase/config';
 import { PATHS } from '../../shared/firebase/paths';
 import { getOrderById, getLocalCachedOrders, saveLocalOrders } from '../orders/order-service';
 import type { Order, InventoryItem, ShelterMetadata } from '../../shared/types';
@@ -96,17 +96,17 @@ export async function authorizeDispatch(
   );
   saveLocalOrders(cached);
 
-  // Sync to Firestore
+  // Sync to Firestore in background
   if (navigator.onLine) {
-    try {
+    withFirestoreTimeout(async () => {
       const ref = doc(db, PATHS.order(orderId));
       await updateDoc(ref, {
         status: 'dispatched',
         dispatchedAt: now,
       });
-    } catch (err) {
+    }, 1500).catch((err) => {
       console.warn('Could not sync dispatch status to Firestore:', err);
-    }
+    });
   }
 
   return { success: true };
@@ -140,15 +140,15 @@ export async function confirmDeliveryAndAutoUpdateInventory(
   saveLocalOrders(cachedOrders);
 
   if (navigator.onLine) {
-    try {
+    withFirestoreTimeout(async () => {
       const orderRef = doc(db, PATHS.order(orderId));
       await updateDoc(orderRef, {
         status: 'confirmed',
         confirmedAt: now,
       });
-    } catch (err) {
+    }, 1500).catch((err) => {
       console.warn('Error confirming order online:', err);
-    }
+    });
   }
 
   // 2. AUTOMATIC INVENTORY UPDATE:

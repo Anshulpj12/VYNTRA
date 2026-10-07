@@ -414,21 +414,68 @@ export default function ShelterRegistrationScreen() {
                 </div>
 
                 {/* Coordinates */}
-                <div className="registration__coords-section">
-                  <div className="registration__coords-header">
-                    <span>🎯 Lock Precise Dispatch Anchor</span>
+                <div className="registration__coords-section" style={{ background: 'var(--vyntra-surface-variant)', padding: '16px', borderRadius: '12px', border: '1px solid var(--vyntra-border)', marginTop: '12px' }}>
+                  <div className="registration__coords-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <span style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span>🎯</span> Precise Sanctuary GPS Coordinates (Linked to SOS Network)
+                    </span>
                     <button
                       type="button"
                       className="part2-btn part2-btn--secondary part2-btn--sm"
                       onClick={handleGetLocation}
                       id="get-gps-btn"
                     >
-                      📡 Get GPS
+                      📡 Auto-Detect GPS
                     </button>
                   </div>
+
+                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                    <span style={{ fontSize: '12px', color: 'var(--vyntra-on-surface-muted)', alignSelf: 'center' }}>Quick Anchors:</span>
+                    <button
+                      type="button"
+                      className="part2-btn part2-btn--ghost part2-btn--sm"
+                      style={{ fontSize: '11px', padding: '2px 8px' }}
+                      onClick={() => { setLatitude('12.9716'); setLongitude('77.5946'); setState('Karnataka'); setDistrict('Bengaluru Urban'); }}
+                    >
+                      📍 Bengaluru
+                    </button>
+                    <button
+                      type="button"
+                      className="part2-btn part2-btn--ghost part2-btn--sm"
+                      style={{ fontSize: '11px', padding: '2px 8px' }}
+                      onClick={() => { setLatitude('28.6139'); setLongitude('77.2090'); setState('Delhi'); setDistrict('Central Delhi'); }}
+                    >
+                      📍 Delhi
+                    </button>
+                    <button
+                      type="button"
+                      className="part2-btn part2-btn--ghost part2-btn--sm"
+                      style={{ fontSize: '11px', padding: '2px 8px' }}
+                      onClick={() => { setLatitude('23.1815'); setLongitude('79.9412'); setState('Madhya Pradesh'); setDistrict('Jabalpur'); }}
+                    >
+                      📍 Jabalpur
+                    </button>
+                    <button
+                      type="button"
+                      className="part2-btn part2-btn--ghost part2-btn--sm"
+                      style={{ fontSize: '11px', padding: '2px 8px' }}
+                      onClick={() => { setLatitude('23.2599'); setLongitude('77.4126'); setState('Madhya Pradesh'); setDistrict('Bhopal'); }}
+                    >
+                      📍 Bhopal
+                    </button>
+                    <button
+                      type="button"
+                      className="part2-btn part2-btn--ghost part2-btn--sm"
+                      style={{ fontSize: '11px', padding: '2px 8px' }}
+                      onClick={() => { setLatitude('19.0760'); setLongitude('72.8777'); setState('Maharashtra'); setDistrict('Mumbai'); }}
+                    >
+                      📍 Mumbai
+                    </button>
+                  </div>
+
                   <div className="part2-grid part2-grid--2">
                     <div className="part2-input-group">
-                      <label className="part2-input-group__label">Latitude</label>
+                      <label className="part2-input-group__label">Latitude <span className="part2-input-group__required">*</span></label>
                       <input
                         id="shelter-lat-input"
                         className={`part2-input ${errors.latitude ? 'part2-input--error' : ''}`}
@@ -436,14 +483,14 @@ export default function ShelterRegistrationScreen() {
                         step="0.000001"
                         value={latitude}
                         onChange={(e) => setLatitude(e.target.value)}
-                        placeholder="12.9716"
+                        placeholder="e.g. 23.1815"
                       />
                       {errors.latitude && (
                         <span className="part2-input-group__error">⚠ {errors.latitude}</span>
                       )}
                     </div>
                     <div className="part2-input-group">
-                      <label className="part2-input-group__label">Longitude</label>
+                      <label className="part2-input-group__label">Longitude <span className="part2-input-group__required">*</span></label>
                       <input
                         id="shelter-lng-input"
                         className={`part2-input ${errors.longitude ? 'part2-input--error' : ''}`}
@@ -451,13 +498,20 @@ export default function ShelterRegistrationScreen() {
                         step="0.000001"
                         value={longitude}
                         onChange={(e) => setLongitude(e.target.value)}
-                        placeholder="77.5946"
+                        placeholder="e.g. 79.9412"
                       />
                       {errors.longitude && (
                         <span className="part2-input-group__error">⚠ {errors.longitude}</span>
                       )}
                     </div>
                   </div>
+
+                  {latitude && longitude && (
+                    <div style={{ marginTop: '8px', padding: '6px 12px', background: 'rgba(56, 102, 65, 0.1)', color: 'var(--vyntra-success)', borderRadius: '6px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span>✅</span>
+                      <span>Coordinates Verified: [{latitude}, {longitude}] — Shelter ready to link to Emergency SOS network.</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

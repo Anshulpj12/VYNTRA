@@ -17,6 +17,7 @@ import BedManagementScreen from './bed-management/BedManagementScreen';
 import FacilitiesScreen from './facilities/FacilitiesScreen';
 import InventoryScreen from './inventory/InventoryScreen';
 import MetadataScreen from './metadata/MetadataScreen';
+import ShelterSOSDecodeScreen from './sos-decode/ShelterSOSDecodeScreen';
 import './styles/part2-base.css';
 
 /** Navigation items for the sidebar */
@@ -33,6 +34,7 @@ const NAV_ITEMS: NavItem[] = [
   { tab: 'beds', label: 'Intake & Allocation', icon: '👤', requiresActive: true },
   { tab: 'facilities', label: 'Facilities & Hygiene', icon: '🏥', requiresActive: true },
   { tab: 'inventory', label: 'Supplies & Dispatch', icon: '📦', requiresActive: true },
+  { tab: 'sos-decode', label: 'SOS Signal Decoder', icon: '🚨', requiresActive: true },
   { tab: 'metadata', label: 'Emergency Network', icon: '🌐', requiresActive: true },
 ];
 
@@ -70,6 +72,8 @@ function ShelterAppInner() {
         return <FacilitiesScreen />;
       case 'inventory':
         return <InventoryScreen />;
+      case 'sos-decode':
+        return <ShelterSOSDecodeScreen />;
       case 'metadata':
         return <MetadataScreen />;
       default:

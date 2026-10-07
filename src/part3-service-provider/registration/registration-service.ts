@@ -4,7 +4,7 @@
  */
 
 import { doc, setDoc } from 'firebase/firestore';
-import { db } from '../../shared/firebase/config';
+import { db, withFirestoreTimeout } from '../../shared/firebase/config';
 import { PATHS } from '../../shared/firebase/paths';
 import { generateUniqueId } from '../../shared/utils/id-generator';
 import type { ServiceProvider, GeoCoordinates } from '../../shared/types';

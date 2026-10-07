@@ -9,9 +9,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { getAllItems, putItem, STORES, addPendingSync } from '../../shared/utils/offline-cache';
 import { calculateDistance } from '../../shared/utils/geo-distance';
-import type { ShelterMetadata, GeoCoordinates } from '../../shared/types';
+import type { ShelterMetadata, ShelterProvider, GeoCoordinates } from '../../shared/types';
 import { db } from '../../shared/firebase/config';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, Timestamp } from 'firebase/firestore';
 import '../styles/sos.css';
 
 // Fallback initial emergency shelters if cache is empty
@@ -131,21 +131,112 @@ export default function SOSShelterSelectScreen() {
     const userCoords: GeoCoordinates = sosData?.coordinates || { lat: 28.6139, lng: 77.2090 };
 
     async function loadShelters() {
-      let shelters = await getAllItems<ShelterMetadata>(STORES.SHELTER_CACHE);
-      if (!shelters || shelters.length === 0) {
-        // Populate fallback demo shelters into cache for offline survival
-        for (const s of INITIAL_DEMO_SHELTERS) {
-          await putItem(STORES.SHELTER_CACHE, s);
+      const shelterMap = new Map<string, ShelterMetadata>();
+
+      // 1. Read from STORES.SHELTER_CACHE
+      try {
+        const cached = await getAllItems<ShelterMetadata>(STORES.SHELTER_CACHE);
+        if (cached && Array.isArray(cached)) {
+          cached.forEach((s) => {
+            if (s && s.shelterId) shelterMap.set(s.shelterId, s);
+          });
         }
-        shelters = INITIAL_DEMO_SHELTERS;
+      } catch (e) {
+        console.warn('Error reading SHELTER_CACHE:', e);
       }
 
+      // 2. Read from STORES.METADATA
+      try {
+        const metadataItems = await getAllItems<ShelterMetadata>(STORES.METADATA);
+        if (metadataItems && Array.isArray(metadataItems)) {
+          metadataItems.forEach((m) => {
+            if (m && m.shelterId) shelterMap.set(m.shelterId, m);
+          });
+        }
+      } catch (e) {
+        console.warn('Error reading METADATA:', e);
+      }
+
+      // 3. Read from STORES.SHELTER_PROVIDERS (Part 2 registration)
+      try {
+        const providers = await getAllItems<ShelterProvider>(STORES.SHELTER_PROVIDERS);
+        if (providers && Array.isArray(providers)) {
+          providers.forEach((prov) => {
+            if (prov && prov.shelterId && !shelterMap.has(prov.shelterId)) {
+              shelterMap.set(prov.shelterId, {
+                shelterId: prov.shelterId,
+                shelterName: prov.shelterName,
+                registeredMobile: prov.registeredMobile,
+                coordinates: prov.coordinates,
+                state: prov.state,
+                district: prov.district,
+                city: prov.location,
+                totalBedCapacity: prov.totalBedCapacity,
+                occupiedBeds: prov.occupiedBeds || 0,
+                availableBeds: prov.availableBeds || prov.totalBedCapacity,
+                shelterScore: 88,
+                currentOccupants: [],
+                facilities: [],
+                inventorySummary: [],
+                lastUpdatedAt: prov.lastUpdatedAt || Date.now(),
+              });
+            }
+          });
+        }
+      } catch (e) {
+        console.warn('Error reading SHELTER_PROVIDERS:', e);
+      }
+
+      // 4. Online Firebase query if connected
+      if (navigator.onLine) {
+        try {
+          const q = collection(db, 'shelter-providers');
+          const snap = await getDocs(q);
+          snap.forEach((docSnap) => {
+            const data = docSnap.data() as ShelterProvider;
+            if (data && data.shelterId) {
+              const meta: ShelterMetadata = {
+                shelterId: data.shelterId,
+                shelterName: data.shelterName,
+                registeredMobile: data.registeredMobile,
+                coordinates: data.coordinates,
+                state: data.state,
+                district: data.district,
+                city: data.location,
+                totalBedCapacity: data.totalBedCapacity,
+                occupiedBeds: data.occupiedBeds || 0,
+                availableBeds: data.availableBeds || data.totalBedCapacity,
+                shelterScore: 90,
+                currentOccupants: [],
+                facilities: [],
+                inventorySummary: [],
+                lastUpdatedAt: data.lastUpdatedAt || Date.now(),
+              };
+              shelterMap.set(data.shelterId, meta);
+              void putItem(STORES.SHELTER_CACHE, meta);
+            }
+          });
+        } catch (err) {
+          console.warn('Could not query online shelters:', err);
+        }
+      }
+
+      // 5. Fallback demo shelters if still empty
+      if (shelterMap.size === 0) {
+        for (const s of INITIAL_DEMO_SHELTERS) {
+          shelterMap.set(s.shelterId, s);
+          await putItem(STORES.SHELTER_CACHE, s);
+        }
+      }
+
+      const allShelters = Array.from(shelterMap.values());
+
       // Rank shelters: composite score = (shelterScore * 0.6) + proximity score (0.4)
-      const ranked: RankedShelter[] = shelters.map((s) => {
+      const ranked: RankedShelter[] = allShelters.map((s) => {
         const dist = calculateDistance(userCoords, s.coordinates);
         // Inverse distance score: 0km = 100pts, 20km = 0pts
         const distScore = Math.max(0, 100 - dist * 5);
-        const composite = (s.shelterScore * 0.6) + (distScore * 0.4);
+        const composite = ((s.shelterScore || 80) * 0.6) + (distScore * 0.4);
         return {
           ...s,
           distanceKm: dist,

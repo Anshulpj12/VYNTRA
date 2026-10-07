@@ -16,6 +16,8 @@ import type {
   InventoryItem,
 } from '../../shared/types';
 import { createDemoShelter } from '../mock-data/demo-shelter';
+import { consolidateMetadata } from '../metadata/metadata-consolidator';
+import { saveToCache, STORES } from '../../shared/utils/offline-cache';
 
 /* ─── State Shape ─── */
 export interface ShelterState {
@@ -44,7 +46,8 @@ export type ShelterTab =
   | 'beds'
   | 'facilities'
   | 'inventory'
-  | 'metadata';
+  | 'metadata'
+  | 'sos-decode';
 
 /* ─── Action Types ─── */
 export type ShelterAction =
@@ -110,6 +113,17 @@ function shelterReducer(state: ShelterState, action: ShelterAction): ShelterStat
 
     case 'LOAD_DEMO_DATA': {
       const demo = createDemoShelter();
+      void (async () => {
+        try {
+          const meta = consolidateMetadata(demo.shelter, demo.occupants, demo.facilities, demo.inventory);
+          meta.shelterScore = 92;
+          await saveToCache(STORES.SHELTER_PROVIDERS, demo.shelter);
+          await saveToCache(STORES.METADATA, meta);
+          await saveToCache(STORES.SHELTER_CACHE, meta);
+        } catch (e) {
+          console.warn('[VYNTRA] Could not cache demo shelter to offline store:', e);
+        }
+      })();
       return {
         ...state,
         shelter: demo.shelter,

@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { getAllItems, putItem, STORES, addPendingSync } from '../../shared/utils/offline-cache';
 import type { CycleRecord, CycleNote } from '../../shared/types';
-import { db } from '../../shared/firebase/config';
+import { db, withFirestoreTimeout } from '../../shared/firebase/config';
 import { doc, setDoc, Timestamp } from 'firebase/firestore';
 import '../styles/tracker.css';
 
@@ -56,17 +56,17 @@ export default function TrackerHomeScreen() {
     await putItem(STORES.CYCLES, cycle);
 
     if (isOnline && vyntraUser) {
-      try {
+      withFirestoreTimeout(async () => {
         await setDoc(doc(db, `users/${vyntraUser.appId}/cycles`, cycle.cycleId), cycle);
-      } catch (err) {
+      }, 1500).catch((err) => {
         console.warn('Sync failed, caching offline', err);
-        await addPendingSync({
+        addPendingSync({
           type: 'update',
           collection: `users/${vyntraUser.appId}/cycles`,
           docId: cycle.cycleId,
           data: cycle,
         });
-      }
+      });
     } else if (vyntraUser) {
       await addPendingSync({
         type: 'update',
