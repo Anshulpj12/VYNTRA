@@ -12,6 +12,8 @@
  */
 
 import { useState, useCallback } from 'react';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db, withFirestoreTimeout } from '../../shared/firebase/config';
 import { useShelter } from '../context/ShelterContext';
 import { useConnectivity } from '../context/ConnectivityContext';
 import {
@@ -181,9 +183,25 @@ export default function ShelterRegistrationScreen() {
         facilities: facilities.filter((f) => f.name.trim()),
       };
 
-      /* Use a demo Google UID for now (will connect to real auth later) */
-      const googleUid = 'demo-provider-uid';
+      /* Use real auth UID if user is signed in, with fallback */
+      const googleUid = auth.currentUser?.uid || 'provider-uid';
       const shelter = await registerShelter(formData, googleUid);
+
+      // 1. Cache shelter in localStorage for instant retrieval
+      try {
+        localStorage.setItem('vyntra_shelter_provider', JSON.stringify(shelter));
+      } catch {}
+
+      // 2. Sync shelter association to user doc in Firestore if online
+      if (auth.currentUser?.uid) {
+        withFirestoreTimeout(async () => {
+          const userRef = doc(db, 'users', auth.currentUser!.uid);
+          await setDoc(userRef, { shelterId: shelter.shelterId, shelter }, { merge: true });
+        }, 2000).catch(() => {});
+      }
+
+      // 3. Notify role listeners across the app
+      window.dispatchEvent(new Event('vyntra-role-data-updated'));
 
       dispatch({ type: 'SET_SHELTER', payload: shelter });
       dispatch({ type: 'SET_TAB', payload: 'dashboard' });

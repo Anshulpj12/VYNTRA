@@ -20,7 +20,7 @@ const DISABILITY_OPTIONS = ['Mobility', 'Visual', 'Hearing', 'Cognitive', 'None'
 const RELATIONSHIP_CHIPS = ['Mother', 'Sister', 'Partner', 'Trusted Friend', 'Father', 'Brother'];
 
 export default function ProfileCreateScreen() {
-  const { vyntraUser, isOnline } = useAuth();
+  const { vyntraUser, isOnline, refreshRoleData } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState<'basic' | 'extended' | 'review'>('basic');
   const [saving, setSaving] = useState(false);
@@ -146,6 +146,10 @@ export default function ProfileCreateScreen() {
         withFirestoreTimeout(async () => {
           const profileRef = doc(db, 'users', effectiveAppId);
           await setDoc(profileRef, { profile }, { merge: true });
+          if (vyntraUser?.googleUid) {
+            const googleUserRef = doc(db, 'users', vyntraUser.googleUid);
+            await setDoc(googleUserRef, { profile }, { merge: true });
+          }
         }, 1500).catch((err) => {
           console.warn('Sync pending. Saved to IndexedDB:', err);
           addPendingSync({
@@ -163,6 +167,9 @@ export default function ProfileCreateScreen() {
           data: { profile },
         });
       }
+
+      // Refresh role data so auth context knows profile exists
+      await refreshRoleData();
 
       setSaving(false);
       navigate('/user/home', { replace: true });

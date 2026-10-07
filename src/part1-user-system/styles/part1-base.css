@@ -16,6 +16,14 @@
   flex-direction: column;
 }
 
+.app-shell:has(.part2-shelter),
+.app-shell:has(.part3-container),
+.app-shell:has(.role-select-screen),
+.app-shell:has(.vyntra-top-role-bar) {
+  max-width: 100%;
+  box-shadow: none;
+}
+
 /* Connectivity Badge */
 .connectivity-badge {
   position: sticky;

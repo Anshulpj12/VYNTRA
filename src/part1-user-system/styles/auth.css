@@ -889,3 +889,232 @@
   margin-top: 4px;
 }
 
+/* ============================================================
+   VYNTRA — Role Select Enhancements (Role Switching + Data Awareness)
+   ============================================================ */
+
+/* User Identity Card */
+.role-user-info-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border: 1.5px solid #e0bfc1;
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-top: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.role-user-info-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.role-user-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(173, 38, 68, 0.2);
+}
+
+.role-user-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.role-user-avatar-fallback {
+  color: #ffffff;
+  font-family: var(--font-headline);
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.role-user-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  text-align: left;
+}
+
+.role-user-name {
+  font-family: var(--font-headline);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--color-on-surface);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.role-user-email {
+  font-size: 0.78rem;
+  color: var(--color-on-surface-variant);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.role-signout-btn {
+  background: var(--color-surface-container-low);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--color-on-surface-variant);
+  transition: all 0.2s;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.role-signout-btn:hover {
+  background: var(--color-error-container);
+  color: var(--color-on-error-container);
+  border-color: var(--color-error);
+}
+
+/* Current Role Indicator */
+.role-current-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-primary-surface);
+  border: 1px solid var(--color-primary-surface-dim);
+  padding: 6px 16px;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-top: 8px;
+}
+
+.role-current-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Active Role Badge on Card */
+.bento-card--active {
+  border-width: 2.5px;
+  position: relative;
+}
+
+.bento-card--rose.bento-card--active {
+  border-color: #ad2644;
+  box-shadow: 0 4px 20px rgba(173, 38, 68, 0.15);
+  background: #fffbfc;
+}
+
+.bento-card--green.bento-card--active {
+  border-color: #2d6a4f;
+  box-shadow: 0 4px 20px rgba(45, 106, 79, 0.15);
+  background: #f7fffa;
+}
+
+.bento-card--amber.bento-card--active {
+  border-color: #b45309;
+  box-shadow: 0 4px 20px rgba(180, 83, 9, 0.15);
+  background: #fffdf7;
+}
+
+.bento-active-badge {
+  position: absolute;
+  top: -10px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-primary);
+  color: #ffffff;
+  padding: 3px 12px;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 8px rgba(173, 38, 68, 0.3);
+}
+
+.bento-active-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+/* Data Saved Badge */
+.bento-data-badge {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-sync-online-surface);
+  border: 1px solid var(--color-sync-online-border);
+  color: var(--color-sync-online-text);
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+/* Role Switching Loading Overlay */
+.role-switching-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(6px);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--color-on-surface);
+  animation: fadeIn 0.15s ease-out;
+}
+
+/* Discreet Mode */
+.discreet-active .bento-card,
+.discreet-active .role-user-info-card,
+.discreet-active .role-identity-chip {
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.discreet-active .role-emergency-card {
+  filter: none;
+  pointer-events: auto;
+}
+
+/* Disabled state for action button */
+.bento-action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+

@@ -6,6 +6,8 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { doc, setDoc } from 'firebase/firestore';
+import { db, withFirestoreTimeout } from '../../shared/firebase/config';
 import { useAuth } from '../../part1-user-system/auth/AuthContext';
 import { registerServiceProvider, type RegistrationInput } from './registration-service';
 import ProviderInfoForm from './components/ProviderInfoForm';
@@ -15,7 +17,7 @@ import '../styles/registration.css';
 
 export default function ServiceProviderRegistrationScreen() {
   const navigate = useNavigate();
-  const { user, vyntraUser } = useAuth();
+  const { user, vyntraUser, refreshRoleData } = useAuth();
 
   const [formData, setFormData] = useState<RegistrationInput>({
     providerName: '',
@@ -44,6 +46,15 @@ export default function ServiceProviderRegistrationScreen() {
     try {
       const res = await registerServiceProvider(formData);
       if (res.success && res.provider) {
+        const uid = user?.uid || vyntraUser?.googleUid;
+        if (uid && navigator.onLine) {
+          withFirestoreTimeout(async () => {
+            const userRef = doc(db, 'users', uid);
+            await setDoc(userRef, { serviceProviderId: res.provider!.providerId, serviceProvider: res.provider }, { merge: true });
+          }, 2000).catch(() => {});
+        }
+        window.dispatchEvent(new Event('vyntra-role-data-updated'));
+        await refreshRoleData();
         // Navigate directly to Service Provider Dashboard
         navigate('/service/dashboard', { replace: true });
       } else {

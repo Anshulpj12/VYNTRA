@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './part1-user-system/auth/AuthContext';
 import LoginScreen from './part1-user-system/auth/LoginScreen';
 import RoleSelectScreen from './part1-user-system/auth/RoleSelectScreen';
@@ -12,6 +12,7 @@ import DistrictChatScreen from './part1-user-system/world-chat/DistrictChatScree
 import SOSConditionsScreen from './part1-user-system/sos/SOSConditionsScreen';
 import SOSShelterSelectScreen from './part1-user-system/sos/SOSShelterSelectScreen';
 import ConnectivityBadge from './part1-user-system/components/ConnectivityBadge';
+import TopRoleSwitcher from './part1-user-system/components/TopRoleSwitcher';
 import ShelterApp from './part2-shelter-provider/ShelterApp';
 
 import ServiceProviderRegistrationScreen from './part3-service-provider/registration/ServiceProviderRegistrationScreen';
@@ -26,6 +27,9 @@ import './shared/design-tokens/tokens.css';
 import './part1-user-system/styles/part1-base.css';
 import './part3-service-provider/styles/part3-base.css';
 
+/**
+ * Protected route wrapper — redirects to login if no auth.
+ */
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, vyntraUser, loading } = useAuth();
   if (loading) return <div className="loading-screen"><div className="loading-spinner" /></div>;
@@ -33,9 +37,43 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+/**
+ * Smart default route — directs user based on active role and existing data.
+ * If user has profile/registration data → go to their dashboard.
+ * If not → go to role select screen.
+ */
+function SmartDefaultRoute() {
+  const { vyntraUser, activeRole, roleData, loading, roleDataLoading } = useAuth();
+
+  if (loading || roleDataLoading) {
+    return <div className="loading-screen"><div className="loading-spinner" /></div>;
+  }
+
+  if (!vyntraUser) {
+    return <Navigate to="/auth/login" replace />;
+  }
+
+  // If the user has data for their active role, go directly to their dashboard
+  switch (activeRole) {
+    case 'user':
+      if (roleData.userProfile) return <Navigate to="/user/home" replace />;
+      break;
+    case 'shelter-provider':
+      if (roleData.shelterProvider) return <Navigate to="/shelter/dashboard" replace />;
+      break;
+    case 'service-provider':
+      if (roleData.serviceProvider) return <Navigate to="/service/dashboard" replace />;
+      break;
+  }
+
+  // Otherwise, go to role selection
+  return <Navigate to="/auth/role-select" replace />;
+}
+
 function AppRoutes() {
   return (
     <div className="app-shell">
+      <TopRoleSwitcher />
       <ConnectivityBadge />
       <Routes>
         {/* Auth Routes */}
@@ -75,9 +113,9 @@ function AppRoutes() {
         <Route path="/dispatch/:orderId" element={<ProtectedRoute><DispatchScreen /></ProtectedRoute>} />
         <Route path="/dispatch/confirm/:orderId" element={<ProtectedRoute><DeliveryConfirmationScreen /></ProtectedRoute>} />
 
-        {/* Default redirect */}
-        <Route path="/" element={<Navigate to="/auth/login" replace />} />
-        <Route path="*" element={<Navigate to="/auth/login" replace />} />
+        {/* Smart default — routes based on role + data */}
+        <Route path="/" element={<SmartDefaultRoute />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>
   );
@@ -85,10 +123,10 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <AuthProvider>
         <AppRoutes />
       </AuthProvider>
-    </BrowserRouter>
+    </HashRouter>
   );
 }

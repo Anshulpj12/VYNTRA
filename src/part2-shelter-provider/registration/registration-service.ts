@@ -121,60 +121,60 @@ export async function registerShelter(
   await saveToCache(STORES.METADATA, metadata);
   await saveToCache(STORES.SHELTER_CACHE, metadata);
 
-  /* Step 4: Attempt Firebase sync only if configured */
+  /* Step 4: Attempt Firebase sync only if configured — NEVER block UI */
   if (isFirebaseConfigured()) {
-    try {
-      if (navigator.onLine) {
-        const syncPromise = (async () => {
-          const shelterRef = doc(db, FIRESTORE_PATHS.shelterProvider(shelterId));
-          await setDoc(shelterRef, shelter);
+    if (navigator.onLine) {
+      const syncPromise = (async () => {
+        const shelterRef = doc(db, FIRESTORE_PATHS.shelterProvider(shelterId));
+        await setDoc(shelterRef, shelter);
 
-          /* Sync facilities */
-          for (const facility of facilityRecords) {
-            const facRef = doc(db, FIRESTORE_PATHS.shelterFacility(shelterId, facility.facilityId));
-            await setDoc(facRef, facility);
-          }
-
-          /* Sync consolidated metadata */
-          const metaRef = doc(db, FIRESTORE_PATHS.shelterMetadata(shelterId));
-          await setDoc(metaRef, metadata);
-        })();
-
-        /* 3-second safety timeout prevents infinite hang */
-        await Promise.race([
-          syncPromise,
-          new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Firebase sync timed out')), 3000)
-          ),
-        ]);
-
-        console.info(`[VYNTRA] Shelter ${shelterId} registered and synced to Firebase`);
-      } else {
-        /* Queue for later sync */
-        await addToSyncQueue({
-          id: `reg-${shelterId}`,
-          store: STORES.SHELTER_PROVIDERS,
-          operation: 'create',
-          data: shelter,
-          timestamp: now,
-          retryCount: 0,
-        });
-
+        /* Sync facilities */
         for (const facility of facilityRecords) {
-          await addToSyncQueue({
-            id: `fac-${facility.facilityId}`,
-            store: STORES.FACILITIES,
-            operation: 'create',
-            data: facility,
-            timestamp: now,
-            retryCount: 0,
-          });
+          const facRef = doc(db, FIRESTORE_PATHS.shelterFacility(shelterId, facility.facilityId));
+          await setDoc(facRef, facility);
         }
 
-        console.info(`[VYNTRA] Shelter ${shelterId} saved offline, queued for sync`);
+        /* Sync consolidated metadata */
+        const metaRef = doc(db, FIRESTORE_PATHS.shelterMetadata(shelterId));
+        await setDoc(metaRef, metadata);
+      })();
+
+      /* Fire-and-forget: 3-second timeout, never blocks the return */
+      Promise.race([
+        syncPromise,
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Firebase sync timed out')), 3000)
+        ),
+      ])
+        .then(() => {
+          console.info(`[VYNTRA] Shelter ${shelterId} registered and synced to Firebase`);
+        })
+        .catch((error) => {
+          console.warn('[VYNTRA] Firebase sync skipped or timed out, data safe locally:', error);
+        });
+    } else {
+      /* Queue for later sync */
+      addToSyncQueue({
+        id: `reg-${shelterId}`,
+        store: STORES.SHELTER_PROVIDERS,
+        operation: 'create',
+        data: shelter,
+        timestamp: now,
+        retryCount: 0,
+      }).catch(() => {});
+
+      for (const facility of facilityRecords) {
+        addToSyncQueue({
+          id: `fac-${facility.facilityId}`,
+          store: STORES.FACILITIES,
+          operation: 'create',
+          data: facility,
+          timestamp: now,
+          retryCount: 0,
+        }).catch(() => {});
       }
-    } catch (error) {
-      console.warn('[VYNTRA] Firebase sync skipped or timed out, data safe locally:', error);
+
+      console.info(`[VYNTRA] Shelter ${shelterId} saved offline, queued for sync`);
     }
   } else {
     console.info(`[VYNTRA] Testing mode: Shelter ${shelterId} activated locally (Firebase bypassed)`);

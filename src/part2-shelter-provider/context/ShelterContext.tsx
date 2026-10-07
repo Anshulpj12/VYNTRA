@@ -95,6 +95,17 @@ function loadStoredState(): ShelterState {
         return parsed;
       }
     }
+    const shlRaw = localStorage.getItem('vyntra_shelter_provider');
+    if (shlRaw) {
+      const shelter = JSON.parse(shlRaw);
+      if (shelter && shelter.shelterId) {
+        return {
+          ...initialState,
+          shelter,
+          activeTab: 'dashboard',
+        };
+      }
+    }
   } catch (e) {
     console.warn('[VYNTRA] Could not parse stored state', e);
   }

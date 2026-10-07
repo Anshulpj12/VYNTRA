@@ -99,15 +99,14 @@ export async function registerServiceProvider(
   // 1. Cache locally first (Offline-first pattern)
   await saveCurrentProvider(provider);
 
-  // 2. Sync to Firebase if online
+  // 2. Background sync to Firebase — NEVER block UI
   if (navigator.onLine) {
-    try {
+    withFirestoreTimeout(async () => {
       const providerDocRef = doc(db, PATHS.serviceProvider(providerId));
       await setDoc(providerDocRef, provider);
-    } catch (err) {
+    }, 2000).catch((err) => {
       console.warn('Firebase sync delayed (offline or permission issue):', err);
-      // We do not fail registration because local cache succeeded
-    }
+    });
   }
 
   return { success: true, provider };

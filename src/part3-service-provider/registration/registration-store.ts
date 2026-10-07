@@ -4,10 +4,9 @@
  */
 
 import type { ServiceProvider } from '../../shared/types';
-import { getItem, putItem } from '../../shared/utils/offline-cache';
+import { getItem, putItem, STORES } from '../../shared/utils/offline-cache';
 
 const LOCAL_STORAGE_KEY = 'vyntra_service_provider_profile';
-const CACHE_STORE = 'profile';
 
 /**
  * Saves current service provider profile to offline storage and localStorage.
@@ -20,10 +19,7 @@ export async function saveCurrentProvider(provider: ServiceProvider): Promise<vo
   }
 
   try {
-    await putItem(CACHE_STORE, {
-      appId: provider.providerId,
-      ...provider,
-    });
+    await putItem(STORES.SERVICE_PROVIDERS, provider);
   } catch (e) {
     console.warn('Could not cache provider in IndexedDB:', e);
   }
@@ -45,7 +41,7 @@ export async function getCurrentProvider(): Promise<ServiceProvider | null> {
 
   // Fallback to IndexedDB
   try {
-    const cached = await getItem<ServiceProvider & { appId: string }>(CACHE_STORE, 'current-service-provider');
+    const cached = await getItem<ServiceProvider>(STORES.SERVICE_PROVIDERS, 'current-service-provider');
     if (cached) {
       return cached;
     }

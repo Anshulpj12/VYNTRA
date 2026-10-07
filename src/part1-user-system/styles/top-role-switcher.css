@@ -1,0 +1,286 @@
+/* ============================================================
+   VYNTRA — Top Role Switcher Header Bar
+   Provides seamless one-click role switching above all functional screens.
+   Tactile Sanctuary aesthetic with live data status pills & network telemetry.
+   ============================================================ */
+
+.vyntra-top-role-bar {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(173, 38, 68, 0.12);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: var(--font-body, 'Inter', sans-serif);
+  box-sizing: border-box;
+  transition: all 0.25s ease;
+}
+
+/* ─── Left Section: Brand & Active Role ─── */
+.top-role-bar__brand-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.top-role-bar__logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif);
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: #ad2644;
+  letter-spacing: -0.02em;
+}
+
+.top-role-bar__logo-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.top-role-bar__current-role-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.top-role-bar__current-role-pill--user {
+  background: #ffdadc;
+  color: #ad2644;
+  border: 1px solid rgba(173, 38, 68, 0.25);
+}
+
+.top-role-bar__current-role-pill--shelter {
+  background: #e2f7e4;
+  color: #186a22;
+  border: 1px solid rgba(24, 106, 34, 0.25);
+}
+
+.top-role-bar__current-role-pill--service {
+  background: #fff3e0;
+  color: #e65100;
+  border: 1px solid rgba(230, 81, 0, 0.25);
+}
+
+/* ─── Center Section: Role Switcher Buttons ─── */
+.top-role-bar__switcher {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f4f6fa;
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid #e2e6f0;
+}
+
+.top-role-bar__role-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #4a5568;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  min-height: 38px;
+}
+
+.top-role-bar__role-btn:hover {
+  background: #ffffff;
+  color: #1a202c;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.top-role-bar__role-btn--active {
+  background: #ffffff;
+  color: #ad2644;
+  border-color: rgba(173, 38, 68, 0.2);
+  box-shadow: 0 2px 8px rgba(173, 38, 68, 0.12);
+  font-weight: 700;
+}
+
+.top-role-bar__role-btn--active.top-role-bar__role-btn--shelter {
+  color: #186a22;
+  border-color: rgba(24, 106, 34, 0.25);
+  box-shadow: 0 2px 8px rgba(24, 106, 34, 0.12);
+}
+
+.top-role-bar__role-btn--active.top-role-bar__role-btn--service {
+  color: #e65100;
+  border-color: rgba(230, 81, 0, 0.25);
+  box-shadow: 0 2px 8px rgba(230, 81, 0, 0.12);
+}
+
+.top-role-bar__role-badge {
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.top-role-bar__role-badge--ready {
+  background: #e2f7e4;
+  color: #186a22;
+}
+
+.top-role-bar__role-badge--new {
+  background: #f0f4fd;
+  color: #6b7280;
+}
+
+/* ─── Right Section: User & Telemetry ─── */
+.top-role-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.top-role-bar__all-roles-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #d6dae4;
+  color: #4a5568;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 38px;
+}
+
+.top-role-bar__all-roles-btn:hover {
+  background: #f7f9fd;
+  border-color: #ad2644;
+  color: #ad2644;
+}
+
+.top-role-bar__user-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 6px;
+  border-radius: 999px;
+  background: #f4f6fa;
+  border: 1px solid #e2e6f0;
+}
+
+.top-role-bar__avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #ad2644;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.75rem;
+  overflow: hidden;
+}
+
+.top-role-bar__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.top-role-bar__user-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #2d3748;
+  max-width: 110px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.top-role-bar__logout-btn {
+  background: transparent;
+  border: none;
+  color: #8c7072;
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  min-height: 32px;
+}
+
+.top-role-bar__logout-btn:hover {
+  color: #ba1a1a;
+  background: #ffdad6;
+}
+
+.top-role-bar__status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #186a22;
+  box-shadow: 0 0 0 2px rgba(24, 106, 34, 0.2);
+  flex-shrink: 0;
+}
+
+.top-role-bar__status-dot--offline {
+  background: #ba1a1a;
+  box-shadow: 0 0 0 2px rgba(186, 26, 26, 0.2);
+}
+
+/* ─── Responsive Adjustments ─── */
+@media (max-width: 860px) {
+  .top-role-bar__user-name {
+    display: none;
+  }
+  .top-role-bar__role-btn span.role-title {
+    display: none;
+  }
+  .top-role-bar__role-badge {
+    display: none;
+  }
+  .top-role-bar__role-btn {
+    padding: 7px 10px;
+  }
+}
+
+@media (max-width: 580px) {
+  .vyntra-top-role-bar {
+    padding: 6px 10px;
+    gap: 8px;
+  }
+  .top-role-bar__current-role-pill {
+    display: none;
+  }
+  .top-role-bar__all-roles-btn span {
+    display: none;
+  }
+  .top-role-bar__all-roles-btn {
+    padding: 6px 8px;
+  }
+}
