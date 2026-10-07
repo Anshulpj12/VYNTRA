@@ -1290,3 +1290,44 @@
   opacity: 0.9;
 }
 
+/* Connected Google Account Pill */
+.role-connected-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #ffffff;
+  border: 1.5px solid #dee2ec;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  color: #584143;
+  margin-top: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.connected-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2d6a4f;
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+.connected-signout-btn {
+  background: #f5f3f0;
+  border: 1px solid #dee2ec;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #8c7072;
+  transition: all 0.15s;
+}
+
+.connected-signout-btn:hover {
+  background: #ffdad6;
+  color: #ba1a1a;
+  border-color: #ba1a1a;
+}
+

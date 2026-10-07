@@ -2,17 +2,21 @@
  * VYNTRA — Role Selection & Sign-In Screen (Role-First Flow)
  * 
  * Users arrive here first. They select a role, then a sign-in modal appears
- * (Google, Email, or Guest). After authentication, the system loads their
- * role-specific data and navigates to the correct destination.
+ * specifically for that role (Google, Email, or Guest).
  * 
- * If already signed in, clicking a role card simply switches the active role.
+ * Each role maintains independent authentication and database records:
+ * - User Mode: links to UserProfile (safe shelters, SOS, menstrual tracker)
+ * - Shelter Provider: links to ShelterProvider (bed capacity, facilities, intake)
+ * - Service Provider: links to ServiceProvider (dispatch, orders, relief items)
+ * 
+ * When a user re-logs in, their role data is automatically restored from the database.
  * 
  * @module part1-user-system/auth/RoleSelectScreen
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth, type UserRole } from './AuthContext';
+import { useAuth, type UserRole, type RoleData } from './AuthContext';
 import '../styles/auth.css';
 
 /** Role configuration with metadata for the UI */
@@ -75,8 +79,6 @@ const ROLE_CONFIGS: RoleConfig[] = [
 export default function RoleSelectScreen() {
   const navigate = useNavigate();
   const {
-    vyntraUser,
-    activeRole,
     roleData,
     roleDataLoading,
     setActiveRole,
@@ -88,9 +90,9 @@ export default function RoleSelectScreen() {
     user,
     isOnline,
     error: authError,
+    isRoleSignedIn,
   } = useAuth();
 
-  const [copied, setCopied] = useState(false);
   const [discreetMode, setDiscreetMode] = useState(false);
   const [switching, setSwitching] = useState(false);
 
@@ -103,45 +105,8 @@ export default function RoleSelectScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
-  const isSignedIn = !!(user || vyntraUser);
-  const appId = vyntraUser?.appId || '';
-  const userEmail = user?.email || 'Guest User';
-  const displayName = user?.displayName || vyntraUser?.appId?.slice(-8) || 'User';
-
   /**
-   * After sign-in completes, if we have a pending role, navigate to it.
-   * This effect watches for the user becoming authenticated.
-   */
-  useEffect(() => {
-    if (isSignedIn && pendingRole && !switching) {
-      // Sign-in just completed — now switch role and navigate
-      const navigateAfterSignIn = async () => {
-        setSwitching(true);
-        try {
-          await setActiveRole(pendingRole.role);
-          const existingData = hasExistingData(pendingRole.role);
-          setShowSignInModal(false);
-          setPendingRole(null);
-          navigate(existingData ? pendingRole.existingRoute : pendingRole.newRoute, { replace: true });
-        } catch (err) {
-          console.warn('[VYNTRA] Post-sign-in role switch error:', err);
-        } finally {
-          setSwitching(false);
-        }
-      };
-      navigateAfterSignIn();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSignedIn, pendingRole]);
-
-  const handleCopyId = () => {
-    navigator.clipboard.writeText(appId);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  /**
-   * Check if a role has existing data (i.e., user doesn't need to register/create profile again).
+   * Check if a role has existing data in roleData (loaded from DB/cache).
    */
   const hasExistingData = (role: UserRole): boolean => {
     switch (role) {
@@ -158,12 +123,12 @@ export default function RoleSelectScreen() {
 
   /**
    * Handle role card click:
-   * - If already signed in: switch role + navigate
-   * - If NOT signed in: store pending role + show sign-in modal
+   * - If ALREADY signed in for this specific role: switch role + navigate
+   * - If NOT signed in for this specific role: open sign-in modal for this role
    */
   const handleRoleSelect = async (config: RoleConfig) => {
-    if (isSignedIn) {
-      // Already authenticated — just switch role and navigate
+    const isAuthedForThisRole = isRoleSignedIn(config.role);
+    if (isAuthedForThisRole) {
       setSwitching(true);
       try {
         await setActiveRole(config.role);
@@ -175,7 +140,7 @@ export default function RoleSelectScreen() {
         setSwitching(false);
       }
     } else {
-      // Not signed in — show sign-in modal with this role pending
+      // Prompt sign in specifically for this role
       setPendingRole(config);
       setFormError(null);
       setEmail('');
@@ -186,16 +151,27 @@ export default function RoleSelectScreen() {
   };
 
   /**
-   * Google sign-in from modal — role will be applied via useEffect after auth completes
+   * Google sign-in from modal — applied strictly for pendingRole
    */
   const handleGoogleSignIn = async () => {
+    if (!pendingRole) return;
     setFormError(null);
     setSubmitting(true);
     try {
-      await signInWithGoogle();
-      // useEffect will handle navigation after vyntraUser is set
-    } catch (err) {
-      setFormError('Google Sign-in was not completed or failed.');
+      const loadedRoleData: RoleData = await signInWithGoogle(pendingRole.role);
+      const hasData = pendingRole.role === 'user'
+        ? !!loadedRoleData.userProfile
+        : pendingRole.role === 'shelter-provider'
+        ? !!loadedRoleData.shelterProvider
+        : !!loadedRoleData.serviceProvider;
+
+      setShowSignInModal(false);
+      const targetRoute = hasData ? pendingRole.existingRoute : pendingRole.newRoute;
+      setPendingRole(null);
+      navigate(targetRoute, { replace: true });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : (authError || 'Google Sign-in was not completed or failed.');
+      setFormError(msg);
       console.warn('Auth notice:', err);
     } finally {
       setSubmitting(false);
@@ -203,10 +179,11 @@ export default function RoleSelectScreen() {
   };
 
   /**
-   * Email sign-in/sign-up from modal
+   * Email sign-in/sign-up from modal — applied strictly for pendingRole
    */
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!pendingRole) return;
     if (!email.trim() || !password) {
       setFormError('Please provide both email and password.');
       return;
@@ -214,12 +191,22 @@ export default function RoleSelectScreen() {
     setFormError(null);
     setSubmitting(true);
     try {
+      let loadedRoleData: RoleData;
       if (emailMode === 'signin') {
-        await signInWithEmail(email, password);
+        loadedRoleData = await signInWithEmail(email, password, pendingRole.role);
       } else {
-        await signUpWithEmail(email, password);
+        loadedRoleData = await signUpWithEmail(email, password, pendingRole.role);
       }
-      // useEffect will handle navigation after vyntraUser is set
+      const hasData = pendingRole.role === 'user'
+        ? !!loadedRoleData.userProfile
+        : pendingRole.role === 'shelter-provider'
+        ? !!loadedRoleData.shelterProvider
+        : !!loadedRoleData.serviceProvider;
+
+      setShowSignInModal(false);
+      const targetRoute = hasData ? pendingRole.existingRoute : pendingRole.newRoute;
+      setPendingRole(null);
+      navigate(targetRoute, { replace: true });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Authentication failed';
       setFormError(msg);
@@ -229,14 +216,24 @@ export default function RoleSelectScreen() {
   };
 
   /**
-   * Guest entry from modal
+   * Guest entry from modal — applied strictly for pendingRole
    */
   const handleGuestEntry = async () => {
+    if (!pendingRole) return;
     setFormError(null);
     setSubmitting(true);
     try {
-      await signInAsGuest();
-      // useEffect will handle navigation after vyntraUser is set
+      const loadedRoleData = await signInAsGuest(pendingRole.role);
+      const hasData = pendingRole.role === 'user'
+        ? !!loadedRoleData.userProfile
+        : pendingRole.role === 'shelter-provider'
+        ? !!loadedRoleData.shelterProvider
+        : !!loadedRoleData.serviceProvider;
+
+      setShowSignInModal(false);
+      const targetRoute = hasData ? pendingRole.existingRoute : pendingRole.newRoute;
+      setPendingRole(null);
+      navigate(targetRoute, { replace: true });
     } catch {
       setFormError('Could not initialize emergency guest mode.');
     } finally {
@@ -251,6 +248,7 @@ export default function RoleSelectScreen() {
     setShowSignInModal(false);
     setPendingRole(null);
     setFormError(null);
+    setSubmitting(false);
   };
 
   return (
@@ -267,70 +265,23 @@ export default function RoleSelectScreen() {
       <header className="role-hero-header">
         <h1 className="role-hero-title">Welcome to VYNTRA</h1>
         <p className="role-hero-subtitle">
-          {isSignedIn
-            ? 'Select your operational role to enter customized safety protocols and emergency networks.'
-            : 'Choose your role to get started. You\'ll sign in after selecting.'}
+          Select your operational role below. Each portal maintains independent security and dedicated profile records.
         </p>
 
-        {/* User Identity Card — only when signed in */}
-        {isSignedIn && (
-          <>
-            <div className="role-user-info-card" id="role-user-info">
-              <div className="role-user-info-top">
-                <div className="role-user-avatar">
-                  {user?.photoURL ? (
-                    <img
-                      src={user.photoURL}
-                      alt="Profile"
-                      className="role-user-avatar-img"
-                      referrerPolicy="no-referrer"
-                    />
-                  ) : (
-                    <span className="role-user-avatar-fallback">
-                      {displayName.charAt(0).toUpperCase()}
-                    </span>
-                  )}
-                </div>
-                <div className="role-user-details">
-                  <span className="role-user-name">{displayName}</span>
-                  <span className="role-user-email">{userEmail}</span>
-                </div>
-                <button
-                  type="button"
-                  className="role-signout-btn"
-                  onClick={signOut}
-                  title="Sign Out"
-                  id="sign-out-btn"
-                >
-                  🚪 Sign Out
-                </button>
-              </div>
-              <div className="role-identity-chip">
-                <div className="identity-info">
-                  <span className="identity-icon">🪪</span>
-                  <span className="identity-label">ID: <strong>{appId}</strong></span>
-                </div>
-                <button
-                  type="button"
-                  className="identity-copy-btn"
-                  onClick={handleCopyId}
-                  title="Copy ID"
-                >
-                  {copied ? '✓ Copied' : '📋 Copy'}
-                </button>
-              </div>
-            </div>
-
-            {/* Current Role Indicator */}
-            <div className="role-current-indicator" id="current-role-badge">
-              <span className="role-current-dot" />
-              <span>Current Role: <strong>{
-                activeRole === 'user' ? 'User Mode'
-                : activeRole === 'shelter-provider' ? 'Shelter Provider'
-                : 'Service Provider'
-              }</strong></span>
-            </div>
-          </>
+        {/* Clean, unobtrusive Google account badge if connected */}
+        {user && (
+          <div className="role-connected-pill">
+            <span className="connected-dot" />
+            <span>Connected: <strong>{user.email || user.displayName}</strong></span>
+            <button
+              type="button"
+              className="connected-signout-btn"
+              onClick={() => signOut()}
+              title="Sign Out All"
+            >
+              Sign Out
+            </button>
+          </div>
         )}
       </header>
 
@@ -345,28 +296,42 @@ export default function RoleSelectScreen() {
       {/* Bento Roles Grid */}
       <div className="roles-bento-grid">
         {ROLE_CONFIGS.map((config) => {
-          const isCurrentRole = isSignedIn && activeRole === config.role;
-          const hasData = isSignedIn && hasExistingData(config.role);
+          const isAuthed = isRoleSignedIn(config.role);
+          const hasData = hasExistingData(config.role);
+          const profileSummary =
+            config.role === 'user' && roleData.userProfile
+              ? roleData.userProfile.name
+              : config.role === 'shelter-provider' && roleData.shelterProvider
+              ? roleData.shelterProvider.shelterName
+              : config.role === 'service-provider' && roleData.serviceProvider
+              ? roleData.serviceProvider.providerName
+              : null;
 
           return (
             <article
               key={config.role}
-              className={`bento-card bento-card--${config.tagColor} ${isCurrentRole ? 'bento-card--active' : ''}`}
+              className={`bento-card bento-card--${config.tagColor} ${isAuthed ? 'bento-card--active' : ''}`}
               onClick={() => handleRoleSelect(config)}
               id={`role-card-${config.role}`}
             >
               {/* Active Role Badge */}
-              {isCurrentRole && (
+              {isAuthed && (
                 <div className="bento-active-badge">
                   <span className="bento-active-dot" />
-                  Active Role
+                  Active Portal
                 </div>
               )}
 
               {/* Data Status Badge */}
               {hasData && (
                 <div className="bento-data-badge">
-                  ✅ Profile Saved
+                  ✅ {profileSummary ? profileSummary : 'Profile Loaded'}
+                </div>
+              )}
+
+              {isAuthed && !hasData && (
+                <div className="bento-data-badge" style={{ background: '#fff3cd', color: '#856404', borderColor: '#ffeeba' }}>
+                  🆕 Setup Required
                 </div>
               )}
 
@@ -401,9 +366,9 @@ export default function RoleSelectScreen() {
                 disabled={switching}
               >
                 <span>
-                  {isSignedIn
+                  {isAuthed
                     ? (hasData ? config.continueLabel : config.actionLabel)
-                    : config.actionLabel}
+                    : `Sign in to ${config.title}`}
                 </span>
                 <span className="btn-arrow">→</span>
               </button>
@@ -412,7 +377,7 @@ export default function RoleSelectScreen() {
         })}
       </div>
 
-      {/* ──── Sign-In Modal (appears after role selection) ──── */}
+      {/* ──── Sign-In Modal (appears specifically for selected role) ──── */}
       {showSignInModal && pendingRole && (
         <div className="signin-modal-overlay" onClick={handleCloseModal}>
           <div className="signin-modal-card" onClick={(e) => e.stopPropagation()}>
