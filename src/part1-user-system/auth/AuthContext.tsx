@@ -550,25 +550,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return loadedData;
     } catch (err: unknown) {
       const authErr = err as { code?: string; message?: string };
-      const code = authErr.code || '';
-      console.error('[VYNTRA Auth] Google sign-in error:', code, authErr.message);
+      const code = authErr?.code || '';
+      console.error('[VYNTRA Auth] Google sign-in error:', code, authErr?.message);
+      const currentHost = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+      let friendlyMsg = `Google Sign-in failed: ${authErr?.message || code || 'Unknown error'}`;
 
       if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
-        setError('Sign-in popup was closed. Please try again.');
+        friendlyMsg = 'Sign-in popup was closed. Please try again.';
       } else if (code === 'auth/popup-blocked') {
-        setError('Popup was blocked by your browser. Please allow popups for this site and try again.');
+        friendlyMsg = 'Popup was blocked by your browser. Please allow popups for this site and try again.';
       } else if (code === 'auth/unauthorized-domain') {
-        setError('This domain is not authorized for sign-in. Add it in Firebase Console → Authentication → Settings → Authorized Domains.');
+        friendlyMsg = `Domain "${currentHost}" is not authorized in Firebase. Add "${currentHost}" in Firebase Console → Authentication → Settings → Authorized Domains.`;
       } else if (code === 'auth/operation-not-allowed') {
-        setError('Google sign-in is not enabled. Enable it in Firebase Console → Authentication → Sign-in Method → Google.');
+        friendlyMsg = 'Google sign-in is not enabled. Enable it in Firebase Console → Authentication → Sign-in Method → Google.';
       } else if (code === 'auth/network-request-failed') {
-        setError('Network error. Check your internet connection and try again.');
+        friendlyMsg = 'Network error. Check your internet connection and try again.';
       } else if (code === 'auth/internal-error') {
-        setError('Internal authentication error. Please try again in a moment.');
-      } else {
-        setError(`Google Sign-in failed: ${authErr.message || code || 'Unknown error'}`);
+        friendlyMsg = 'Internal authentication error. Please try again in a moment.';
       }
-      throw err;
+
+      setError(friendlyMsg);
+      throw new Error(friendlyMsg);
     } finally {
       isSigningInRef.current = false;
     }

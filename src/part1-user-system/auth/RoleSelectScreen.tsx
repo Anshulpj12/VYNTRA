@@ -169,8 +169,9 @@ export default function RoleSelectScreen() {
       const targetRoute = hasData ? pendingRole.existingRoute : pendingRole.newRoute;
       setPendingRole(null);
       navigate(targetRoute, { replace: true });
-    } catch (err) {
-      setFormError(authError || 'Google Sign-in was not completed or failed.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : (authError || 'Google Sign-in was not completed or failed.');
+      setFormError(msg);
       console.warn('Auth notice:', err);
     } finally {
       setSubmitting(false);
