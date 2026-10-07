@@ -1,20 +1,30 @@
 /**
  * VYNTRA — Main Home Screen (User System)
  * High-visibility SOS trigger, quick modules, and emergency contacts.
+ * Includes "Get Shelter Data" button to manually download district
+ * shelter providers from Firebase into local IndexedDB cache.
  * Offline-first with local cached profile retrieval.
  */
 
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
-import { getItem, STORES } from '../../shared/utils/offline-cache';
-import type { UserProfile } from '../../shared/types';
+import { getItem, getAllItems, STORES } from '../../shared/utils/offline-cache';
+import { forceShelterSync, getLastSyncTimestamp } from './shelter-cache';
+import type { UserProfile, ShelterMetadata } from '../../shared/types';
 import '../styles/sos.css';
 
+/** Sync status for the Get Data button */
+type SyncStatus = 'idle' | 'syncing' | 'success' | 'error' | 'offline' | 'no-district';
+
 export default function HomeScreen() {
-  const { vyntraUser, user } = useAuth();
+  const { vyntraUser, user, isOnline } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
+  const [syncMessage, setSyncMessage] = useState('');
+  const [cachedCount, setCachedCount] = useState(0);
+  const [lastSynced, setLastSynced] = useState<string>('');
 
   useEffect(() => {
     async function loadProfile() {
@@ -22,14 +32,79 @@ export default function HomeScreen() {
       const cached = await getItem<UserProfile>(STORES.PROFILE, vyntraUser.appId);
       if (cached) {
         setProfile(cached);
+
+        /* Check existing cached shelter count for user's district */
+        try {
+          const allCached = await getAllItems<ShelterMetadata>(STORES.SHELTER_CACHE);
+          const districtShelters = allCached.filter(
+            (s) => s.district?.toLowerCase() === cached.district?.toLowerCase()
+          );
+          setCachedCount(districtShelters.length);
+
+          /* Show last sync time if available */
+          if (cached.district) {
+            const ts = getLastSyncTimestamp(cached.district);
+            if (ts > 0) {
+              setLastSynced(formatTimeAgo(ts));
+            }
+          }
+        } catch {
+          /* Non-critical — just display 0 */
+        }
       }
     }
     loadProfile();
   }, [vyntraUser]);
 
-  const handleSOSTrigger = () => {
-    // Initiate SOS workflow -> conditions screen
-    navigate('/sos/conditions');
+  /**
+   * Handles the manual "Get Data" button press.
+   * Downloads district-matching shelter providers from Firebase
+   * and saves them to IndexedDB SHELTER_CACHE store.
+   */
+  const handleGetData = async () => {
+    /* Guard: need internet */
+    if (!navigator.onLine) {
+      setSyncStatus('offline');
+      setSyncMessage('You\'re offline. Connect to the internet to download shelter data.');
+      return;
+    }
+
+    /* Guard: need district in profile */
+    if (!profile?.district || !profile?.state) {
+      setSyncStatus('no-district');
+      setSyncMessage('Please complete your profile with your district first.');
+      return;
+    }
+
+    setSyncStatus('syncing');
+    setSyncMessage(`Downloading shelters for ${profile.district}, ${profile.state}...`);
+
+    try {
+      const count = await forceShelterSync(profile.district, profile.state);
+
+      if (count > 0) {
+        setSyncStatus('success');
+        setSyncMessage(`✓ Downloaded ${count} shelter${count > 1 ? 's' : ''} for ${profile.district}`);
+        setCachedCount(count);
+        setLastSynced('Just now');
+      } else if (count === 0) {
+        setSyncStatus('success');
+        setSyncMessage(`No shelter providers registered in ${profile.district} yet.`);
+      } else {
+        setSyncStatus('error');
+        setSyncMessage('Could not connect to server. Try again later.');
+      }
+    } catch (err) {
+      console.warn('[HomeScreen] Shelter sync failed:', err);
+      setSyncStatus('error');
+      setSyncMessage('Download failed. Please check your connection and try again.');
+    }
+
+    /* Auto-clear status after 6 seconds */
+    setTimeout(() => {
+      setSyncStatus('idle');
+      setSyncMessage('');
+    }, 6000);
   };
 
   const displayName = profile?.name || user?.displayName || 'User';
@@ -86,6 +161,59 @@ export default function HomeScreen() {
         </div>
       )}
 
+      {/* ═══════════ Get Shelter Data Card ═══════════ */}
+      <div className="shelter-sync-card">
+        <div className="shelter-sync-card__header">
+          <div className="shelter-sync-card__icon">📡</div>
+          <div className="shelter-sync-card__info">
+            <div className="shelter-sync-card__title">District Shelter Data</div>
+            <div className="shelter-sync-card__subtitle">
+              {profile?.district
+                ? <>
+                    {cachedCount > 0
+                      ? <>{cachedCount} shelter{cachedCount > 1 ? 's' : ''} cached for <strong>{profile.district}</strong></>
+                      : <>No shelters downloaded for <strong>{profile.district}</strong> yet</>
+                    }
+                    {lastSynced && (
+                      <span className="shelter-sync-card__last-sync"> • Synced {lastSynced}</span>
+                    )}
+                  </>
+                : 'Complete your profile to download shelter data'
+              }
+            </div>
+          </div>
+        </div>
+
+        <button
+          className="shelter-sync-card__btn"
+          onClick={handleGetData}
+          disabled={syncStatus === 'syncing'}
+        >
+          {syncStatus === 'syncing' ? (
+            <>
+              <span className="shelter-sync-card__spinner" />
+              Downloading...
+            </>
+          ) : (
+            <>
+              <span>⬇️</span>
+              Get Shelter Data
+            </>
+          )}
+        </button>
+
+        {/* Status Feedback */}
+        {syncMessage && (
+          <div className={`shelter-sync-card__status shelter-sync-card__status--${syncStatus}`}>
+            {syncStatus === 'success' && <span>✅</span>}
+            {syncStatus === 'error' && <span>⚠️</span>}
+            {syncStatus === 'offline' && <span>📵</span>}
+            {syncStatus === 'no-district' && <span>📋</span>}
+            <span>{syncMessage}</span>
+          </div>
+        )}
+      </div>
+
       {/* Central Big SOS Card */}
       <div className="sos-trigger-card">
         <span style={{
@@ -104,7 +232,7 @@ export default function HomeScreen() {
 
         <button
           className="sos-main-btn"
-          onClick={handleSOSTrigger}
+          onClick={() => navigate('/sos/conditions')}
           aria-label="Activate SOS Emergency Dispatch"
         >
           SOS
@@ -168,4 +296,21 @@ export default function HomeScreen() {
       </div>
     </div>
   );
+}
+
+/**
+ * Formats a timestamp into a human-readable "time ago" string.
+ *
+ * @param timestamp - Unix timestamp in milliseconds
+ * @returns Formatted string like "2 min ago", "1 hr ago", etc.
+ */
+function formatTimeAgo(timestamp: number): string {
+  const diff = Date.now() - timestamp;
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hr${hours > 1 ? 's' : ''} ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} day${days > 1 ? 's' : ''} ago`;
 }

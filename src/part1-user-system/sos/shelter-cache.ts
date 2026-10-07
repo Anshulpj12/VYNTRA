@@ -103,6 +103,23 @@ function toShelterMetadata(provider: ShelterProvider): ShelterMetadata {
 }
 
 /**
+ * Forces a shelter sync for the given district, bypassing the
+ * staleness check. Use this for user-initiated "Get Data" actions.
+ *
+ * @param userDistrict - The user's district from their profile
+ * @param userState - The user's state from their profile
+ * @returns The number of shelters synced, or -1 if failed
+ */
+export async function forceShelterSync(
+  userDistrict: string,
+  userState: string
+): Promise<number> {
+  /* Clear the staleness timestamp so syncDistrictShelters won't skip */
+  localStorage.removeItem(`${SYNC_TS_PREFIX}${userDistrict.toLowerCase()}`);
+  return syncDistrictShelters(userDistrict, userState);
+}
+
+/**
  * Downloads shelter providers for the user's district from Firebase
  * and saves each as a ShelterMetadata entry in IndexedDB.
  *
