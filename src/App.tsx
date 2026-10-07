@@ -27,12 +27,15 @@ import './part1-user-system/styles/part1-base.css';
 import './part3-service-provider/styles/part3-base.css';
 
 /**
- * Protected route wrapper — redirects to role-select if no auth.
+ * Protected route wrapper — redirects to role-select if no auth or role not signed in.
  */
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, vyntraUser, loading } = useAuth();
+function ProtectedRoute({ children, requiredRole }: { children: React.ReactNode; requiredRole?: 'user' | 'shelter-provider' | 'service-provider' }) {
+  const { user, vyntraUser, loading, isRoleSignedIn } = useAuth();
   if (loading) return <div className="loading-screen"><div className="loading-spinner" /></div>;
   if (!user && !vyntraUser) return <Navigate to="/auth/role-select" replace />;
+  if (requiredRole && isRoleSignedIn && !isRoleSignedIn(requiredRole)) {
+    return <Navigate to="/auth/role-select" replace />;
+  }
   return <>{children}</>;
 }
 
@@ -43,7 +46,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
  * If not signed in → go to role select screen (which is now the landing page).
  */
 function SmartDefaultRoute() {
-  const { vyntraUser, activeRole, roleData, loading, roleDataLoading } = useAuth();
+  const { vyntraUser, activeRole, roleData, loading, roleDataLoading, isRoleSignedIn } = useAuth();
 
   if (loading || roleDataLoading) {
     return <div className="loading-screen"><div className="loading-spinner" /></div>;
@@ -53,17 +56,19 @@ function SmartDefaultRoute() {
     return <Navigate to="/auth/role-select" replace />;
   }
 
-  // If the user has data for their active role, go directly to their dashboard
-  switch (activeRole) {
-    case 'user':
-      if (roleData.userProfile) return <Navigate to="/user/home" replace />;
-      break;
-    case 'shelter-provider':
-      if (roleData.shelterProvider) return <Navigate to="/shelter/dashboard" replace />;
-      break;
-    case 'service-provider':
-      if (roleData.serviceProvider) return <Navigate to="/service/dashboard" replace />;
-      break;
+  // Only auto-route if the active role is signed in
+  if (isRoleSignedIn && isRoleSignedIn(activeRole)) {
+    switch (activeRole) {
+      case 'user':
+        if (roleData.userProfile) return <Navigate to="/user/home" replace />;
+        break;
+      case 'shelter-provider':
+        if (roleData.shelterProvider) return <Navigate to="/shelter/dashboard" replace />;
+        break;
+      case 'service-provider':
+        if (roleData.serviceProvider) return <Navigate to="/service/dashboard" replace />;
+        break;
+    }
   }
 
   // Otherwise, go to role selection
@@ -83,37 +88,37 @@ function AppRoutes() {
         <Route path="/auth/login" element={<Navigate to="/auth/role-select" replace />} />
 
         {/* User Routes (Part 1) */}
-        <Route path="/user/home" element={<ProtectedRoute><HomeScreen /></ProtectedRoute>} />
-        <Route path="/user/profile/create" element={<ProtectedRoute><ProfileCreateScreen /></ProtectedRoute>} />
-        <Route path="/user/profile" element={<ProtectedRoute><ProfileViewScreen /></ProtectedRoute>} />
+        <Route path="/user/home" element={<ProtectedRoute requiredRole="user"><HomeScreen /></ProtectedRoute>} />
+        <Route path="/user/profile/create" element={<ProtectedRoute requiredRole="user"><ProfileCreateScreen /></ProtectedRoute>} />
+        <Route path="/user/profile" element={<ProtectedRoute requiredRole="user"><ProfileViewScreen /></ProtectedRoute>} />
 
         {/* Menstrual Tracker */}
-        <Route path="/user/cycle-tracker" element={<ProtectedRoute><TrackerHomeScreen /></ProtectedRoute>} />
+        <Route path="/user/cycle-tracker" element={<ProtectedRoute requiredRole="user"><TrackerHomeScreen /></ProtectedRoute>} />
 
         {/* World Chat */}
-        <Route path="/chat" element={<ProtectedRoute><ChatEntryScreen /></ProtectedRoute>} />
-        <Route path="/chat/:districtCode" element={<ProtectedRoute><DistrictChatScreen /></ProtectedRoute>} />
+        <Route path="/chat" element={<ProtectedRoute requiredRole="user"><ChatEntryScreen /></ProtectedRoute>} />
+        <Route path="/chat/:districtCode" element={<ProtectedRoute requiredRole="user"><DistrictChatScreen /></ProtectedRoute>} />
 
         {/* SOS */}
-        <Route path="/sos/conditions" element={<ProtectedRoute><SOSConditionsScreen /></ProtectedRoute>} />
-        <Route path="/sos/shelters" element={<ProtectedRoute><SOSShelterSelectScreen /></ProtectedRoute>} />
+        <Route path="/sos/conditions" element={<ProtectedRoute requiredRole="user"><SOSConditionsScreen /></ProtectedRoute>} />
+        <Route path="/sos/shelters" element={<ProtectedRoute requiredRole="user"><SOSShelterSelectScreen /></ProtectedRoute>} />
 
         {/* Part 2: Shelter Provider Module */}
-        <Route path="/shelter/*" element={<ShelterApp />} />
+        <Route path="/shelter/*" element={<ProtectedRoute requiredRole="shelter-provider"><ShelterApp /></ProtectedRoute>} />
 
         {/* Part 3: Service Provider, Orders & Dispatch */}
-        <Route path="/service/register" element={<ProtectedRoute><ServiceProviderRegistrationScreen /></ProtectedRoute>} />
-        <Route path="/service/dashboard" element={<ProtectedRoute><ServiceDashboardScreen /></ProtectedRoute>} />
-        <Route path="/service/sos-decode" element={<ProtectedRoute><SOSDecodeScreen /></ProtectedRoute>} />
+        <Route path="/service/register" element={<ProtectedRoute requiredRole="service-provider"><ServiceProviderRegistrationScreen /></ProtectedRoute>} />
+        <Route path="/service/dashboard" element={<ProtectedRoute requiredRole="service-provider"><ServiceDashboardScreen /></ProtectedRoute>} />
+        <Route path="/service/sos-decode" element={<ProtectedRoute requiredRole="service-provider"><SOSDecodeScreen /></ProtectedRoute>} />
         <Route path="/service" element={<Navigate to="/service/dashboard" replace />} />
 
         {/* Part 3: Orders */}
-        <Route path="/orders/create" element={<ProtectedRoute><OrderCreationScreen /></ProtectedRoute>} />
-        <Route path="/orders/:orderId" element={<ProtectedRoute><OrderDetailScreen /></ProtectedRoute>} />
+        <Route path="/orders/create" element={<ProtectedRoute requiredRole="service-provider"><OrderCreationScreen /></ProtectedRoute>} />
+        <Route path="/orders/:orderId" element={<ProtectedRoute requiredRole="service-provider"><OrderDetailScreen /></ProtectedRoute>} />
 
         {/* Part 3: Dispatch & Delivery */}
-        <Route path="/dispatch/:orderId" element={<ProtectedRoute><DispatchScreen /></ProtectedRoute>} />
-        <Route path="/dispatch/confirm/:orderId" element={<ProtectedRoute><DeliveryConfirmationScreen /></ProtectedRoute>} />
+        <Route path="/dispatch/:orderId" element={<ProtectedRoute requiredRole="service-provider"><DispatchScreen /></ProtectedRoute>} />
+        <Route path="/dispatch/confirm/:orderId" element={<ProtectedRoute requiredRole="service-provider"><DeliveryConfirmationScreen /></ProtectedRoute>} />
 
         {/* Smart default — routes based on role + data */}
         <Route path="/" element={<SmartDefaultRoute />} />

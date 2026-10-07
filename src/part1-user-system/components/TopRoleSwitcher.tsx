@@ -35,6 +35,7 @@ export default function TopRoleSwitcher() {
     setActiveRole,
     signOut,
     isOnline,
+    isRoleSignedIn,
   } = useAuth();
   const [switchingRole, setSwitchingRole] = useState<UserRole | null>(null);
 
@@ -85,6 +86,12 @@ export default function TopRoleSwitcher() {
       if (location.pathname !== target) {
         navigate(target);
       }
+      return;
+    }
+
+    // Role isolation: if role is not signed in yet, redirect to role-select to authenticate
+    if (isRoleSignedIn && !isRoleSignedIn(config.role)) {
+      navigate('/auth/role-select');
       return;
     }
 
@@ -180,7 +187,7 @@ export default function TopRoleSwitcher() {
           <button
             type="button"
             className="top-role-bar__logout-btn"
-            onClick={signOut}
+            onClick={() => void signOut()}
             title="Sign Out"
           >
             Exit

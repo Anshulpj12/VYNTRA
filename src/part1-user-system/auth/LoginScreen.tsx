@@ -107,7 +107,7 @@ export default function LoginScreen() {
 
         <button
           className="login-btn login-btn--google"
-          onClick={signInWithGoogle}
+          onClick={() => void signInWithGoogle('user')}
           disabled={!isOnline}
         >
           <svg className="login-google-icon" viewBox="0 0 24 24" width="24" height="24">
