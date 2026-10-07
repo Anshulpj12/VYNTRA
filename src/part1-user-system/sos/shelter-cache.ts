@@ -155,11 +155,15 @@ export async function syncDistrictShelters(
 
   try {
     const shelterRef = collection(db, 'shelter-providers');
+    const districtLower = userDistrict.toLowerCase().trim();
+    const stateLower = userState.toLowerCase().trim();
 
     /*
      * Query shelters that match the user's district.
-     * We query by district primarily; state is used as a secondary
-     * filter client-side in case districts share names across states.
+     * Firebase Firestore `where` is case-sensitive, so we try
+     * an exact match first. If the district was entered with
+     * different casing between Part 1 and Part 2, we fall back
+     * to fetching all active shelters and filtering client-side.
      */
     const districtQuery = query(
       shelterRef,
@@ -168,28 +172,60 @@ export async function syncDistrictShelters(
     );
 
     const result = await withFirestoreTimeout(getDocs(districtQuery), 5000);
-    if (!result) {
-      console.warn('[shelter-cache] Firebase query timed out');
-      return -1;
-    }
 
     let syncCount = 0;
 
-    result.forEach((docSnap) => {
-      const data = docSnap.data() as ShelterProvider;
+    if (result) {
+      result.forEach((docSnap) => {
+        const data = docSnap.data() as ShelterProvider;
 
-      /* Secondary state filter — same district name might exist in different states */
-      if (
-        data &&
-        data.shelterId &&
-        data.coordinates &&
-        data.state === userState
-      ) {
-        const metadata = toShelterMetadata(data);
-        void putItem(STORES.SHELTER_CACHE, metadata);
-        syncCount++;
+        /* Secondary state filter — case-insensitive comparison */
+        if (
+          data &&
+          data.shelterId &&
+          data.coordinates &&
+          data.state?.toLowerCase().trim() === stateLower
+        ) {
+          const metadata = toShelterMetadata(data);
+          void putItem(STORES.SHELTER_CACHE, metadata);
+          syncCount++;
+        }
+      });
+    }
+
+    /*
+     * If exact-case district query returned no results, try
+     * fetching all active shelters and filtering client-side.
+     * This handles casing mismatches like "Bengaluru Urban"
+     * vs "bengaluru urban" between the user profile and shelter.
+     */
+    if (syncCount === 0) {
+      try {
+        const allActiveQuery = query(
+          shelterRef,
+          where('isActive', '==', true)
+        );
+        const allResult = await withFirestoreTimeout(getDocs(allActiveQuery), 5000);
+        if (allResult) {
+          allResult.forEach((docSnap) => {
+            const data = docSnap.data() as ShelterProvider;
+            if (
+              data &&
+              data.shelterId &&
+              data.coordinates &&
+              data.district?.toLowerCase().trim() === districtLower &&
+              data.state?.toLowerCase().trim() === stateLower
+            ) {
+              const metadata = toShelterMetadata(data);
+              void putItem(STORES.SHELTER_CACHE, metadata);
+              syncCount++;
+            }
+          });
+        }
+      } catch {
+        /* Fallback query failed — non-critical */
       }
-    });
+    }
 
     /* Also try fetching from shelter metadata sub-collection for richer data */
     try {
@@ -202,7 +238,11 @@ export async function syncDistrictShelters(
       if (metaResult) {
         metaResult.forEach((docSnap) => {
           const meta = docSnap.data() as ShelterMetadata;
-          if (meta && meta.shelterId && meta.state === userState) {
+          if (
+            meta &&
+            meta.shelterId &&
+            meta.state?.toLowerCase().trim() === stateLower
+          ) {
             void putItem(STORES.SHELTER_CACHE, meta);
             syncCount++;
           }

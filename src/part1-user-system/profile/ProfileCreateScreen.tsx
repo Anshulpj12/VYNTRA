@@ -335,7 +335,7 @@ export default function ProfileCreateScreen() {
                 >
                   <option value="">Select State</option>
                   {getStateList().map((s) => (
-                    <option key={s.code} value={s.code}>{s.name}</option>
+                    <option key={s.code} value={s.name}>{s.name}</option>
                   ))}
                 </select>
               </div>
