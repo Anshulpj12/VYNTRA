@@ -18,7 +18,7 @@ import '../styles/sos.css';
 type SyncStatus = 'idle' | 'syncing' | 'success' | 'error' | 'offline' | 'no-district';
 
 export default function HomeScreen() {
-  const { vyntraUser, user, isOnline } = useAuth();
+  const { vyntraUser, user } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');

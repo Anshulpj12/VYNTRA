@@ -15,15 +15,21 @@
  * @module part1-user-system/sos/SOSShelterSelectScreen
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
-import { putItem, STORES, addPendingSync } from '../../shared/utils/offline-cache';
+import { getItem, putItem, STORES, addPendingSync } from '../../shared/utils/offline-cache';
 import { calculateDistance } from '../../shared/utils/geo-distance';
-import type { ShelterMetadata, GeoCoordinates } from '../../shared/types';
+import type { ShelterMetadata, GeoCoordinates, UserProfile } from '../../shared/types';
 import { db } from '../../shared/firebase/config';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
-import { getAllAvailableShelters, syncDistrictShelters } from './shelter-cache';
+import {
+  getAllAvailableShelters,
+  syncDistrictShelters,
+  downloadAndCacheSheltersOnline,
+  getLastSyncTimestamp,
+  formatTimeAgo,
+} from './shelter-cache';
 import '../styles/sos.css';
 
 /** Shelter with computed distance and composite ranking score */
@@ -44,7 +50,7 @@ interface PendingSOSData {
 }
 
 export default function SOSShelterSelectScreen() {
-  const { isOnline } = useAuth();
+  const { isOnline, vyntraUser } = useAuth();
   const navigate = useNavigate();
 
   /* ─── Load pending SOS from sessionStorage ─── */
@@ -60,11 +66,42 @@ export default function SOSShelterSelectScreen() {
     return null;
   });
 
+  const [userDistrict, setUserDistrict] = useState<string>(sosData?.district || '');
+  const [userState, setUserState] = useState<string>(sosData?.state || '');
   const [rankedShelters, setRankedShelters] = useState<RankedShelter[]>([]);
   const [selectedShelterId, setSelectedShelterId] = useState<string>('');
   const [dispatchedSuccess, setDispatchedSuccess] = useState(false);
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  /* Sync & Download states */
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'success' | 'error' | 'offline'>('idle');
+  const [syncMessage, setSyncMessage] = useState<string>('');
+  const [lastSynced, setLastSynced] = useState<string>(() => {
+    const target = (sosData?.district || '').trim() || 'all';
+    const ts = getLastSyncTimestamp(target);
+    return ts > 0 ? formatTimeAgo(ts) : '';
+  });
+
+  /* Profile fallback if district wasn't present in pending SOS */
+  useEffect(() => {
+    async function checkProfile() {
+      if (!userDistrict && vyntraUser?.appId) {
+        try {
+          const prof = await getItem<UserProfile>(STORES.PROFILE, vyntraUser.appId);
+          if (prof?.district) {
+            setUserDistrict(prof.district);
+            const ts = getLastSyncTimestamp(prof.district);
+            if (ts > 0) setLastSynced(formatTimeAgo(ts));
+          }
+          if (prof?.state) setUserState(prof.state);
+        } catch {
+          // ignore
+        }
+      }
+    }
+    checkProfile();
+  }, [userDistrict, vyntraUser?.appId]);
 
   /** Copy the compact SOS code to clipboard */
   const handleCopyCode = async () => {
@@ -79,26 +116,54 @@ export default function SOSShelterSelectScreen() {
     }
   };
 
-  /* ─── Load & rank shelters from cache ─── */
-  useEffect(() => {
+  /* ─── Load & rank shelters from local IndexedDB cache ─── */
+  const loadAndRankShelters = useCallback(async () => {
     const userCoords: GeoCoordinates = sosData?.coordinates || { lat: 28.6139, lng: 77.2090 };
-    const userDistrict = sosData?.district || '';
-    const userState = sosData?.state || '';
+    const allShelters = await getAllAvailableShelters(userDistrict);
 
-    async function loadShelters() {
+    if (allShelters.length === 0) {
+      setRankedShelters([]);
+      setLoading(false);
+      return [];
+    }
+
+    const ranked: RankedShelter[] = allShelters.map((shelter) => {
+      const dist = calculateDistance(userCoords, shelter.coordinates);
+      const distScore = Math.max(0, 100 - dist * 5);
+      const composite = ((shelter.shelterScore || 80) * 0.6) + (distScore * 0.4);
+
+      return {
+        ...shelter,
+        distanceKm: dist,
+        compositeScore: composite,
+      };
+    });
+
+    ranked.sort((a, b) => b.compositeScore - a.compositeScore);
+    setRankedShelters(ranked);
+
+    setSelectedShelterId((prev) => {
+      if (prev && ranked.some((s) => s.shelterId === prev)) {
+        return prev;
+      }
+      return ranked[0]?.shelterId || '';
+    });
+
+    setLoading(false);
+    return ranked;
+  }, [sosData?.coordinates, userDistrict]);
+
+  /* Initial mount: load cache & fire non-blocking background sync if online */
+  useEffect(() => {
+    async function init() {
       setLoading(true);
 
-      /*
-       * Step 1: If online & district known, trigger a background sync
-       * to ensure we have the latest shelter data for this district.
-       * This is non-blocking — we load from cache first, then update.
-       */
-      if (navigator.onLine && userDistrict && userState) {
+      if (navigator.onLine && userDistrict) {
         syncDistrictShelters(userDistrict, userState)
           .then((count) => {
             if (count > 0) {
-              /* Re-load shelters with fresh data */
               loadAndRankShelters();
+              setLastSynced('Just now');
             }
           })
           .catch((err) => {
@@ -109,59 +174,55 @@ export default function SOSShelterSelectScreen() {
       await loadAndRankShelters();
     }
 
-    async function loadAndRankShelters() {
-      /*
-       * Step 2: Read all available shelters from IndexedDB.
-       * The getAllAvailableShelters function merges data from:
-       *   - SHELTER_CACHE (district-synced data)
-       *   - METADATA (Part 2 consolidated metadata)
-       *   - SHELTER_PROVIDERS (Part 2 registration data)
-       * It deduplicates by shelterId and prioritizes the user's district.
-       */
-      const allShelters = await getAllAvailableShelters(userDistrict);
+    init();
+  }, [loadAndRankShelters, userDistrict, userState]);
 
-      if (allShelters.length === 0) {
-        setRankedShelters([]);
-        setLoading(false);
-        return;
-      }
-
-      /*
-       * Step 3: Rank shelters using composite score.
-       *
-       * compositeScore = (shelterScore × 0.6) + (distanceScore × 0.4)
-       *
-       * Distance score uses inverse scaling:
-       *   0 km  → 100 points
-       *   20 km → 0 points
-       *
-       * This means closer shelters with higher readiness scores rank first.
-       */
-      const ranked: RankedShelter[] = allShelters.map((shelter) => {
-        const dist = calculateDistance(userCoords, shelter.coordinates);
-        const distScore = Math.max(0, 100 - dist * 5);
-        const composite = ((shelter.shelterScore || 80) * 0.6) + (distScore * 0.4);
-
-        return {
-          ...shelter,
-          distanceKm: dist,
-          compositeScore: composite,
-        };
-      });
-
-      ranked.sort((a, b) => b.compositeScore - a.compositeScore);
-      setRankedShelters(ranked);
-
-      if (ranked.length > 0 && !selectedShelterId) {
-        setSelectedShelterId(ranked[0].shelterId);
-      }
-
-      setLoading(false);
+  /* ─── User-Initiated Download & Cache Action ─── */
+  const handleDownloadAndCache = async () => {
+    if (!navigator.onLine) {
+      setSyncStatus('offline');
+      setSyncMessage(
+        rankedShelters.length > 0
+          ? `You are offline. Using ${rankedShelters.length} shelter${rankedShelters.length === 1 ? '' : 's'} already saved locally on this device.`
+          : 'You are currently offline. Connect to the internet to download and save shelter data.'
+      );
+      setTimeout(() => setSyncStatus('idle'), 5000);
+      return;
     }
 
-    loadShelters();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sosData?.coordinates, sosData?.district, sosData?.state]);
+    setSyncStatus('syncing');
+    setSyncMessage(
+      userDistrict
+        ? `Connecting to cloud & downloading shelters for ${userDistrict}...`
+        : 'Connecting to cloud & downloading all emergency shelters...'
+    );
+
+    try {
+      const result = await downloadAndCacheSheltersOnline(userDistrict, userState);
+      await loadAndRankShelters();
+
+      if (result.success) {
+        setSyncStatus('success');
+        setSyncMessage(
+          `✓ Saved ${result.totalCached} shelter${result.totalCached === 1 ? '' : 's'} locally in IndexedDB (${result.districtCount} in ${userDistrict || 'your area'})! Ready for 100% offline SOS.`
+        );
+        setLastSynced('Just now');
+      } else {
+        setSyncStatus('error');
+        setSyncMessage(result.message || 'Download failed. Local cache retained.');
+      }
+    } catch (err: any) {
+      console.warn('[SOS] Manual shelter download error:', err);
+      setSyncStatus('error');
+      setSyncMessage(`Download failed: ${err?.message || 'Network error'}. Local cache retained.`);
+    }
+
+    /* Auto-clear message banner after 6 seconds */
+    setTimeout(() => {
+      setSyncStatus('idle');
+      setSyncMessage('');
+    }, 6000);
+  };
 
   /* ─── SMS Dispatch Handler ─── */
   const handleSendSMS = async () => {
@@ -174,14 +235,6 @@ export default function SOSShelterSelectScreen() {
     const shelter = rankedShelters.find((s) => s.shelterId === selectedShelterId);
     if (!shelter) return;
 
-    /*
-     * Construct native SMS URI.
-     * Format: sms:<number>?body=<encoded-message>
-     *
-     * The compact SOS code (e.g. VYNTRA|26.9124,75.7873|PG-WC|USR-A7K2M9X1|1696588800)
-     * is placed as the SMS body. The shelter's registered mobile number
-     * is the recipient. The user just needs to press Send.
-     */
     const smsUrl = `sms:${shelter.registeredMobile}?body=${encodeURIComponent(sosData.compactCode)}`;
 
     /* Prepare SOS Request record for persistence */
@@ -229,7 +282,7 @@ export default function SOSShelterSelectScreen() {
         ...record,
       });
     } catch {
-      /* Non-critical — history caching failure doesn't block dispatch */
+      /* Non-critical */
     }
 
     setDispatchedSuccess(true);
@@ -314,6 +367,67 @@ export default function SOSShelterSelectScreen() {
         </div>
       )}
 
+      {/* ═══════════ Offline Shelter Cache & Online Download Bar ═══════════ */}
+      <div className="shelter-sync-card" style={{ marginTop: '4px' }}>
+        <div className="shelter-sync-card__header">
+          <div className="shelter-sync-card__icon">💾</div>
+          <div className="shelter-sync-card__info">
+            <div className="shelter-sync-card__title" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <span>Offline Shelter Storage</span>
+              <span style={{
+                fontSize: '0.68rem',
+                fontWeight: 700,
+                padding: '2px 8px',
+                borderRadius: '12px',
+                background: isOnline ? 'var(--color-tertiary-container)' : 'var(--color-surface-container-highest)',
+                color: isOnline ? 'var(--color-on-tertiary-container)' : 'var(--color-outline)',
+              }}>
+                {isOnline ? '🟢 Cloud Online' : '📵 Offline Mode'}
+              </span>
+            </div>
+            <div className="shelter-sync-card__subtitle">
+              {rankedShelters.length > 0 ? (
+                <>
+                  <strong>{rankedShelters.length} shelter{rankedShelters.length === 1 ? '' : 's'}</strong> saved locally in IndexedDB storage
+                  {userDistrict && <> for <strong>{userDistrict}</strong></>}
+                  {lastSynced && <span className="shelter-sync-card__last-sync"> • Cached {lastSynced}</span>}
+                </>
+              ) : (
+                <>No shelters cached locally yet. Click below to load online and save to your device.</>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <button
+          className="shelter-sync-card__btn"
+          onClick={handleDownloadAndCache}
+          disabled={syncStatus === 'syncing'}
+        >
+          {syncStatus === 'syncing' ? (
+            <>
+              <span className="shelter-sync-card__spinner" />
+              <span>Downloading & Saving Locally...</span>
+            </>
+          ) : (
+            <>
+              <span>⬇️</span>
+              <span>Download & Save Shelters Locally</span>
+            </>
+          )}
+        </button>
+
+        {/* Status Feedback Message */}
+        {syncMessage && (
+          <div className={`shelter-sync-card__status shelter-sync-card__status--${syncStatus}`}>
+            {syncStatus === 'success' && <span>✅</span>}
+            {syncStatus === 'error' && <span>⚠️</span>}
+            {syncStatus === 'offline' && <span>📵</span>}
+            <span>{syncMessage}</span>
+          </div>
+        )}
+      </div>
+
       {/* Dispatched Success Banner */}
       {dispatchedSuccess && (
         <div style={{
@@ -371,19 +485,53 @@ export default function SOSShelterSelectScreen() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '12px',
+          gap: '14px',
         }}>
           <span style={{ fontSize: '2.5rem' }}>🏛️</span>
           <div>
             <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-on-surface)', marginBottom: '6px' }}>
-              No Shelters Cached Yet
+              No Shelters Saved Locally Yet
             </div>
             <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-on-surface-variant)', lineHeight: 1.5 }}>
               {navigator.onLine
-                ? 'Shelter providers for your district haven\'t been registered yet. Try again later or use the emergency helplines below.'
-                : 'You\'re offline and no shelter data has been downloaded for your district. Connect to the internet to download shelter information.'}
+                ? 'Shelter providers haven\'t been saved to your device yet. Click the button below to download and save shelter data locally.'
+                : 'You\'re offline and no shelter data has been downloaded yet. Connect to the internet to download shelter information.'}
             </p>
           </div>
+
+          {/* Action: Direct Download & Cache */}
+          <button
+            onClick={handleDownloadAndCache}
+            disabled={syncStatus === 'syncing'}
+            style={{
+              background: 'var(--color-primary)',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '12px',
+              padding: '12px 20px',
+              fontWeight: 700,
+              fontSize: '0.92rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: syncStatus === 'syncing' ? 'not-allowed' : 'pointer',
+              boxShadow: '0 4px 12px rgba(173, 38, 68, 0.25)',
+              opacity: syncStatus === 'syncing' ? 0.7 : 1,
+            }}
+          >
+            {syncStatus === 'syncing' ? (
+              <>
+                <span className="shelter-sync-card__spinner" />
+                <span>Downloading & Saving Locally...</span>
+              </>
+            ) : (
+              <>
+                <span>⬇️</span>
+                <span>Download Shelters from Cloud & Save Locally</span>
+              </>
+            )}
+          </button>
+
           {/* Fallback: National Emergency Numbers */}
           <div style={{
             display: 'flex',
@@ -422,25 +570,33 @@ export default function SOSShelterSelectScreen() {
       {!loading && rankedShelters.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {/* District Match Indicator */}
-          {sosData?.district && (
+          {userDistrict && (
             <div style={{
               fontSize: '0.78rem',
               color: 'var(--color-on-surface-variant)',
               fontWeight: 600,
               padding: '0 2px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
             }}>
-              Showing shelters for <strong>{sosData.district}</strong>, {sosData.state}
-              {rankedShelters.some(
-                (s) => s.district?.toLowerCase() !== sosData.district?.toLowerCase()
-              ) && ' + nearby districts'}
+              <span>
+                Showing shelters for <strong>{userDistrict}</strong>{userState ? `, ${userState}` : ''}
+                {rankedShelters.some(
+                  (s) => s.district?.toLowerCase() !== userDistrict.toLowerCase()
+                ) && ' + nearby districts'}
+              </span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--color-primary)', fontWeight: 700 }}>
+                {rankedShelters.length} Available Offline
+              </span>
             </div>
           )}
 
           {rankedShelters.map((shelter, idx) => {
             const isSelected = shelter.shelterId === selectedShelterId;
             const isSameDistrict =
-              sosData?.district &&
-              shelter.district?.toLowerCase() === sosData.district.toLowerCase();
+              userDistrict &&
+              shelter.district?.toLowerCase() === userDistrict.toLowerCase();
 
             return (
               <div
@@ -450,7 +606,7 @@ export default function SOSShelterSelectScreen() {
               >
                 <div className="shelter-card-top">
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
                       <span style={{
                         fontSize: '0.72rem',
                         fontWeight: 800,
@@ -471,6 +627,19 @@ export default function SOSShelterSelectScreen() {
                           Same District
                         </span>
                       )}
+                      <span style={{
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
+                        background: 'var(--color-surface-container-highest)',
+                        color: 'var(--color-on-surface-variant)',
+                        padding: '2px 6px',
+                        borderRadius: '8px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '3px',
+                      }}>
+                        💾 Saved Locally
+                      </span>
                     </div>
                     <div className="shelter-name">{shelter.shelterName}</div>
                     <div className="shelter-location">

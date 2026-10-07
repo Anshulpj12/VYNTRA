@@ -82,24 +82,191 @@ export function isSyncStale(district: string): boolean {
  * @param provider - Raw shelter provider record from Firebase
  * @returns ShelterMetadata suitable for caching and ranking
  */
-function toShelterMetadata(provider: ShelterProvider): ShelterMetadata {
+/**
+ * Formats a timestamp into a human-readable "time ago" string.
+ *
+ * @param timestamp - Unix timestamp in milliseconds
+ * @returns Formatted string like "Just now", "2 min ago", etc.
+ */
+export function formatTimeAgo(timestamp: number): string {
+  if (!timestamp || timestamp <= 0) return '';
+  const diff = Date.now() - timestamp;
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hr${hours > 1 ? 's' : ''} ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} day${days > 1 ? 's' : ''} ago`;
+}
+
+/** Result object returned by downloadAndCacheSheltersOnline */
+export interface CacheDownloadResult {
+  success: boolean;
+  totalCached: number;
+  districtCount: number;
+  message: string;
+}
+
+/**
+ * Converts a raw ShelterProvider document into the ShelterMetadata
+ * shape expected by the SOS shelter ranking system.
+ *
+ * @param provider - Raw shelter provider record from Firebase
+ * @returns ShelterMetadata suitable for caching and ranking
+ */
+function toShelterMetadata(provider: any): ShelterMetadata {
   return {
-    shelterId: provider.shelterId,
-    shelterName: provider.shelterName,
-    registeredMobile: provider.registeredMobile,
-    coordinates: provider.coordinates as Coordinates,
-    state: provider.state,
-    district: provider.district,
-    city: provider.location || '',
-    totalBedCapacity: provider.totalBedCapacity,
-    occupiedBeds: provider.occupiedBeds || 0,
-    availableBeds: provider.availableBeds ?? provider.totalBedCapacity,
-    shelterScore: 80, // Default score until Part 3 scoring is applied
-    currentOccupants: [],
-    facilities: [],
-    inventorySummary: [],
+    shelterId: provider.shelterId || `SHL-${Date.now()}`,
+    shelterName: provider.shelterName || 'Emergency Shelter',
+    registeredMobile: provider.registeredMobile || '112',
+    coordinates: (provider.coordinates as Coordinates) || { lat: 28.6139, lng: 77.2090 },
+    state: provider.state || '',
+    district: provider.district || '',
+    city: provider.city || provider.location || '',
+    totalBedCapacity: provider.totalBedCapacity ?? 0,
+    occupiedBeds: provider.occupiedBeds ?? 0,
+    availableBeds: provider.availableBeds ?? provider.totalBedCapacity ?? 0,
+    shelterScore: provider.shelterScore ?? 80,
+    currentOccupants: provider.currentOccupants || [],
+    facilities: provider.facilities || [],
+    inventorySummary: provider.inventorySummary || [],
     lastUpdatedAt: provider.lastUpdatedAt || Date.now(),
   };
+}
+
+/**
+ * Downloads active shelters from Firebase online and saves them
+ * directly into IndexedDB (STORES.SHELTER_CACHE) for offline use.
+ *
+ * It checks the user's district, but also retrieves active shelters
+ * regional/statewide so users have reliable local shelter data saved.
+ *
+ * @param userDistrict - Optional district name
+ * @param userState - Optional state name
+ */
+export async function downloadAndCacheSheltersOnline(
+  userDistrict?: string,
+  userState?: string
+): Promise<CacheDownloadResult> {
+  const districtClean = (userDistrict || '').trim();
+  const districtLower = districtClean.toLowerCase();
+  const locationLabel = districtClean
+    ? (userState ? `${districtClean}, ${userState.trim()}` : districtClean)
+    : 'your area';
+
+  /* 1. Offline guard */
+  if (!navigator.onLine) {
+    const existing = await getAllAvailableShelters(districtClean);
+    const districtMatches = districtClean
+      ? existing.filter((s) => s.district?.toLowerCase().trim() === districtLower).length
+      : existing.length;
+    return {
+      success: false,
+      totalCached: existing.length,
+      districtCount: districtMatches,
+      message: existing.length > 0
+        ? `Offline: Using ${existing.length} shelter${existing.length === 1 ? '' : 's'} saved locally on this device.`
+        : 'You are currently offline. Connect to the internet to download shelter data.',
+    };
+  }
+
+  try {
+    const shelterRef = collection(db, 'shelter-providers');
+    const seenShelterIds = new Set<string>();
+    let savedCount = 0;
+
+    /* A. Query active shelters first */
+    try {
+      const activeQuery = query(shelterRef, where('isActive', '==', true));
+      const activeResult = await withFirestoreTimeout(getDocs(activeQuery), 6000);
+      if (activeResult && !activeResult.empty) {
+        for (const docSnap of activeResult.docs) {
+          const data = docSnap.data() as ShelterProvider;
+          if (data && data.shelterId) {
+            seenShelterIds.add(data.shelterId);
+            const metadata = toShelterMetadata(data);
+            await putItem(STORES.SHELTER_CACHE, metadata);
+            savedCount++;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('[shelter-cache] Active query timed out or failed:', e);
+    }
+
+    /* B. Fallback: Query all shelters in shelter-providers collection */
+    if (savedCount === 0) {
+      try {
+        const allResult = await withFirestoreTimeout(getDocs(shelterRef), 6000);
+        if (allResult && !allResult.empty) {
+          for (const docSnap of allResult.docs) {
+            const data = docSnap.data() as ShelterProvider;
+            if (data && data.shelterId && !seenShelterIds.has(data.shelterId)) {
+              seenShelterIds.add(data.shelterId);
+              const metadata = toShelterMetadata(data);
+              await putItem(STORES.SHELTER_CACHE, metadata);
+              savedCount++;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('[shelter-cache] All shelters query timed out or failed:', e);
+      }
+    }
+
+    /* C. Also pull any metadata documents from shelter-metadata */
+    try {
+      const metaRef = collection(db, 'shelter-metadata');
+      const metaResult = await withFirestoreTimeout(getDocs(metaRef), 4000);
+      if (metaResult && !metaResult.empty) {
+        for (const docSnap of metaResult.docs) {
+          const meta = docSnap.data() as ShelterMetadata;
+          if (meta && meta.shelterId && !seenShelterIds.has(meta.shelterId)) {
+            seenShelterIds.add(meta.shelterId);
+            await putItem(STORES.SHELTER_CACHE, meta);
+            savedCount++;
+          }
+        }
+      }
+    } catch {
+      /* Optional subcollection */
+    }
+
+    /* Update timestamps */
+    if (districtClean) {
+      setLastSyncTimestamp(districtClean);
+    }
+    setLastSyncTimestamp('all');
+
+    /* Fetch combined local cache count (includes any from METADATA / SHELTER_PROVIDERS stores) */
+    const allLocal = await getAllAvailableShelters(districtClean);
+    const districtCount = districtClean
+      ? allLocal.filter((s) => s.district?.toLowerCase().trim() === districtLower).length
+      : allLocal.length;
+
+    const totalCount = allLocal.length;
+
+    return {
+      success: true,
+      totalCached: totalCount,
+      districtCount,
+      message: totalCount > 0
+        ? `✓ Successfully downloaded and saved ${totalCount} shelter${totalCount === 1 ? '' : 's'} locally (${districtCount} in ${locationLabel})!`
+        : `No registered shelters found online yet. Helplines 112 & 1091 are available offline.`,
+    };
+  } catch (err: any) {
+    console.error('[shelter-cache] Download failed:', err);
+    const existing = await getAllAvailableShelters(districtClean);
+    return {
+      success: false,
+      totalCached: existing.length,
+      districtCount: districtClean
+        ? existing.filter((s) => s.district?.toLowerCase().trim() === districtLower).length
+        : existing.length,
+      message: `Failed to download: ${err?.message || 'Network error'}. ${existing.length} shelters remain in local cache.`,
+    };
+  }
 }
 
 /**
@@ -114,21 +281,15 @@ export async function forceShelterSync(
   userDistrict: string,
   userState: string
 ): Promise<number> {
-  /* Clear the staleness timestamp so syncDistrictShelters won't skip */
-  localStorage.removeItem(`${SYNC_TS_PREFIX}${userDistrict.toLowerCase()}`);
-  return syncDistrictShelters(userDistrict, userState);
+  const result = await downloadAndCacheSheltersOnline(userDistrict, userState);
+  return result.success ? result.totalCached : -1;
 }
 
 /**
  * Downloads shelter providers for the user's district from Firebase
  * and saves each as a ShelterMetadata entry in IndexedDB.
  *
- * This is the primary sync function. It should be called:
- *   1. When the user first opens the SOS conditions screen (background)
- *   2. When the app detects that connectivity has been restored
- *
- * The function is safe to call repeatedly — it checks staleness
- * internally and skips the Firebase query if a recent sync exists.
+ * Safe to call repeatedly in background — skips if recently synced.
  *
  * @param userDistrict - The user's district from their profile
  * @param userState - The user's state from their profile
@@ -138,126 +299,14 @@ export async function syncDistrictShelters(
   userDistrict: string,
   userState: string
 ): Promise<number> {
-  /* Guard: must be online */
   if (!navigator.onLine) {
     return -1;
   }
-
-  /* Guard: don't re-sync too frequently */
   if (!isSyncStale(userDistrict)) {
     return -1;
   }
-
-  /* Guard: need valid district */
-  if (!userDistrict || userDistrict.trim().length === 0) {
-    return -1;
-  }
-
-  try {
-    const shelterRef = collection(db, 'shelter-providers');
-    const districtLower = userDistrict.toLowerCase().trim();
-    const stateLower = userState.toLowerCase().trim();
-
-    /*
-     * Query shelters that match the user's district.
-     * Firebase Firestore `where` is case-sensitive, so we try
-     * an exact match first. If the district was entered with
-     * different casing between Part 1 and Part 2, we fall back
-     * to fetching all active shelters and filtering client-side.
-     */
-    const districtQuery = query(
-      shelterRef,
-      where('district', '==', userDistrict),
-      where('isActive', '==', true)
-    );
-
-    const result = await withFirestoreTimeout(getDocs(districtQuery), 5000);
-
-    let syncCount = 0;
-
-    if (result) {
-      result.forEach((docSnap) => {
-        const data = docSnap.data() as ShelterProvider;
-
-        /* Secondary state filter — case-insensitive comparison */
-        if (
-          data &&
-          data.shelterId &&
-          data.coordinates &&
-          data.state?.toLowerCase().trim() === stateLower
-        ) {
-          const metadata = toShelterMetadata(data);
-          void putItem(STORES.SHELTER_CACHE, metadata);
-          syncCount++;
-        }
-      });
-    }
-
-    /*
-     * If exact-case district query returned no results, try
-     * fetching all active shelters and filtering client-side.
-     * This handles casing mismatches like "Bengaluru Urban"
-     * vs "bengaluru urban" between the user profile and shelter.
-     */
-    if (syncCount === 0) {
-      try {
-        const allActiveQuery = query(
-          shelterRef,
-          where('isActive', '==', true)
-        );
-        const allResult = await withFirestoreTimeout(getDocs(allActiveQuery), 5000);
-        if (allResult) {
-          allResult.forEach((docSnap) => {
-            const data = docSnap.data() as ShelterProvider;
-            if (
-              data &&
-              data.shelterId &&
-              data.coordinates &&
-              data.district?.toLowerCase().trim() === districtLower &&
-              data.state?.toLowerCase().trim() === stateLower
-            ) {
-              const metadata = toShelterMetadata(data);
-              void putItem(STORES.SHELTER_CACHE, metadata);
-              syncCount++;
-            }
-          });
-        }
-      } catch {
-        /* Fallback query failed — non-critical */
-      }
-    }
-
-    /* Also try fetching from shelter metadata sub-collection for richer data */
-    try {
-      const metadataRef = collection(db, 'shelter-metadata');
-      const metaQuery = query(
-        metadataRef,
-        where('district', '==', userDistrict)
-      );
-      const metaResult = await withFirestoreTimeout(getDocs(metaQuery), 3000);
-      if (metaResult) {
-        metaResult.forEach((docSnap) => {
-          const meta = docSnap.data() as ShelterMetadata;
-          if (
-            meta &&
-            meta.shelterId &&
-            meta.state?.toLowerCase().trim() === stateLower
-          ) {
-            void putItem(STORES.SHELTER_CACHE, meta);
-            syncCount++;
-          }
-        });
-      }
-    } catch {
-      /* Metadata collection may not exist yet — that's okay */
-    }
-
-    setLastSyncTimestamp(userDistrict);
-    return syncCount;
-  } catch (err) {
-    console.warn('[shelter-cache] Sync failed:', err);
-    return -1;
-  }
+  const result = await downloadAndCacheSheltersOnline(userDistrict, userState);
+  return result.success ? result.totalCached : -1;
 }
 
 /* ─── Local Cache Retrieval ──────────────────────────────────────── */
