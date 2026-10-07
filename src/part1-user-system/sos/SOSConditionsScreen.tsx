@@ -2,6 +2,7 @@
  * VYNTRA — SOS Conditions Screen
  * Fast selection of emergency conditions with auto-fill from saved profile.
  * Obtains live GPS with automatic fallback to stored profile coordinates.
+ * Triggers background shelter sync when conditions screen loads.
  */
 
 import { useState, useEffect } from 'react';
@@ -9,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { getItem, STORES } from '../../shared/utils/offline-cache';
 import { SOS_CONDITIONS, encodeSOS } from '../../shared/constants/sos-codes';
+import { syncDistrictShelters } from './shelter-cache';
 import type { UserProfile, GeoCoordinates } from '../../shared/types';
 import '../styles/sos.css';
 
@@ -67,6 +69,17 @@ export default function SOSConditionsScreen() {
         setLocationLoaded(true);
       } else {
         setLocationLoaded(true);
+      }
+
+      /*
+       * Background shelter sync: Pre-fetch district shelters from Firebase
+       * so they're cached in IndexedDB by the time the user reaches
+       * the shelter selection screen. Non-blocking — runs in background.
+       */
+      if (cached?.district && cached?.state && navigator.onLine) {
+        syncDistrictShelters(cached.district, cached.state).catch((err) => {
+          console.warn('[SOS] Background shelter sync skipped:', err);
+        });
       }
     }
 
